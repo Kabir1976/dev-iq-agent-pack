@@ -1,0 +1,137 @@
+# Dev.IQ — Per-Client Configuration
+# ─────────────────────────────────────────────────────────────────
+# This file controls how Dev.IQ behaves in this repo. Fill in the
+# values for your client engagement during bootstrap. The Dev-IQ
+# agent can help: attach this file to the chat and say
+# "Customize this config for my codebase and stack."
+#
+# After editing, re-run /dev-iq-bootstrap to apply changes.
+# ─────────────────────────────────────────────────────────────────
+
+# ── Client ────────────────────────────────────────────────────────
+client:
+  name: ""                        # e.g. "UPS", "Acme Corp"
+  engagement: ""                  # e.g. "STLC Modernization"
+  sparq_lead: ""                  # Sparq consultant name
+
+# ── Maturity ──────────────────────────────────────────────────────
+maturity:
+  tier: "early"                   # early | mid | higher
+                                  # early   → advisory only, all outputs are drafts
+                                  # mid     → automated review, suggest-only PR verdicts
+                                  # higher  → autonomous verdicts, blast radius enabled
+  # Rationale lives in maturity-profile.md
+  # Re-evaluate quarterly or after a major delivery milestone.
+
+# ── Work Item Tracker ─────────────────────────────────────────────
+tracker:
+  type: "ado"                     # ado | jira | linear | github-issues
+  # ADO
+  ado:
+    org_url: ""                   # e.g. "https://dev.azure.com/my-org"
+    project: ""                   # e.g. "MyProject"
+    work_item_types:              # types to resolve for traceability
+      - "User Story"
+      - "Task"
+      - "Bug"
+  # Jira (fill if type: jira)
+  jira:
+    base_url: ""                  # e.g. "https://my-org.atlassian.net"
+    project_key: ""               # e.g. "PROJ"
+
+# ── Version Control ───────────────────────────────────────────────
+vcs:
+  type: "github"                  # github | ado-repos | gitlab | bitbucket
+  default_branch: "main"          # main | master | develop
+  pr_base_branch: "main"          # branch PRs target by default
+
+# ── Language & Stack ──────────────────────────────────────────────
+stack:
+  languages:                      # primary languages in this repo
+    - ""                          # e.g. "typescript", "python", "java", "csharp"
+  frameworks:                     # primary frameworks
+    - ""                          # e.g. "react", "fastapi", "spring-boot"
+  package_manager: ""             # npm | yarn | pip | maven | gradle | nuget
+  runtime: ""                     # e.g. "node20", "python3.11", "java17"
+
+# ── Code Standards ────────────────────────────────────────────────
+code_standards:
+  lint_tool: ""                   # eslint | pylint | rubocop | checkstyle
+  formatter: ""                   # prettier | black | gofmt
+  test_framework: ""              # jest | pytest | junit | xunit | rspec
+  coverage_tool: ""               # sonarqube | codecov | coveralls | jacoco
+  min_coverage_threshold: 80      # % — skills warn below this
+
+# ── Architecture ──────────────────────────────────────────────────
+architecture:
+  style: ""                       # monolith | microservices | modular-monolith | serverless
+  docs_path: ""                   # path to architecture docs, e.g. "docs/architecture/"
+  pattern_library: ""             # path to patterns, e.g. "docs/patterns/"
+  adr_path: ""                    # path to ADRs, e.g. "docs/adr/"
+
+# ── DI Signal Telemetry ───────────────────────────────────────────
+# Generic signal sources. Override per-signal in telemetry-overlay.md
+# for client-specific tooling.
+signals:
+  intent:
+    source: "ado"                 # ado | jira | linear | github-issues
+  design:
+    architecture_docs: ""         # e.g. "docs/architecture/"
+    pattern_library: ""           # e.g. "docs/patterns/"
+  quality:
+    coverage_tool: ""             # sonarqube | codecov | coveralls
+    lint_tool: ""                 # eslint | pylint | rubocop
+    sast_tool: ""                 # snyk | semgrep | checkmarx | none
+  risk:
+    dependency_file: ""           # package.json | requirements.txt | pom.xml | *.csproj
+    schema_path: ""               # e.g. "db/migrations/"
+    api_contracts_path: ""        # e.g. "api/openapi.yaml"
+  confidence:
+    enabled: false                # Phase 2 — do not enable until Mid+ maturity
+
+# ── Agents ────────────────────────────────────────────────────────
+agents:
+  default: "Dev-IQ"               # Default agent for code + delivery questions
+  plan_first: "Dev-IQ-PLAN"       # Plan-first agent for complex/risky tasks
+  auto_switch_threshold: "high"   # risk level that triggers plan-first suggestion
+                                  # low | medium | high
+
+# ── PR Behavior ───────────────────────────────────────────────────
+pr:
+  require_work_item_link: true    # warn if PR has no linked work item
+  require_di_assessment: true     # every PR gets a DI four-layer assessment
+  auto_assign_on_yellow: false    # auto-assign reviewer on Yellow signal (Mid+)
+  block_on_red: true              # block PR verdict on Red signal
+  security_block_threshold: "high" # severity that always blocks: high | critical
+
+# ── Blast Radius ──────────────────────────────────────────────────
+blast_radius:
+  enabled: false                  # enable at Mid+ maturity
+  dependency_map_path: ""         # path to service/module dependency map
+  high_risk_paths:                # paths where changes need extra scrutiny
+    - ""                          # e.g. "src/core/", "db/schema/", "api/"
+
+# ── Hooks ─────────────────────────────────────────────────────────
+hooks:
+  hindsight_enabled: true         # learn from corrections across sessions
+  telemetry_sink: "local"         # local | webhook | none
+  telemetry_webhook_url: ""       # fill if sink: webhook
+
+# ── Governance ────────────────────────────────────────────────────
+governance:
+  # Detailed posture lives in governance.md
+  # Quick flags:
+  allow_ai_merge_without_review: false
+  allow_new_dependencies: false   # agents must confirm before adding deps
+  mask_secrets_in_prompts: true
+  require_traceability: true
+
+# ── Bootstrap ─────────────────────────────────────────────────────
+bootstrap:
+  mode: "trial"                   # trial | committed
+                                  # trial  → files in .git/info/exclude only
+                                  # committed → files visible to git
+  preset: "pod"                   # solo | pod
+                                  # solo → individual contributor defaults
+                                  # pod  → cross-functional team defaults
+  version: "0.1.0"

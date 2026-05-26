@@ -1,0 +1,6 @@
+hooks/logs/*
+hooks/state/*
+!hooks/state/dismissed-lessons.json
+!hooks/state/edit-frequency.json
+hooks/hooks.json
+.dev-iq/.install-manifest.json
