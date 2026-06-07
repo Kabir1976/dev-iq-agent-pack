@@ -12,7 +12,7 @@
 client:
   name: ""                        # e.g. "UPS", "Acme Corp"
   engagement: ""                  # e.g. "STLC Modernization"
-  sparq_lead: ""                  # Sparq consultant name
+  engagement_lead: ""             # lead consultant name
 
 # ── Maturity ──────────────────────────────────────────────────────
 maturity:

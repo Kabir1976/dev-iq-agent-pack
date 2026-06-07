@@ -122,7 +122,7 @@ inside each file.
 
 ## Relationship with Assert.IQ
 
-Dev.IQ and Assert.IQ are complementary packs within Sparq Intelligence Studio.
+Dev.IQ and Assert.IQ are complementary packs within Intelligence Studio.
 If Assert.IQ is also installed in this repo:
 - Defer all test generation, defect analysis, and quality signal decisions
   to Assert.IQ skills.

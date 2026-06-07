@@ -79,7 +79,7 @@ When the team is ready to adopt: `--graduate` moves the files into git tracking.
 - Not a SaaS — no account, no data leaving your IDE boundary
 - Not an AI that pushes code — it proposes, you decide; `@di-review-required` is on every output
 - Not a replacement for code review — it makes review faster by front-loading the structured thinking
-- Not locked to Sparq — the pack is yours; if Sparq rotates off, it stays in your repo
+- Not locked to any vendor — the pack lives in your repo; no account, no licence, no external dependency
 
 ---
 
@@ -93,5 +93,4 @@ Questions: **kabir.chugh@teamsparq.com**
 
 ---
 
-*Dev.IQ Agent Pack v0.9.0 · Sparq Intelligence Studio*
-*21 skills · GitHub Copilot Chat + Claude Code · github.com/Kabir1976/dev-iq*
+*Dev.IQ Agent Pack v0.9.0 · 21 skills · GitHub Copilot Chat + Claude Code*

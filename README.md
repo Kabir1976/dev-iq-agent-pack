@@ -1,12 +1,10 @@
 # Dev.IQ
 
-> Developer Intelligence for every IDE, every sprint, every team.
-
-**v0.1.0** · [Full documentation →](README.dev-iq.md)
+**v0.9.0** · [Full documentation →](README.dev-iq.md)
 
 ---
 
-## Developer Intelligence — the shift from coding to crafting
+## Developer Intelligence
 
 Traditional development asks one question: *does this work?*
 
@@ -42,7 +40,6 @@ Dev.IQ is the accelerator. It drops a DI reasoning layer directly into **GitHub 
 
 DI is the operating model. Dev.IQ is how developers act on it — from day one, in the tools they already use.
 
-> **Part of Sparq Intelligence Studio.**
 > Dev.IQ covers the developer lifecycle. Assert.IQ covers the QE lifecycle.
 > Install both for full SDLC coverage.
 

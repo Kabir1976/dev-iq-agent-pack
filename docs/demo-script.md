@@ -99,7 +99,7 @@ Open with one question to the room:
 **What to highlight in the output:**
 - The layer-by-layer verdict table
 - Any Hold condition — explain which layer triggered it and what fixes it
-- "If the team moves to Mid maturity, High security findings here automatically block the verdict — not the developer, not Sparq, the configured rules the team agreed on."
+- "If the team moves to Mid maturity, High security findings here automatically block the verdict — not the developer, not any external party — the configured rules the team agreed on."
 
 **Pause:**
 > "What's your current pre-merge process? What would it mean if 100% of PRs had this before review?"
@@ -124,11 +124,11 @@ Show `.dev-iq/maturity-profile.md` in VS Code.
 **"Isn't this just a linter?"**
 > "A linter checks syntax rules. This checks whether the PR solves the right problem, follows your patterns, handles errors correctly, and won't break downstream consumers. Different tool, different layer."
 
-**"Does Sparq see our code?"**
-> "No. The pack is a set of markdown and YAML files. It runs inside your IDE — your code hits your AI provider (GitHub Copilot or Anthropic), same as it does today. Sparq has no server in the loop. You own the pack."
+**"Does anyone outside our team see our code?"**
+> "No. The pack is a set of markdown and YAML files. It runs inside your IDE — your code hits your AI provider (GitHub Copilot or Anthropic), same as it does today. There's no server in the loop. You own the pack."
 
-**"What happens when Sparq rolls off?"**
-> "The pack stays. It's in your repo. Your team can keep using it, modify it, and update it independently. There's no licence, no SaaS subscription, no account to cancel."
+**"What happens if we want to remove it or take ownership ourselves?"**
+> "The pack stays in your repo either way. Your team can keep using it, modify it, and update it independently. There's no licence, no SaaS subscription, no account to cancel. Run `--uninstall` to remove it cleanly if needed."
 
 **"Can we customize the rules?"**
 > "Yes — `.dev-iq/config.yaml` sets your stack, maturity tier, coverage thresholds, SAST tool. The instruction files in `.github/instructions/` are markdown — your team can edit them. The skills in `.github/skills/` are editable too."
@@ -156,5 +156,4 @@ Send within 24 hours:
 
 ---
 
-*Dev.IQ Agent Pack v0.9.0 · Sparq Intelligence Studio*
-*Demo facilitator: Kabir Chugh, kabir.chugh@teamsparq.com*
+*Dev.IQ Agent Pack v0.9.0 · Demo facilitator: Kabir Chugh, kabir.chugh@teamsparq.com*

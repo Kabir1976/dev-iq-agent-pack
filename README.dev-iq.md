@@ -4,8 +4,7 @@
 > instructions, modes, and tools that turn GitHub Copilot Chat **and**
 > Claude Code into a delivery-aware engineering partner inside the IDE.
 
-**Version**: v0.1.0
-**Status**: Internal Sparq asset — Intelligence Studio
+**Version**: v0.9.0
 **Owner**: [Owner Name]
 **Repo**: [repo link]
 
@@ -20,7 +19,7 @@ Aider). It is *not* a SaaS product. It is *not* a runtime. It is a
 versioned set of files — markdown, YAML, JSON — that lives in the repo
 and is owned by the team.
 
-The pack operationalizes Sparq's **Developer Intelligence (DI)** framework:
+The pack operationalizes the **Developer Intelligence (DI)** framework:
 
 - The five-layer signal model (Intent → Design → Quality → Risk → Confidence)
   is loaded as the AI's reasoning lens on every interaction.
@@ -34,11 +33,10 @@ DI is the operating model. Dev.IQ is how teams *act* on it —
 without ever becoming a tooling pitch.
 
 > **Relationship to Assert.IQ:**
-> Dev.IQ and Assert.IQ are complementary products within Sparq's Intelligence
-> Studio. Assert.IQ owns the QE lifecycle (testing, defects, quality signals).
-> Dev.IQ owns the developer lifecycle (requirements, design, code, deployment).
-> They share the same pack architecture and can be installed independently or
-> together for full SDLC coverage.
+> Dev.IQ and Assert.IQ are complementary packs. Assert.IQ owns the QE lifecycle
+> (testing, defects, quality signals). Dev.IQ owns the developer lifecycle
+> (requirements, design, code, deployment). They share the same pack architecture
+> and can be installed independently or together for full SDLC coverage.
 
 ---
 
@@ -471,8 +469,7 @@ matches your actual tools and file paths.
 ## What Dev.IQ Is Not
 
 - It is not a runtime. There is no service to deploy.
-- It is not a SaaS. The client owns the files; if Sparq rotates off the
-  account, the pack stays.
+- It is not a SaaS. The files stay in your repo — no account, no external dependency.
 - It is not a replacement for engineering judgment. Every output is a
   draft; human review is required.
 - It is not a replacement for Assert.IQ. Use both packs together for full
@@ -492,11 +489,11 @@ Tag releases. Keep a CHANGELOG in `.dev-iq/CHANGELOG.md`.
 
 ---
 
-## Dev.IQ + Assert.IQ — Sparq Intelligence Studio
+## Dev.IQ + Assert.IQ
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                   SPARQ INTELLIGENCE STUDIO                      │
+│                     INTELLIGENCE STUDIO                          │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │   ┌──────────────────────────┐  ┌──────────────────────────┐   │
@@ -528,7 +525,7 @@ Tag releases. Keep a CHANGELOG in `.dev-iq/CHANGELOG.md`.
 | Pack Technical Owner | [Your Name] |
 | DI Framework Sponsor | [Name] |
 | Pilot Account Lead | [Embedded Lead] |
-| Governance Review | DI Sponsor + Sparq InfoSec |
+| Governance Review | DI Sponsor + InfoSec |
 | Versioning and Release | [Your Name] |
 | Collaboration | Assert.IQ / Jarius Hayes |
 
@@ -537,6 +534,6 @@ Tag releases. Keep a CHANGELOG in `.dev-iq/CHANGELOG.md`.
 ## Where to Learn More
 
 - Assert.IQ Agent Pack — the QE capability layer this pack complements
-- Quality Intelligence Kit (Sparq internal) — the operating model that inspired DI
+- Quality Intelligence Kit — the operating model that inspired DI
 - DI Diagnostic Guide — how to set the right maturity tier
-- Sparq Skills Library — human-readable prompts that informed these agent skills
+- DI Skills Library — human-readable prompts that informed these agent skills

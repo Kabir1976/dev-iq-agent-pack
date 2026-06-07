@@ -21,9 +21,9 @@ You do **not** need admin rights to install Dev.IQ. It writes only into your pro
 
 ## Step 1 — Get the Pack
 
-### Option A: Receive from Sparq
+### Option A: Download the pack
 
-Sparq will provide a zip file named `dev-iq-vX.Y.Z.zip`. Save it somewhere outside your project:
+You will receive a zip file named `dev-iq-vX.Y.Z.zip`. Save it somewhere outside your project:
 
 ```
 ~/tools/dev-iq/     ← good
@@ -41,7 +41,7 @@ unzip dev-iq-vX.Y.Z.zip -d ~/tools/dev-iq
 Expand-Archive dev-iq-vX.Y.Z.zip -DestinationPath C:\tools\dev-iq
 ```
 
-### Option B: Clone directly (if Sparq grants repo access)
+### Option B: Clone from GitHub
 
 ```bash
 git clone https://github.com/Kabir1976/dev-iq ~/tools/dev-iq
@@ -128,7 +128,7 @@ Open `.dev-iq/config.yaml` in VS Code and fill in the values for your engagement
 client:
   name: "Acme Corp"          # ← your client name
   engagement: "Modernisation Phase 1"
-  sparq_lead: "Your Name"
+  engagement_lead: "Your Name"
 
 maturity:
   tier: "early"              # ← early | mid | higher
@@ -175,9 +175,9 @@ If the agent picker does not show Dev-IQ, reload VS Code (`Ctrl+Shift+P` → `De
 
 ---
 
-## Step 5 — Update Dev.IQ (when Sparq releases a new version)
+## Step 5 — Update Dev.IQ
 
-When you receive an updated pack zip, unzip it to the same location (overwriting the old files), then re-run bootstrap against your project:
+When a new version is available, unzip it to the same location (overwriting the old files), then re-run bootstrap against your project:
 
 ```bash
 # macOS / Linux
@@ -301,16 +301,14 @@ Then re-run bootstrap.
 
 ---
 
-## Handover
+## Ownership
 
-If Sparq rolls off the engagement, everything Dev.IQ needs is in the files above. No external service, no Sparq account required. The team can:
+Everything Dev.IQ needs is in the files above. No external service, no account required. The team can:
 
 - Continue using the skills as-is
 - Update by downloading a new zip and re-running bootstrap
 - Modify skill definitions in `.github/skills/` to suit their evolving standards
 
-The pack is yours.
-
 ---
 
-*Dev.IQ Agent Pack v0.9.0 · Sparq Intelligence Studio · Pack owner: Kabir Chugh, Sparq*
+*Dev.IQ Agent Pack v0.9.0*
