@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Dev.IQ Agent Pack — Bootstrap Installer
 # Version : 0.9.0
-# Usage   : bash scripts/bootstrap.sh [--target=<path>] [--mode=trial|committed] [--graduate] [--hooks]
+# Usage   : bash scripts/bootstrap.sh [--target=<path>] [--mode=trial|committed] [--preset=pod|solo|portable] [--graduate] [--uninstall] [--hooks]
 set -euo pipefail
 
 PACK_VERSION="0.9.0"
@@ -26,14 +26,18 @@ die()  { echo -e "${C_RED}[dev-iq] ✗${C_RST} $*" >&2; exit 1; }
 TARGET="$(pwd)"
 MODE=""
 GRADUATE=false
+UNINSTALL=false
 INCLUDE_HOOKS=false
+PRESET=""
 
 for arg in "$@"; do
   case "$arg" in
-    --target=*)  TARGET="${arg#*=}" ;;
-    --mode=*)    MODE="${arg#*=}" ;;
-    --graduate)  GRADUATE=true ;;
-    --hooks)     INCLUDE_HOOKS=true ;;
+    --target=*)   TARGET="${arg#*=}" ;;
+    --mode=*)     MODE="${arg#*=}" ;;
+    --preset=*)   PRESET="${arg#*=}" ;;
+    --graduate)   GRADUATE=true ;;
+    --uninstall)  UNINSTALL=true ;;
+    --hooks)      INCLUDE_HOOKS=true ;;
     --help|-h)
       cat << EOF
 Dev.IQ Agent Pack — Bootstrap Installer v${PACK_VERSION}
@@ -42,31 +46,48 @@ Usage:
   bash scripts/bootstrap.sh [options]
 
 Options:
-  --target=<path>       Target repository root (default: current directory)
-  --mode=trial          Install without touching git history (uses .git/info/exclude)
-  --mode=committed      Install files visibly so the team can commit them
-  --graduate            Convert a trial install to committed mode
-  --hooks               Also install the hooks/ directory
-  --help                Show this help message
+  --target=<path>              Target repository root (default: current directory)
+  --mode=trial                 Install without touching git history (uses .git/info/exclude)
+  --mode=committed             Install files visibly so the team can commit them
+  --preset=pod                 Team pod install: committed mode + hooks
+  --preset=solo                Individual developer: trial mode, no hooks
+  --preset=portable            Client handoff: committed mode, no hooks, minimal footprint
+  --graduate                   Convert a trial install to committed mode
+  --uninstall                  Remove Dev.IQ from the target repository
+  --hooks                      Also install the hooks/ directory
+  --help                       Show this help message
 
 Examples:
   # Fresh install, interactive mode selection:
   bash /path/to/dev-iq/scripts/bootstrap.sh
 
-  # Install into another repo, trial mode:
-  bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --mode=trial
+  # Install for an individual developer (trial mode):
+  bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --preset=solo
 
-  # Update an existing install:
-  bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --mode=committed
+  # Install for a whole team (committed mode + hooks):
+  bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --preset=pod
 
   # Graduate a trial install to committed:
   bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --graduate
+
+  # Remove Dev.IQ from a repository:
+  bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --uninstall
 EOF
       exit 0
       ;;
     *) die "Unknown argument: '$arg'. Run with --help for usage." ;;
   esac
 done
+
+# ── Apply preset (sets mode and hooks before validation) ──────────
+if [[ -n "$PRESET" ]]; then
+  case "$PRESET" in
+    pod)       MODE="committed"; INCLUDE_HOOKS=true  ;;
+    solo)      MODE="trial";     INCLUDE_HOOKS=false ;;
+    portable)  MODE="committed"; INCLUDE_HOOKS=false ;;
+    *) die "Unknown preset: '$PRESET'. Use: pod | solo | portable" ;;
+  esac
+fi
 
 # ── Validate prerequisites ────────────────────────────────────────
 command -v python3 >/dev/null 2>&1 || die "python3 is required but not found."
@@ -130,6 +151,80 @@ PYEOF
   exit 0
 fi
 
+# ── Uninstall mode ───────────────────────────────────────────────
+if [[ "$UNINSTALL" == true ]]; then
+  echo ""
+  log "Removing Dev.IQ Agent Pack from: $TARGET"
+  echo ""
+
+  if [[ -t 0 ]]; then
+    read -rp "  This will delete Dev.IQ files from $TARGET. Continue? [y/N] " _confirm
+    [[ "${_confirm,,}" == "y" ]] || { log "Uninstall cancelled."; exit 0; }
+  fi
+
+  # Remove pack-owned directories
+  for dir in ".github/skills" ".github/instructions" ".github/agents" ".claude/agents"; do
+    if [[ -d "$TARGET/$dir" ]]; then
+      rm -rf "${TARGET:?}/$dir"
+      ok "Removed : $dir"
+    fi
+  done
+
+  # Remove pack-owned files
+  for file in ".claude/skills.md"; do
+    if [[ -f "$TARGET/$file" ]]; then
+      rm -f "$TARGET/$file"
+      ok "Removed : $file"
+    fi
+  done
+
+  # Remove dev-iq marker block from CLAUDE.md (preserve rest of file)
+  CLAUDE_DST="$TARGET/CLAUDE.md"
+  if [[ -f "$CLAUDE_DST" ]] && grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
+    python3 - "$CLAUDE_DST" "$MARKER_START" "$MARKER_END" << 'PYEOF'
+import sys, re
+dst, ms, me = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(dst, encoding='utf-8') as f:
+    content = f.read()
+pattern = re.escape(ms) + r'.*?' + re.escape(me)
+result = re.sub(pattern, '', content, flags=re.DOTALL).strip()
+with open(dst, 'w', encoding='utf-8') as f:
+    f.write(result + '\n' if result else '')
+PYEOF
+    ok "Removed Dev.IQ block from CLAUDE.md."
+    # If CLAUDE.md is now empty, remove it entirely
+    [[ -s "$CLAUDE_DST" ]] || { rm -f "$CLAUDE_DST"; ok "Removed empty CLAUDE.md."; }
+  fi
+
+  # Remove trial mode entries from .git/info/exclude
+  EXCLUDE="$TARGET/.git/info/exclude"
+  if [[ -f "$EXCLUDE" ]] && grep -qF "# dev-iq" "$EXCLUDE" 2>/dev/null; then
+    grep -v "^# dev-iq" "$EXCLUDE" \
+      | grep -v "^\.github/skills" \
+      | grep -v "^\.github/instructions" \
+      | grep -v "^\.github/agents" \
+      | grep -v "^\.claude/agents" \
+      | grep -v "^\.claude/skills" \
+      | grep -v "^\.dev-iq" \
+      | grep -v "^hooks/" \
+      | grep -v "^CLAUDE\.md" \
+      > "$EXCLUDE.tmp" && mv "$EXCLUDE.tmp" "$EXCLUDE"
+    ok "Removed trial entries from .git/info/exclude."
+  fi
+
+  # Remove .dev-iq/ directory
+  if [[ -d "$TARGET/.dev-iq" ]]; then
+    rm -rf "${TARGET:?}/.dev-iq"
+    ok "Removed : .dev-iq/"
+  fi
+
+  echo ""
+  ok "Dev.IQ removed from $TARGET."
+  echo ""
+  log "User-created files (your code, tests, configs) were not touched."
+  exit 0
+fi
+
 # ── Select install mode ───────────────────────────────────────────
 if [[ -z "$MODE" ]]; then
   if [[ -t 0 ]]; then
@@ -157,7 +252,7 @@ echo ""
 log "─────────────────────────────────────────────"
 log "  Dev.IQ Agent Pack v${PACK_VERSION}"
 log "  Target : $TARGET"
-log "  Mode   : $MODE"
+log "  Mode   : $MODE${PRESET:+ (preset: $PRESET)}"
 log "─────────────────────────────────────────────"
 echo ""
 

@@ -9,22 +9,35 @@
   Target repository root. Defaults to current directory.
 .PARAMETER Mode
   Install mode: 'trial' (local only, .git/info/exclude) or 'committed' (visible to git).
+.PARAMETER Preset
+  pod = committed mode + hooks (team install)
+  solo = trial mode (individual developer)
+  portable = committed mode, no hooks (client handoff)
 .PARAMETER Graduate
   Convert a trial install to committed mode.
+.PARAMETER Uninstall
+  Remove Dev.IQ from the target repository.
 .PARAMETER Hooks
   Also install the hooks/ directory.
 .EXAMPLE
   .\scripts\bootstrap.ps1
 .EXAMPLE
-  .\scripts\bootstrap.ps1 -Target C:\Projects\my-repo -Mode trial
+  .\scripts\bootstrap.ps1 -Target C:\Projects\my-repo -Preset solo
+.EXAMPLE
+  .\scripts\bootstrap.ps1 -Target C:\Projects\my-repo -Preset pod
 .EXAMPLE
   .\scripts\bootstrap.ps1 -Target C:\Projects\my-repo -Graduate
+.EXAMPLE
+  .\scripts\bootstrap.ps1 -Target C:\Projects\my-repo -Uninstall
 #>
 param(
     [string]$Target  = (Get-Location).Path,
     [ValidateSet("trial","committed","")]
     [string]$Mode    = "",
+    [ValidateSet("pod","solo","portable","")]
+    [string]$Preset  = "",
     [switch]$Graduate,
+    [switch]$Uninstall,
     [switch]$Hooks
 )
 
@@ -51,6 +64,15 @@ if (-not (Test-Path $Target -PathType Container)) { Write-Fail "Target directory
 if (-not (Test-Path "$Target\.git" -PathType Container)) { Write-Fail "Target is not a git repository: $Target" }
 $Target = (Resolve-Path $Target).Path
 
+# ── Apply preset ─────────────────────────────────────────────────
+if ($Preset -ne "") {
+    switch ($Preset) {
+        "pod"      { $Mode = "committed"; $Hooks = $true }
+        "solo"     { $Mode = "trial";     $Hooks = $false }
+        "portable" { $Mode = "committed"; $Hooks = $false }
+    }
+}
+
 # ── Detect existing install ───────────────────────────────────────
 $ManifestPath = "$Target\.dev-iq\.install-manifest.json"
 $IsUpgrade    = $false
@@ -66,6 +88,79 @@ if (Test-Path $ManifestPath) {
     Write-Log "  New pack version  : v$PackVersion"
     Write-Log "  Current mode      : $PrevMode"
     Write-Host ""
+}
+
+# ── Uninstall mode ───────────────────────────────────────────────
+if ($Uninstall) {
+    Write-Host ""
+    Write-Log "Removing Dev.IQ Agent Pack from: $Target"
+    Write-Host ""
+
+    $Confirm = Read-Host "  This will delete Dev.IQ files from $Target. Continue? [y/N]"
+    if ($Confirm -ne "y") { Write-Log "Uninstall cancelled."; exit 0 }
+
+    # Remove pack-owned directories
+    foreach ($Dir in @(".github\skills", ".github\instructions", ".github\agents", ".claude\agents")) {
+        $FullDir = "$Target\$Dir"
+        if (Test-Path $FullDir) {
+            Remove-Item -Recurse -Force $FullDir
+            Write-Ok "Removed : $Dir"
+        }
+    }
+
+    # Remove pack-owned files
+    $SkillsMd = "$Target\.claude\skills.md"
+    if (Test-Path $SkillsMd) { Remove-Item -Force $SkillsMd; Write-Ok "Removed : .claude\skills.md" }
+
+    # Remove dev-iq marker block from CLAUDE.md
+    $ClaudeDst = "$Target\CLAUDE.md"
+    if ((Test-Path $ClaudeDst) -and ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart))) {
+        $PyScript = @"
+import sys, re
+dst, ms, me = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(dst, encoding='utf-8') as f: content = f.read()
+pattern = re.escape(ms) + r'.*?' + re.escape(me)
+result = re.sub(pattern, '', content, flags=re.DOTALL).strip()
+with open(dst, 'w', encoding='utf-8') as f: f.write(result + '\n' if result else '')
+"@
+        $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
+        $PyScript | Set-Content $TmpPy -Encoding UTF8
+        & $PythonExe $TmpPy $ClaudeDst $MarkerStart $MarkerEnd
+        Remove-Item $TmpPy -ErrorAction SilentlyContinue
+        Write-Ok "Removed Dev.IQ block from CLAUDE.md."
+        if (-not (Get-Content $ClaudeDst -Raw).Trim()) {
+            Remove-Item -Force $ClaudeDst; Write-Ok "Removed empty CLAUDE.md."
+        }
+    }
+
+    # Remove trial entries from .git\info\exclude
+    $ExcludePath = "$Target\.git\info\exclude"
+    if ((Test-Path $ExcludePath) -and ((Get-Content $ExcludePath -Raw) -match "# dev-iq")) {
+        $Lines = Get-Content $ExcludePath |
+            Where-Object { $_ -notmatch "^# dev-iq" } |
+            Where-Object { $_ -notmatch "^\.github/skills" } |
+            Where-Object { $_ -notmatch "^\.github/instructions" } |
+            Where-Object { $_ -notmatch "^\.github/agents" } |
+            Where-Object { $_ -notmatch "^\.claude/agents" } |
+            Where-Object { $_ -notmatch "^\.claude/skills" } |
+            Where-Object { $_ -notmatch "^\.dev-iq" } |
+            Where-Object { $_ -notmatch "^hooks/" } |
+            Where-Object { $_ -notmatch "^CLAUDE\.md" }
+        $Lines | Set-Content $ExcludePath -Encoding UTF8
+        Write-Ok "Removed trial entries from .git\info\exclude."
+    }
+
+    # Remove .dev-iq/ directory
+    if (Test-Path "$Target\.dev-iq") {
+        Remove-Item -Recurse -Force "$Target\.dev-iq"
+        Write-Ok "Removed : .dev-iq\"
+    }
+
+    Write-Host ""
+    Write-Ok "Dev.IQ removed from $Target."
+    Write-Host ""
+    Write-Log "User-created files (your code, tests, configs) were not touched."
+    exit 0
 }
 
 # ── Graduate mode ─────────────────────────────────────────────────
@@ -121,7 +216,7 @@ Write-Host ""
 Write-Log "─────────────────────────────────────────────"
 Write-Log "  Dev.IQ Agent Pack v$PackVersion"
 Write-Log "  Target : $Target"
-Write-Log "  Mode   : $Mode"
+Write-Log "  Mode   : $Mode$(if ($Preset) { " (preset: $Preset)" } else { '' })"
 Write-Log "─────────────────────────────────────────────"
 Write-Host ""
 
