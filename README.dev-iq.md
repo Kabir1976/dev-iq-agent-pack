@@ -5,8 +5,8 @@
 > Claude Code into a delivery-aware engineering partner inside the IDE.
 
 **Version**: v0.9.0
-**Owner**: [Owner Name]
-**Repo**: [repo link]
+**Owner**: Kabir Chugh, Sparq
+**Repo**: https://github.com/Kabir1976/dev-iq
 
 ---
 
@@ -522,11 +522,11 @@ Tag releases. Keep a CHANGELOG in `.dev-iq/CHANGELOG.md`.
 
 | Role | Responsibility |
 |------|---------------|
-| Pack Technical Owner | [Your Name] |
-| DI Framework Sponsor | [Name] |
-| Pilot Account Lead | [Embedded Lead] |
+| Pack Technical Owner | Kabir Chugh |
+| DI Framework Sponsor | TBD |
+| Pilot Account Lead | TBD |
 | Governance Review | DI Sponsor + InfoSec |
-| Versioning and Release | [Your Name] |
+| Versioning and Release | Kabir Chugh |
 | Collaboration | Assert.IQ / Jarius Hayes |
 
 ---
