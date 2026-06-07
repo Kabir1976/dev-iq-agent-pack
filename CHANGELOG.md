@@ -77,4 +77,4 @@ Initial pre-release of the Dev.IQ Agent Pack.
 - Signal emission wired into 3 existing skills: `review-pr-readiness`, `review-security`, `refactor-code`
 - Telemetry sink API spec (Approach B foundation)
 
-*Blocked on: Assert.IQ team alignment on shared signal directory path.*
+Signal directory: `.dev-iq/signals/` (Dev.IQ-owned namespace). Assert.IQ integration is complementary and deferred — both packs operate independently.
