@@ -23,7 +23,7 @@ The pack operationalizes the **Developer Intelligence (DI)** framework:
 
 - The five-layer signal model (Intent → Design → Quality → Risk → Confidence)
   is loaded as the AI's reasoning lens on every interaction.
-- 21 skills cover the developer lifecycle: requirements, design, development,
+- 22 skills cover the developer lifecycle: requirements, design, development,
   code review, and deployment readiness.
 - A Dev.IQ agent provides delivery-aware coaching and execution.
 - MCP wiring connects to ADO or Jira and to GitHub for first-class

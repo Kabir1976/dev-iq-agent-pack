@@ -13,7 +13,7 @@ Initial pre-release of the Dev.IQ Agent Pack.
 
 ### Added
 
-**Skills (21 total)**
+**Skills (22 total)**
 - `explain-code` — INTENT signal, plain-language code explanation with intent gap detection
 - `generate-user-stories` — INTENT signal, user stories with ACs from requirements
 - `review-acceptance-criteria` — INTENT signal, AC quality review (testable, specific, complete)
@@ -38,7 +38,7 @@ Initial pre-release of the Dev.IQ Agent Pack.
 - `dev-iq-bootstrap` — setup, guided pack installation and configuration
 
 **Agents**
-- `Dev-IQ` (Copilot Chat) — full tool set, intent-to-skill routing for all 21 skills
+- `Dev-IQ` (Copilot Chat) — full tool set, intent-to-skill routing for all 22 skills
 - `Dev-IQ-PLAN` (Copilot Chat) — read-only planning agent, structured plan + Start Implementation handoff
 - `dev-iq` (Claude Code) — full tool set, same routing table
 - `dev-iq-plan` (Claude Code) — read-only planning agent

@@ -288,7 +288,7 @@ Then re-run bootstrap.
 
 | Location | Contents | Owned by |
 |----------|----------|----------|
-| `.github/skills/` | 21 skill definitions | Pack — updated on upgrade |
+| `.github/skills/` | 22 skill definitions | Pack — updated on upgrade |
 | `.github/instructions/` | 5 always-on instruction files | Pack — updated on upgrade |
 | `.github/agents/` | Dev-IQ and Dev-IQ-PLAN agent specs | Pack — updated on upgrade |
 | `.claude/agents/` | Claude Code agent definitions | Pack — updated on upgrade |

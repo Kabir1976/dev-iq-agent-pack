@@ -33,7 +33,7 @@ Every skill output runs through all four layers and gives you evidence, not a sc
 
 ## What changes on day one
 
-You open Copilot Chat (or Claude Code), select the Dev-IQ agent, and type `/`. You get 21 skills covering your full delivery loop.
+You open Copilot Chat (or Claude Code), select the Dev-IQ agent, and type `/`. You get 22 skills covering your full delivery loop.
 
 **Three you'll use on the first day:**
 
@@ -93,4 +93,4 @@ Questions: **kabir.chugh@teamsparq.com**
 
 ---
 
-*Dev.IQ Agent Pack v0.9.0 · 21 skills · GitHub Copilot Chat + Claude Code*
+*Dev.IQ Agent Pack v0.9.0 · 22 skills · GitHub Copilot Chat + Claude Code*

@@ -14,7 +14,7 @@ Developer Intelligence, dropped into your developers' IDE — works with GitHub 
 
 **Dev.IQ** — the commercialized Sparq capability inside Intelligence Studio that operationalizes DI with AI-assisted code review, PR readiness assessment, security review, blast radius estimation, and workflow-integrated traceability.
 
-**Dev.IQ Agent Pack** — the capability layer inside the IDE. 21 skills, 5 always-on instruction files, two agents (Dev-IQ for action, Dev-IQ-PLAN for plan-first work), MCP wiring for GitHub and ADO, and maturity gating so capabilities only fire where the team is ready.
+**Dev.IQ Agent Pack** — the capability layer inside the IDE. 22 skills, 5 always-on instruction files, two agents (Dev-IQ for action, Dev-IQ-PLAN for plan-first work), MCP wiring for GitHub and ADO, and maturity gating so capabilities only fire where the team is ready.
 
 ---
 
@@ -28,7 +28,7 @@ Developer Intelligence, dropped into your developers' IDE — works with GitHub 
 
 ---
 
-## The 21 skills at a glance
+## The 22 skills at a glance
 
 | Lifecycle Phase | Skills (invoked with `/` in chat) |
 |----------------|-----------------------------------|

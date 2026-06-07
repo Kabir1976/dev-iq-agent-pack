@@ -285,7 +285,7 @@ maturity.tier: early
 | .dev-iq/maturity-profile.md | trial | Early maturity — advisory mode, coaching notes |
 | .dev-iq/governance.md | trial | Default governance posture |
 | .dev-iq/.install-manifest.json | trial | Version: 1.0.0 |
-| .github/skills/ | trial | 21 skill definitions |
+| .github/skills/ | trial | 22 skill definitions |
 | .claude/settings.json | trial | Hook configuration |
 
 ---

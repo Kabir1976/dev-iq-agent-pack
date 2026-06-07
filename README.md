@@ -32,7 +32,7 @@ The immediate impact:
 
 Dev.IQ is the accelerator. It drops a DI reasoning layer directly into **GitHub Copilot Chat** and **Claude Code** so developers don't have to learn a new tool or change their workflow. The IDE they already use becomes delivery-intelligent.
 
-- **21 skills** covering the full developer lifecycle — user story review, API design, feature scaffolding, code review, security analysis, PR readiness, blast radius estimation, deployment checks, and more.
+- **22 skills** covering the full developer lifecycle — user story review, API design, feature scaffolding, code review, security analysis, PR readiness, blast radius estimation, deployment checks, and more.
 - **Two agents** (`Dev-IQ` for full execution, `Dev-IQ-PLAN` for plan-first workflows) with a built-in handoff button between them.
 - **Maturity-aware behavior** — a one-file config scales the pack from "early / advisory only" to "higher / autonomous PR verdicts," meeting teams where they are.
 - **MCP wiring** to GitHub, ADO, Jira, Sentry, Grafana, Playwright, Slack, and 13 more tool surfaces — configured in one file, credentials kept in your OS keychain.
@@ -61,10 +61,10 @@ DI is the operating model. Dev.IQ is how developers act on it — from day one, 
 **Claude Code**
 
 ```bash
-/plugin install [your-org]/dev-iq@v0.1.0
+/plugin install [your-org]/dev-iq@v0.9.0
 ```
 
-This installs the 21 skills and both agents globally. Nothing is written to your codebase yet — that's the next step.
+This installs the 22 skills and both agents globally. Nothing is written to your codebase yet — that's the next step.
 
 ---
 
