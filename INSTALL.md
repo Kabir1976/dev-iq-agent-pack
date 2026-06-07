@@ -59,6 +59,44 @@ cd /path/to/your-project
 
 Then run the bootstrap:
 
+### Fast path — presets (recommended)
+
+Use a preset to skip the interactive prompts:
+
+| Preset | Who it's for | What it does |
+|--------|-------------|-------------|
+| `--preset=pod` | Team pod adoption | Committed mode + hooks enabled |
+| `--preset=solo` | Individual developer trial | Trial mode (invisible to git), no hooks |
+| `--preset=portable` | Client handoff / CI | Committed mode, no hooks |
+
+**macOS / Linux:**
+```bash
+# Team adoption
+bash ~/tools/dev-iq/scripts/bootstrap.sh --preset=pod
+
+# Individual trial
+bash ~/tools/dev-iq/scripts/bootstrap.sh --preset=solo
+
+# Client handoff
+bash ~/tools/dev-iq/scripts/bootstrap.sh --preset=portable
+```
+
+**Windows (PowerShell):**
+```powershell
+# Team adoption
+.\tools\dev-iq\scripts\bootstrap.ps1 -Preset pod
+
+# Individual trial
+.\tools\dev-iq\scripts\bootstrap.ps1 -Preset solo
+
+# Client handoff
+.\tools\dev-iq\scripts\bootstrap.ps1 -Preset portable
+```
+
+### Manual mode selection
+
+If you prefer to choose interactively, run without a preset — the script will prompt:
+
 **macOS / Linux:**
 ```bash
 bash ~/tools/dev-iq/scripts/bootstrap.sh
@@ -175,6 +213,36 @@ git push
 ```
 
 Open the PR with a short description — the team reviews and merges. From that point, every developer who pulls the branch gets Dev.IQ automatically.
+
+---
+
+## Step 7 — Uninstall Dev.IQ (optional)
+
+To remove Dev.IQ from a project entirely:
+
+**macOS / Linux:**
+```bash
+bash ~/tools/dev-iq/scripts/bootstrap.sh --uninstall
+```
+
+**Windows (PowerShell):**
+```powershell
+.\tools\dev-iq\scripts\bootstrap.ps1 -Uninstall
+```
+
+The uninstall script:
+- Removes all pack-owned directories (`.github/skills/`, `.github/instructions/`, `.github/agents/`, `.claude/`, `.dev-iq/`)
+- Strips the `<!-- dev-iq:start -->…`<!-- dev-iq:end -->` marker block from `CLAUDE.md` (preserves everything else in the file)
+- Removes all trial-mode entries from `.git/info/exclude`
+- Does **not** touch `CLAUDE.md` content outside the marker block, or any files you created yourself
+
+After uninstall, commit the removed files if the install was in committed mode:
+
+```bash
+git add -A
+git commit -m "Remove Dev.IQ Agent Pack"
+git push
+```
 
 ---
 
