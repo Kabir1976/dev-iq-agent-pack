@@ -83,7 +83,7 @@ Copilot loads these automatically when the file in focus matches the
 - **Agents** — `Dev-IQ` (default, full tools, action-oriented) and
   `Dev-IQ-PLAN` (read-only planning sibling, ends with Start Implementation
   handoff to Dev-IQ).
-- **Skills** — 21 DI skills invoked with `/skill-name` in Copilot Chat.
+- **Skills** — 22 DI skills invoked with `/skill-name` in Copilot Chat.
   Type `/` to see all available skills.
 - **Per-client config** — `.dev-iq/config.yaml`, `.dev-iq/governance.md`,
   `.dev-iq/maturity-profile.md`, `.dev-iq/telemetry-overlay.md`.

@@ -92,7 +92,7 @@ inside each file.
   full tools) and `.claude/agents/dev-iq-plan.md` (read-only planning
   sibling).
 - **Skills** — `.github/skills/` (canonical) is mirrored at `.claude/skills`
-  so Claude auto-discovers all 21 DI skills (code review, scaffold feature,
+  so Claude auto-discovers all 22 DI skills (code review, scaffold feature,
   API design, PR readiness, blast radius estimation, release notes, etc.).
 - **Hooks** — wired through `.claude/settings.json`, sourced from
   `hooks/hooks.json` (Claude plugin format). Run `bash install.sh` (or

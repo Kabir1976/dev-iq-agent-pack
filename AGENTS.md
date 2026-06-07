@@ -39,7 +39,7 @@ matching file(s) for the user's current task.
 
 ## Skills
 
-The pack ships 21 DI skills under `.github/skills/`. Each has a `SKILL.md`
+The pack ships 22 DI skills under `.github/skills/`. Each has a `SKILL.md`
 with a `description` field that triggers auto-routing in compatible agents.
 
 | Phase | Skills |

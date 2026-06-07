@@ -116,7 +116,7 @@ Bootstrap copies instruction files, `.dev-iq/` config, `.vscode/settings.json`, 
 .github/
   copilot-instructions.md     ← always-on DI reasoning rules for Copilot
   instructions/               ← scoped rule sheets (code standards, security, etc.)
-  skills/                     ← 21 DI skills, one subfolder each
+  skills/                     ← 22 DI skills, one subfolder each
   agents/                     ← Dev-IQ and Dev-IQ-PLAN agent definitions
 .claude/
   agents/                     ← Claude Code subagent counterparts
