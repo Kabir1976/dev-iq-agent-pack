@@ -1,5 +1,5 @@
 SPARQ  ·  INTELLIGENCE STUDIO  ·  CAPABILITY ONE-PAGER
-**Dev.IQ Agent Pack** *(Internal use only right now)*
+**Dev.IQ Agent Pack**
 Developer Intelligence, dropped into your developers' IDE — works with GitHub Copilot Chat and Claude Code.
 
 ---
