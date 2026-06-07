@@ -483,9 +483,10 @@ matches your actual tools and file paths.
 
 | Version | Notes |
 |---------|-------|
-| 0.1.0 | Initial release. DI five-layer signal model. Pack structure established. 21-skill registry defined. Foundation, instructions, and core developer skills. |
+| 0.9.0 | Pre-release. 22 skills complete. Bootstrap with `--preset` and `--uninstall`. VERSION + CHANGELOG at repo root. All Copilot and Claude Code surfaces wired. |
+| 0.1.0 | Initial release. DI five-layer signal model. Pack structure established. Foundation and instruction files. |
 
-Tag releases. Keep a CHANGELOG in `.dev-iq/CHANGELOG.md`.
+See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 ---
 
