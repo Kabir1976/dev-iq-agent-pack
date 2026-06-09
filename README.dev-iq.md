@@ -1,7 +1,7 @@
 # Dev.IQ
 
 > The capability layer for developer delivery intelligence. DI-grounded skills,
-> instructions, modes, and tools that turn GitHub Copilot Chat **and**
+> instructions, agents, and tools that turn GitHub Copilot Chat **and**
 > Claude Code into a delivery-aware engineering partner inside the IDE.
 
 **Version**: v0.9.0
@@ -21,7 +21,7 @@ and is owned by the team.
 
 The pack operationalizes the **Developer Intelligence (DI)** framework:
 
-- The five-layer signal model (Intent → Design → Quality → Risk → Confidence)
+- The four-layer signal model (Intent → Design → Quality → Risk → Decision Confidence)
   is loaded as the AI's reasoning lens on every interaction.
 - 22 skills cover the developer lifecycle: requirements, design, development,
   code review, and deployment readiness.
@@ -50,38 +50,215 @@ short installer that wires `.claude/settings.json` and the skills symlink.
 | Asset | Canonical location | Copilot reads | Claude reads |
 |---|---|---|---|
 | Always-on guidance | `.github/copilot-instructions.md` + mirrored body in `CLAUDE.md` | `.github/copilot-instructions.md` | `CLAUDE.md` |
-| Scoped instructions | `.github/instructions/*.instructions.md` | same (auto via `applyTo`) | same (via `@`-imports in `CLAUDE.md`) |
-| Skills | `.github/skills/*/SKILL.md` | `.github/skills/` directly | `.claude/skills/` (symlink → `.github/skills/`) |
+| Scoped instructions | `.github/instructions/*.instructions.md` | same (auto via `applyTo`) | same (via `@`-imports in `CLAUDE.md`; "When this applies" prose) |
+| Skills (22) | `.github/skills/*/SKILL.md` | `.github/skills/` directly | `.claude/skills/` (symlink → `.github/skills/`) |
 | Agents | `.github/agents/Dev-IQ.agent.md` + `Dev-IQ-PLAN.agent.md` (Copilot) + `.claude/agents/dev-iq.md` + `dev-iq-plan.md` (Claude) | agent files | subagent files |
-| Hooks | `hooks/hooks.json` + `hooks/scripts/` | yes | `.claude/settings.json` (hooks block) |
-| MCP wiring | `.vscode/mcp.json` | yes | yes |
+| Hooks | `hooks/hooks.json` + `hooks/scripts/` | yes (via `chat.hookFilesLocations`) | `.claude/settings.json` (hooks block, synced by installer) |
+| MCP wiring | `.vscode/mcp.json` | yes | yes (VS Code MCP is tool-agnostic) |
 | Per-client config | `.dev-iq/*` | yes | yes |
 | Generic agent pointer | `AGENTS.md` | n/a | read by Codex CLI / Cursor / Aider |
 
-**After dropping the pack into a repo, run the installer once:**
+---
+
+## Installation
+
+The pack supports two install paths. Pick based on whether you're evaluating
+Dev.IQ or deploying it into a team's repo.
+
+### Path A — Try it on the pack repo itself
+
+Best when you want to explore Dev.IQ without touching your team's repository.
+Clone the pack, run the bootstrap, and open the pack folder as your workspace.
 
 ```bash
-bash install.sh        # macOS / Linux
-.\install.ps1          # Windows PowerShell
+git clone https://github.com/Kabir1976/dev-iq
+cd dev-iq
+
+# macOS / Linux
+bash scripts/bootstrap.sh --preset=solo
+
+# Windows PowerShell
+pwsh -File scripts/bootstrap.ps1 -Preset solo
 ```
 
-The installer is idempotent. It (1) syncs `hooks.json` into
-`.claude/settings.json` and (2) creates `.claude/skills` as a symlink to
-`../.github/skills`.
+What it does (all inside the pack folder):
+
+- Renders `hooks/hooks.template.json` into `hooks/hooks.json` with the pack root absolute path baked in.
+- Merges the rendered hooks block into `.claude/settings.json`, preserving any other keys.
+- Creates `.claude/skills` as a symlink to `../.github/skills` so Claude Code discovers the same skills Copilot does (falls back to a copy on Windows without Developer Mode — re-run after edits in that case).
+
+Idempotent on every platform — safe to re-run. Reverse with `--uninstall`.
+
+### Path B — Install into your codebase
+
+This is the real deployment path. Bootstrap copies the full set of workspace
+surfaces into a target repo so Copilot Chat and Claude Code can discover the
+skills, agents, instructions, hooks, and config from that codebase.
+
+Run from a terminal in your target repo. No editor required:
+
+```bash
+# 1. Clone the pack somewhere on your machine (one time, anywhere)
+git clone https://github.com/Kabir1976/dev-iq ~/dev-iq
+
+# 2. cd into YOUR repo
+cd ~/code/my-app
+
+# 3. Run the bootstrap from the clone
+bash ~/dev-iq/scripts/bootstrap.sh --mode=trial
+
+# Windows PowerShell
+pwsh -File ~\dev-iq\scripts\bootstrap.ps1 -Mode trial
+```
+
+The script is fully standalone — it accepts `--preset=solo|pod`, prompts
+interactively when run in a TTY, and writes everything Copilot and Claude need
+into your workspace. You do not need to open VS Code or Claude Code first, and
+`/dev-iq-bootstrap` does not need to be loaded — the script is what the skill
+calls under the hood.
+
+**Where does `--preset=solo` put the DI instructions?** Solo is designed for
+a single developer who wants DI rules to apply across every repo they open.
+The instruction files (`di-foundation`, `di-code-standards`, etc.) and
+`CLAUDE.md` install to your VS Code user prompts folder and
+`~/.claude/CLAUDE.md` — not to `.github/instructions/` in the workspace.
+Use `--preset=pod` if you want the instructions checked into this repo for
+the whole team.
+
+Already have the pack loaded in your editor? You can also run
+`/dev-iq-bootstrap` from Copilot Chat or Claude Code — same outcome,
+chat-driven prompts.
+
+### Presets
+
+| Preset | What it configures | Best for |
+|--------|--------------------|----------|
+| `pod` | Committed + hooks | Cross-functional teams adopting DI together |
+| `solo` | Trial, no hooks, instructions user-global | Individual contributor evaluating solo |
+| `portable` | Skills user-globally, minimal workspace footprint | Developer who works across many repos |
+
+**Portable mode** installs skills to `~/.agents/skills/` (Copilot) and
+`~/.claude/skills/` (Claude Code) so every workspace gets the 22 DI skills.
+Workspace footprint shrinks to just the Dev-IQ agent files and the install
+manifest — no instructions, hooks, settings, or `CLAUDE.md` written to the
+repo.
+
+```bash
+bash ~/dev-iq/scripts/bootstrap.sh --preset=portable
+# Reverse with: --uninstall
+```
+
+### Pinning to a tag
+
+Use `git checkout v0.9.0` (or `git clone --branch v0.9.0`) on the cloned copy.
+Use the latest tag from the Releases page. Bootstrap CLI flags, manifest schema,
+skill names, and workspace surface layout will not change incompatibly without
+a major-version bump (after v1.0.0).
+
+---
+
+## What Bootstrap Delivers
+
+Bootstrap copies the complete workspace surface into the target repo.
+Copilot and Claude Code can't auto-discover skills or agents that aren't
+physically present in the workspace, so all of them ship in.
+
+| Surface | Why it's per-repo |
+|---------|-------------------|
+| `.dev-iq/config.yaml` | Maturity tier, tracker, language, signal sink — varies by repo. |
+| `.dev-iq/governance.md` | Compliance posture — varies by client / regulatory regime. |
+| `.dev-iq/maturity-profile.md` | Tier rationale — team-specific. |
+| `.github/copilot-instructions.md` + `.github/instructions/di-*.instructions.md` | Copilot reads these only from the workspace; their `applyTo` globs scope to repo files. |
+| `.github/skills/` | All 22 DI skills — Copilot Chat reads them from this workspace path. |
+| `.github/agents/` | `Dev-IQ.agent.md` and `Dev-IQ-PLAN.agent.md` custom chat modes. |
+| `.claude/agents/` | Claude Code subagent counterparts (`dev-iq.md`, `dev-iq-plan.md`). |
+| `.claude/skills` | Symlink to `../.github/skills` (copy fallback on Windows without Developer Mode). |
+| `CLAUDE.md` / `AGENTS.md` | Claude and other agent runners read these from the repo root. |
+| `.vscode/settings.json` + `.vscode/mcp.json` | Wires VS Code Copilot; declares MCP servers. JSON deep-merged into any pre-existing settings — your values win on conflicts. |
+| `hooks/` (scripts/, config/, hooks.json) | Hook scripts that fire on session events. `hooks.json` rendered at bootstrap time so paths resolve to workspace copies. |
+| `.claude/settings.json` | Claude Code reads the hooks block from here. Bootstrap merges only the hooks key, preserving any other settings. |
+
+### Trial vs Committed
+
+| Mode | What happens | Reverse with |
+|------|-------------|--------------|
+| `--mode=trial` | Files land in workspace; paths added to `.git/info/exclude` (local-only). `.gitignore` untouched. | `--graduate` (promote) or `--uninstall` (remove) |
+| `--mode=committed` | Files land in workspace and are visible to git. | `--uninstall` |
+| `--mode=ask` (default in TTY) | Prompts interactively. Non-TTY falls back to `committed`. | — |
+
+SHA256-compares before writing — pre-existing files are preserved, never
+silently overwritten. Every install writes `.dev-iq/.install-manifest.json`
+recording `{version, installed_at, mode, paths[]}`.
+
+**Graduating from trial → committed:**
+
+```bash
+# macOS / Linux
+scripts/bootstrap.sh --graduate
+
+# Windows
+pwsh -File scripts/bootstrap.ps1 -Graduate
+
+# Then commit the pack files:
+git add .dev-iq .claude .github CLAUDE.md AGENTS.md
+git commit -m "chore: adopt Dev.IQ agent pack"
+```
+
+**Removing the pack from a workspace:**
+
+```bash
+# macOS / Linux
+scripts/bootstrap.sh --uninstall
+scripts/bootstrap.sh --uninstall --dry-run  # preview without changing anything
+
+# Windows
+pwsh -File scripts/bootstrap.ps1 -Uninstall
+pwsh -File scripts/bootstrap.ps1 -Uninstall -DryRun
+```
+
+---
+
+## Upgrading to a New Release
+
+Upgrades are explicit and intentional:
+
+1. Read the release notes on the Releases page and any migration notes.
+2. Uninstall the current path you used:
+   - Path A: `bash scripts/bootstrap.sh --uninstall` in the cloned pack.
+   - Path B: `bash scripts/bootstrap.sh --uninstall` in each target repo.
+3. `git pull` (or re-clone) to the new tag, then re-run the same path to refresh.
+
+---
+
+## Platform Notes (`.claude/skills` symlink)
+
+The installer creates `.claude/skills` as a directory symlink to
+`../.github/skills/`, so Copilot and Claude share one canonical copy of the
+22 skills. Behavior varies by platform:
+
+| Platform | What happens | What you need to do |
+|----------|-------------|---------------------|
+| macOS / Linux | Symlink created normally. | Nothing — edits to either path reflect instantly. |
+| Windows + Developer Mode (or admin shell) | Symlink created normally. | Enable Developer Mode once: Settings → Privacy & security → For developers → Developer Mode On. Then re-run `bootstrap.ps1`. |
+| Windows without Developer Mode / admin | Installer falls back to copying `.github/skills/` → `.claude/skills/` and logs the fallback. | Re-run `bootstrap.ps1` after editing any skill so Claude sees the change. Prefer Developer Mode to avoid drift. |
+| CI runners, Docker COPY, manual zip downloads | Symlinks may not be preserved — you may get a broken link or a copy. | Run `scripts/bootstrap.sh` after checkout to repair the link. |
+
+The installer is idempotent on every platform — re-running is always safe.
 
 ---
 
 ## The Developer Intelligence (DI) Signal Model
 
-Every skill in this pack reasons through the five DI signal layers:
+Every skill in this pack reasons through four DI signal layers:
 
 ```
 SIGNAL        QUESTION                    DATA SOURCE (GENERIC)
 ──────────────────────────────────────────────────────────────────
 INTENT    →   What are we building?       Work items, AC, PRDs, Design docs
-DESIGN    →   Is it built right?          Git Diff, AST, Architecture docs
+DESIGN    →   Is it built right?          Git diff, AST, Architecture docs
 QUALITY   →   Is it production-ready?     Test results, Coverage, Lint/SAST
 RISK      →   What could break?           Deps, Schema changes, API contracts
+              ─────────────────
 CONFIDENCE→   Should we proceed?          Synthesis of above (Phase 2)
 ```
 
@@ -104,8 +281,6 @@ dev-iq/
 │
 ├── CLAUDE.md                              # Always-on guidance for Claude Code
 ├── AGENTS.md                              # Always-on for Codex CLI / Cursor / Aider
-├── install.sh                             # macOS / Linux installer
-├── install.ps1                            # Windows installer
 ├── MANIFEST.md                            # Inventory of all pack files
 │
 ├── .github/
@@ -172,7 +347,6 @@ dev-iq/
 │   │   ├── skill-improve-session-start.ps1 + .sh
 │   │   └── track-telemetry.ps1 + .sh
 │   ├── state/
-│   │   ├── .last-janitor
 │   │   ├── dismissed-lessons.json
 │   │   └── edit-frequency.json
 │   └── hooks.template.json
@@ -184,11 +358,11 @@ dev-iq/
 ├── tests/
 │   └── .gitignore
 │
-└── .dev-iq/                               # Per-client config
+└── .dev-iq/                               # Per-client config (created by bootstrap)
     ├── config.yaml                        # Maturity tier, tracker, framework
     ├── maturity-profile.md                # Tier rationale
     ├── governance.md                      # Compliance posture
-    ├── telemetry-overlay.md               # Generic signals + client data sources
+    ├── telemetry-overlay.md               # Signal → data source mapping
     └── CHANGELOG.md                       # Version history
 ```
 
@@ -220,39 +394,64 @@ Hooks          hooks/hooks.json + hooks/scripts/          Session-end skill
 
 ---
 
-## Quick Start
+## How to Use
 
-### 1. Drop the Pack into the Client Repo
+### Invoking a skill
 
-Copy these into the repo root:
-- `MANIFEST.md`
-- `README.dev-iq.md`
-- `CLAUDE.md` + `AGENTS.md`
-- `.github/copilot-instructions.md`
-- `.github/instructions/`
-- `.github/skills/`
-- `.github/agents/`
-- `.claude/`
-- `.vscode/mcp.json` + `.vscode/settings.json`
-- `hooks/`
-- `scripts/`
-- `.dev-iq/`
+Open Copilot Chat in VS Code (or Claude Code). Type `/` to see available skills.
+Type the skill name to invoke. Provide inputs when prompted, or skip if the skill
+can resolve them from context (work item from branch name, scope from current
+diff, etc.).
 
-### 2. Configure for the Client Context
+### Using the Dev-IQ agents
+
+Pick **Dev-IQ** from the agent dropdown for default behavior — it routes to the
+right skill and has full tools to act. Pick **Dev-IQ-PLAN** when you want
+plan-first behavior on a larger or riskier task; it produces a plan and surfaces
+a **Start Implementation** handoff button that switches back to Dev-IQ for
+execution. Both agents are maturity-aware: they adjust recommendations based on
+`maturity.tier` and proactively raise traceability gaps, design issues on
+changed surfaces, and governance concerns when AI is applied to high-risk areas.
+
+### Combining skills
+
+Skills compose. A typical PR-time workflow:
+
+```
+/generate-user-stories          → define what we're building
+/design-api                     → design the interface
+/scaffold-feature               → generate boilerplate
+/code-review                    → four-layer review
+/review-pr-readiness            → Go/Hold verdict before opening PR
+/new-pull-request               → PR body with DI risk band + traceability
+```
+
+A typical incident-driven workflow:
+
+```
+/debug-issue                    → structured diagnosis + fix suggestion
+/review-security                → confirm the fix doesn't introduce new exposure
+/blast-radius-estimator         → map what else could be affected
+/review-deployment-readiness    → Go/No-Go before pushing the fix
+/generate-rollback-plan         → have a plan before you deploy
+```
+
+### Configure for your client context
 
 Open `.dev-iq/config.yaml` and set:
+
 - `client.name`
-- `maturity.tier` — `early`, `mid`, or `higher` based on DI Diagnostic
-- `tracker.type` — `ado` or `jira`
+- `maturity.tier` — `early`, `mid`, or `higher` based on the DI Diagnostic
+- `tracker.type` — `ado` or `jira`, plus connection details
 - `vcs.type` — `github`, `ado-repos`, `gitlab`, or `bitbucket`
 - `language` — primary language(s)
 
 Open `.dev-iq/maturity-profile.md` and document the rationale for the chosen tier.
 
-### 3. Configure the Telemetry Overlay (Client-Specific)
+### Wire the telemetry overlay
 
-Open `.dev-iq/telemetry-overlay.md` and map each DI signal to your
-client's actual data sources:
+Open `.dev-iq/telemetry-overlay.md` and map each DI signal to your client's
+actual data sources:
 
 ```yaml
 signals:
@@ -270,29 +469,25 @@ signals:
     schema_path: db/migrations/
 ```
 
-### 4. Wire MCP
+### Validate
 
-Open `.vscode/mcp.json` and confirm the servers for your tracker and VCS
-are enabled. Provide the required PATs / API tokens at input prompts.
-
-### 5. Bootstrap the Workspace
-
-```
-@Dev-IQ help me onboard this repo
-```
-or directly:
-```
-/dev-iq-bootstrap
-```
-
-### 6. Validate
+In Copilot Chat, select the Dev-IQ agent and run:
 
 ```
 /code-review
 ```
 
-The agent should respond with a DI five-layer assessment of the current
-branch diff.
+The agent should respond with a four-layer DI assessment of the current branch
+diff. If MCP is wired correctly, it will pull live work item data; if not, it
+will ask for it.
+
+### Pick a starter skill for the team
+
+Recommended first invocations:
+
+- **Requirements phase**: `/review-acceptance-criteria` on a recent work item
+- **Development phase**: `/code-review` on the current branch
+- **PR phase**: `/review-pr-readiness` before opening the PR
 
 ---
 
@@ -324,7 +519,7 @@ skill that requires it.
 | Skill | DI Signal | Purpose |
 |-------|-----------|---------|
 | `/scaffold-feature` | INTENT + DESIGN | Generate boilerplate from AC + story |
-| `/code-review` | DESIGN + QUALITY | Review code through DI five-layer lens |
+| `/code-review` | DESIGN + QUALITY | Review code through DI four-layer lens |
 | `/debug-issue` | RISK + QUALITY | Structured bug diagnosis + fix suggestion |
 | `/refactor-code` | DESIGN + QUALITY | Refactoring suggestions with rationale |
 | `/review-security` | QUALITY + RISK | Security-focused code review |
@@ -367,30 +562,9 @@ The pack reads `.dev-iq/maturity-profile.md` and adjusts behavior:
 |------|----------|
 | **Early** | Foundation + intent + design review only. Risk assessment operates in advisory mode. All outputs are drafts with coaching notes. Human review required for every output. |
 | **Mid** | Add quality signals, automated code review, PR readiness in suggest-only mode. DI routing operates as designed. Risk assessment provides structured reports. |
-| **Higher** | Full pack including blast radius estimation, autonomous PR readiness verdict, and predictive deployment risk. Confidence signal available (Phase 2). |
+| **Higher** | Full pack including blast radius estimation, autonomous PR readiness verdict, and predictive deployment risk. Decision Confidence signal available (Phase 2). |
 
----
-
-## The Feedback Loop
-
-Skills improve from production experience. When a DI signal issues a
-**High Confidence** outcome but a production incident still occurs:
-
-```
-1. Post-Mortem Skill Audit is triggered
-2. Skill author analyzes why the signal missed
-3. Prompt template is updated with new constraint or example
-4. Skill is returned to REVIEW status
-5. Updated skill re-enters approval workflow
-```
-
-**Ownership:**
-
-| Role | Responsibility |
-|------|---------------|
-| Primary | Skill author |
-| Fallback | Team Lead / Competency Council |
-| Escalation | Pack Maintainer |
+Maturity is set during the DI Diagnostic and re-evaluated quarterly.
 
 ---
 
@@ -422,22 +596,16 @@ Every skill includes an explicit **Governance** section.
 | Add a domain skill | New folder under `.github/skills/<name>/` with `SKILL.md` |
 | Adjust code standards | `.github/instructions/di-code-standards.instructions.md` |
 | Adjust security rules | `.github/instructions/di-security.instructions.md` |
+| Change telemetry sink | `.dev-iq/config.yaml` → `signals.sink` |
 
 ### Adding a New Skill
 
 1. Create `.github/skills/your-skill/SKILL.md` with:
    - YAML frontmatter: `name`, `description`, `di_signal`, `maturity_required`
-   - `## Overview`
-   - `## When to Use`
-   - `## Instructions`
-   - `## Inputs Required`
-   - `## Output Format`
-   - `## Examples`
-   - `## Governance`
-2. Add supporting templates or references to the same folder
-3. Update the skill registry in this README
-4. Update `MANIFEST.md`
-5. Claude Code picks up the skill automatically via the `.claude/skills/` symlink
+   - `## Overview`, `## When to Use`, `## Instructions`, `## Inputs Required`, `## Output Format`, `## Governance`
+2. Add supporting templates or references to the same folder.
+3. Update the skill registry in this README and `MANIFEST.md`.
+4. Claude Code picks up the skill automatically via the `.claude/skills/` symlink — no second copy needed.
 
 ---
 
@@ -449,7 +617,8 @@ with a minimal MCP query directly.
 
 **Generated code doesn't match our conventions.**
 Update `.github/instructions/di-code-standards.instructions.md` with
-explicit examples of your project's patterns.
+explicit examples of your project's patterns. The agent reads instructions
+before generating.
 
 **Risk assessment feels off.**
 Adjust signal weighting in `.github/skills/review-pr-readiness/SKILL.md`.
@@ -469,13 +638,33 @@ matches your actual tools and file paths.
 ## What Dev.IQ Is Not
 
 - It is not a runtime. There is no service to deploy.
-- It is not a SaaS. The files stay in your repo — no account, no external dependency.
-- It is not a replacement for engineering judgment. Every output is a
-  draft; human review is required.
-- It is not a replacement for Assert.IQ. Use both packs together for full
-  SDLC + QE coverage.
-- It is not a tooling pitch. Use it where the maturity supports it. Lead
-  with DI thinking, not with this pack.
+- It is not a SaaS. The client owns the files — if Sparq rotates off the account, the pack stays.
+- It is not a replacement for engineering judgment. Every output is a draft; human review is required.
+- It is not a replacement for Assert.IQ. Use both packs together for full SDLC + QE coverage.
+- It is not a tooling pitch. Use it where the maturity supports it. Lead with DI thinking, not with this pack.
+
+---
+
+## The Feedback Loop
+
+Skills improve from production experience. When a DI signal issues a
+**High Confidence** outcome but a production incident still occurs:
+
+```
+1. Post-Mortem Skill Audit is triggered
+2. Skill author analyzes why the signal missed
+3. Prompt template is updated with new constraint or example
+4. Skill is returned to REVIEW status
+5. Updated skill re-enters approval workflow
+```
+
+**Ownership:**
+
+| Role | Responsibility |
+|------|---------------|
+| Primary | Skill author |
+| Fallback | Team Lead / Competency Council |
+| Escalation | Pack Maintainer |
 
 ---
 
@@ -484,7 +673,7 @@ matches your actual tools and file paths.
 | Version | Notes |
 |---------|-------|
 | 0.9.0 | Pre-release. 22 skills complete. Bootstrap with `--preset` and `--uninstall`. VERSION + CHANGELOG at repo root. All Copilot and Claude Code surfaces wired. |
-| 0.1.0 | Initial release. DI five-layer signal model. Pack structure established. Foundation and instruction files. |
+| 0.1.0 | Initial release. DI four-layer signal model. Pack structure established. Foundation and instruction files. |
 
 See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
@@ -508,7 +697,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 │   │  Deployment              │  │  Learn                    │   │
 │   │                          │  │                           │   │
 │   │  Primary: Developers     │  │  Primary: QE Engineers    │   │
-│   │  Signal: DI (5 layers)   │  │  Signal: QI (4 layers)   │   │
+│   │  Signal: DI (4 layers)   │  │  Signal: QI (4 layers)   │   │
 │   └──────────────────────────┘  └──────────────────────────┘   │
 │                                                                  │
 │   Same pack architecture. Same hooks. Same MCP wiring.          │
