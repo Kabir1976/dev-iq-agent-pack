@@ -60,17 +60,6 @@ if (-not (Test-Path $Target -PathType Container)) { Write-Fail "Target directory
 if (-not (Test-Path "$Target\.git" -PathType Container)) { Write-Fail "Target is not a git repository: $Target" }
 $Target = (Resolve-Path $Target).Path
 
-# python3 is optional — used for config pre-fill and CLAUDE.md update.
-# If missing, install still completes; those steps are skipped with a note.
-$PythonExe = if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" }
-             elseif (Get-Command python -ErrorAction SilentlyContinue) { "python" }
-             else { "" }
-$HavePython = $PythonExe -ne ""
-if (-not $HavePython) {
-    Write-Warn "Python 3 not found — config pre-fill and CLAUDE.md update will be skipped."
-    Write-Warn "The install will still complete. Edit .dev-iq\config.yaml manually afterwards."
-}
-
 # ── Auto-detect project context ───────────────────────────────────
 $DetectedTracker   = "ado"
 $DetectedVcs       = "github"
@@ -190,30 +179,14 @@ if ($Uninstall) {
     # Remove dev-iq marker block from CLAUDE.md
     $ClaudeDst = "$Target\CLAUDE.md"
     if ((Test-Path $ClaudeDst) -and ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart))) {
-        if ($HavePython) {
-            $PyScript = @"
-import sys, re
-dst, ms, me = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(dst, encoding='utf-8') as f: content = f.read()
-pattern = re.escape(ms) + r'.*?' + re.escape(me)
-result = re.sub(pattern, '', content, flags=re.DOTALL).strip()
-with open(dst, 'w', encoding='utf-8') as f: f.write(result + '\n' if result else '')
-"@
-            $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
-            $PyScript | Set-Content $TmpPy -Encoding UTF8
-            & $PythonExe $TmpPy $ClaudeDst $MarkerStart $MarkerEnd
-            Remove-Item $TmpPy -ErrorAction SilentlyContinue
-        } else {
-            # PowerShell fallback: filter out the marker block line by line.
-            $Lines   = Get-Content $ClaudeDst -Encoding UTF8
-            $Inside  = $false
-            $Kept    = foreach ($Line in $Lines) {
-                if ($Line -match [regex]::Escape($MarkerStart)) { $Inside = $true; continue }
-                if ($Line -match [regex]::Escape($MarkerEnd))   { $Inside = $false; continue }
-                if (-not $Inside) { $Line }
-            }
-            ($Kept -join "`n").Trim() | Set-Content $ClaudeDst -Encoding UTF8
+        $Lines   = Get-Content $ClaudeDst -Encoding UTF8
+        $Inside  = $false
+        $Kept    = foreach ($Line in $Lines) {
+            if ($Line -match [regex]::Escape($MarkerStart)) { $Inside = $true; continue }
+            if ($Line -match [regex]::Escape($MarkerEnd))   { $Inside = $false; continue }
+            if (-not $Inside) { $Line }
         }
+        ($Kept -join "`n").Trim() | Set-Content $ClaudeDst -Encoding UTF8
         Write-Ok "Removed Dev.IQ block from CLAUDE.md."
         if (-not (Get-Content $ClaudeDst -Raw -ErrorAction SilentlyContinue).Trim()) {
             Remove-Item -Force $ClaudeDst; Write-Ok "Removed empty CLAUDE.md."
@@ -322,42 +295,43 @@ function Copy-PackDir {
 # ── Config pre-fill with auto-detected values ────────────────────
 function Invoke-PrefillConfig {
     param([string]$ConfigPath)
-    # Skip if no python3, if config doesn't exist, or if this is an upgrade
-    # (the user's existing config has already been configured).
-    if (-not $HavePython -or -not (Test-Path $ConfigPath) -or $IsUpgrade) { return }
+    if (-not (Test-Path $ConfigPath) -or $IsUpgrade) { return }
 
-    $PyScript = @"
-import sys, re
+    $Content = Get-Content $ConfigPath -Raw -Encoding UTF8
 
-path, tracker, ado_org, ado_proj, vcs, lang, fw = sys.argv[1:8]
+    # tracker.type: config default is "ado"; overwrite with detected value.
+    if ($DetectedTracker) {
+        $Content = $Content -replace 'type: "ado"', "type: `"$DetectedTracker`""
+        # signals.intent.source mirrors tracker
+        $Content = $Content -replace 'source: "ado"', "source: `"$DetectedTracker`""
+    }
 
-with open(path, encoding='utf-8') as f:
-    t = f.read()
+    # vcs.type: config default is "github"; only overwrite when different.
+    if ($DetectedVcs -and $DetectedVcs -ne "github") {
+        $Content = $Content -replace 'type: "github"', "type: `"$DetectedVcs`""
+    }
 
-def fill_first(text, key, val):
-    if not val: return text
-    return re.sub(r'(' + re.escape(key) + r':\s*)""', r'\g<1>"' + val + '"', text, count=1)
+    # ado.org_url — empty string placeholder.
+    if ($DetectedAdoOrg) {
+        $Content = $Content -replace 'org_url: ""', "org_url: `"$DetectedAdoOrg`""
+    }
 
-t = fill_first(t, '  type', tracker)
-if ado_org:
-    t = fill_first(t, '    org_url', ado_org)
-if ado_proj:
-    t = fill_first(t, '    project', ado_proj)
-t = re.sub(r'(vcs:\n  type:\s*)""', r'\g<1>"' + vcs + '"', t, count=1)
-if lang:
-    t = re.sub(r'(languages:\n    - )""', r'\g<1>"' + lang + '"', t, count=1)
-if fw:
-    t = re.sub(r'(frameworks:\n    - )""', r'\g<1>"' + fw + '"', t, count=1)
+    # ado.project — first empty project: "".
+    if ($DetectedAdoProject) {
+        $Content = [regex]::Replace($Content, 'project: ""', "project: `"$DetectedAdoProject`"", 1)
+    }
 
-with open(path, 'w', encoding='utf-8') as f:
-    f.write(t)
-"@
-    $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
-    $PyScript | Set-Content $TmpPy -Encoding UTF8
-    & $PythonExe $TmpPy $ConfigPath `
-        $DetectedTracker $DetectedAdoOrg $DetectedAdoProject `
-        $DetectedVcs $DetectedLang $DetectedFramework
-    Remove-Item $TmpPy -ErrorAction SilentlyContinue
+    # stack.languages — first "    - """.
+    if ($DetectedLang) {
+        $Content = [regex]::Replace($Content, '    - ""', "    - `"$DetectedLang`"", 1)
+    }
+
+    # stack.frameworks — first remaining "    - """.
+    if ($DetectedFramework) {
+        $Content = [regex]::Replace($Content, '    - ""', "    - `"$DetectedFramework`"", 1)
+    }
+
+    $Content | Set-Content $ConfigPath -Encoding UTF8 -NoNewline
 }
 
 # ── Install pack-owned files ──────────────────────────────────────
@@ -390,26 +364,12 @@ if (-not (Test-Path $ClaudeDst)) {
     "$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
     Write-Ok "Created CLAUDE.md with Dev.IQ instructions."
 } elseif ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart)) {
-    if ($HavePython) {
-        $PyScript = @"
-import sys
-dst, src = sys.argv[1], sys.argv[2]
-ms, me = '$MarkerStart', '$MarkerEnd'
-with open(dst, encoding='utf-8') as f: orig = f.read()
-with open(src, encoding='utf-8') as f: new  = f.read()
-block = ms + '\n' + new + '\n' + me
-si, ei = orig.find(ms), orig.find(me)
-result = orig[:si] + block + orig[ei + len(me):]
-with open(dst, 'w', encoding='utf-8') as f: f.write(result)
-"@
-        $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
-        $PyScript | Set-Content $TmpPy -Encoding UTF8
-        & $PythonExe $TmpPy $ClaudeDst $ClaudeSrc
-        Remove-Item $TmpPy -ErrorAction SilentlyContinue
-        Write-Ok "Updated Dev.IQ block in existing CLAUDE.md."
-    } else {
-        Write-Warn "CLAUDE.md already has a Dev.IQ block — skipped update (no python3)."
-    }
+    # Remove old block, re-append updated content at end.
+    $Pattern  = [regex]::Escape($MarkerStart) + '[\s\S]*?' + [regex]::Escape($MarkerEnd)
+    $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
+    $Cleaned  = [regex]::Replace($Existing, $Pattern, '').Trim()
+    "$Cleaned`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
+    Write-Ok "Updated Dev.IQ block in existing CLAUDE.md."
 } else {
     $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
     "$Existing`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
@@ -467,11 +427,6 @@ if ($DetectedLang) {
     Write-Host $DetectedLine
 } else {
     Write-Host "  Language not detected — open .dev-iq\config.yaml and fill in stack.languages."
-}
-if (-not $HavePython) {
-    Write-Host ""
-    Write-Host "  Config pre-fill was skipped (python3 not found)."
-    Write-Host "  Fill in .dev-iq\config.yaml — it takes about 2 minutes."
 }
 Write-Host ""
 if ($Mode -eq "trial") {

@@ -84,16 +84,6 @@ fi
 # git is required for .git/info/exclude (trial mode) and remote detection.
 command -v git >/dev/null 2>&1 || die "git is required but not found."
 
-# python3 is optional — used for config pre-fill and CLAUDE.md update.
-# If missing, install still completes; those steps are skipped with a note.
-if command -v python3 >/dev/null 2>&1; then
-  HAVE_PYTHON=true
-else
-  HAVE_PYTHON=false
-  warn "python3 not found — config pre-fill and CLAUDE.md update will be skipped."
-  warn "The install will still complete. Edit .dev-iq/config.yaml manually afterwards."
-fi
-
 [[ -d "$TARGET" ]]      || die "Target directory not found: $TARGET"
 [[ -d "$TARGET/.git" ]] || die "Target is not a git repository: $TARGET"
 TARGET="$(cd "$TARGET" && pwd)"
@@ -190,8 +180,8 @@ IS_UPGRADE=false
 
 if [[ -f "$MANIFEST" ]]; then
   IS_UPGRADE=true
-  PREV_VERSION=$(python3 -c "import json; d=json.load(open('$MANIFEST')); print(d.get('version','unknown'))" 2>/dev/null || echo "unknown")
-  PREV_MODE=$(python3 -c "import json; d=json.load(open('$MANIFEST')); print(d.get('mode','trial'))" 2>/dev/null || echo "trial")
+  PREV_VERSION=$(grep '"version"' "$MANIFEST" | sed 's/.*"version":[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || echo "unknown")
+  PREV_MODE=$(grep '"mode"' "$MANIFEST" | sed 's/.*"mode":[[:space:]]*"\([^"]*\)".*/\1/' 2>/dev/null || echo "trial")
   echo ""
   log "Existing Dev.IQ install detected."
   log "  Installed version : v${PREV_VERSION}"
@@ -219,23 +209,9 @@ if [[ "$GRADUATE" == true ]]; then
     ok "Removed trial entries from .git/info/exclude."
   fi
 
-  _GRAD_NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +%s)
-  if [[ "$HAVE_PYTHON" == true ]]; then
-    python3 - "$MANIFEST" "$_GRAD_NOW" << 'PYEOF'
-import json, sys
-path, ts = sys.argv[1], sys.argv[2]
-with open(path) as f:
-    d = json.load(f)
-d["mode"] = "committed"
-d["graduated_at"] = ts
-with open(path, "w") as f:
-    json.dump(d, f, indent=2)
-PYEOF
-  else
-    # Bash fallback — update mode field with sed (no python3 required).
-    sed -i.bak 's/"mode": "trial"/"mode": "committed"/' "$MANIFEST" 2>/dev/null \
-      && rm -f "${MANIFEST}.bak" || warn "Could not update manifest mode — edit .dev-iq/.install-manifest.json manually."
-  fi
+  sed -i.bak 's/"mode": "trial"/"mode": "committed"/' "$MANIFEST" 2>/dev/null \
+    && rm -f "${MANIFEST}.bak" \
+    || warn "Could not update manifest mode — edit .dev-iq/.install-manifest.json manually."
 
   ok "Graduated to committed mode."
   echo ""
@@ -271,23 +247,9 @@ if [[ "$UNINSTALL" == true ]]; then
 
   CLAUDE_DST="$TARGET/CLAUDE.md"
   if [[ -f "$CLAUDE_DST" ]] && grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
-    if [[ "$HAVE_PYTHON" == true ]]; then
-      python3 - "$CLAUDE_DST" "$MARKER_START" "$MARKER_END" << 'PYEOF'
-import sys, re
-dst, ms, me = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(dst, encoding='utf-8') as f:
-    content = f.read()
-pattern = re.escape(ms) + r'.*?' + re.escape(me)
-result = re.sub(pattern, '', content, flags=re.DOTALL).strip()
-with open(dst, 'w', encoding='utf-8') as f:
-    f.write(result + '\n' if result else '')
-PYEOF
-    else
-      # sed fallback: delete from start marker to end marker (inclusive).
-      sed -i.bak "/${MARKER_START//\//\\/}/,/${MARKER_END//\//\\/}/d" "$CLAUDE_DST" 2>/dev/null \
-        && rm -f "${CLAUDE_DST}.bak" \
-        || warn "Could not remove Dev.IQ block from CLAUDE.md (no python3/sed). Delete the block between $MARKER_START and $MARKER_END manually."
-    fi
+    sed -i.bak "/${MARKER_START//\//\\/}/,/${MARKER_END//\//\\/}/d" "$CLAUDE_DST" 2>/dev/null \
+      && rm -f "${CLAUDE_DST}.bak" \
+      || warn "Could not remove Dev.IQ block from CLAUDE.md — delete the block between $MARKER_START and $MARKER_END manually."
     ok "Removed Dev.IQ block from CLAUDE.md."
     [[ -s "$CLAUDE_DST" ]] || { rm -f "$CLAUDE_DST"; ok "Removed empty CLAUDE.md."; }
   fi
@@ -384,70 +346,53 @@ _copy_file "$PACK_ROOT/.dev-iq/telemetry-overlay.md"  "$TARGET/.dev-iq/telemetry
 # ── Pre-fill config.yaml with auto-detected values ────────────────
 prefill_config() {
   local cfg="$1"
-  [[ -f "$cfg" ]]         || return
-  [[ "$HAVE_PYTHON" == true ]] || return
-  # Skip on upgrade — the user's existing config is already configured.
+  [[ -f "$cfg" ]]              || return
   [[ "$IS_UPGRADE" == false ]] || return
 
-  python3 - "$cfg" \
-    "$DETECTED_TRACKER" "$DETECTED_VCS" \
-    "${DETECTED_ADO_ORG:-}" "${DETECTED_ADO_PROJECT:-}" \
-    "${DETECTED_LANG:-}" "${DETECTED_FRAMEWORK:-}" << 'PYEOF'
-import sys, re
+  # tracker.type: config default is "ado"; overwrite with detected value.
+  if [[ -n "$DETECTED_TRACKER" ]]; then
+    sed -i.bak "s/type: \"ado\"/type: \"${DETECTED_TRACKER}\"/" "$cfg" \
+      && rm -f "${cfg}.bak"
+    # signals.intent.source mirrors tracker
+    sed -i.bak "s/source: \"ado\"/source: \"${DETECTED_TRACKER}\"/" "$cfg" \
+      && rm -f "${cfg}.bak"
+  fi
 
-cfg, tracker, vcs, ado_org, ado_project, lang, framework = sys.argv[1:8]
+  # vcs.type: config default is "github"; only overwrite when different.
+  if [[ -n "$DETECTED_VCS" && "$DETECTED_VCS" != "github" ]]; then
+    sed -i.bak "s/type: \"github\"/type: \"${DETECTED_VCS}\"/" "$cfg" \
+      && rm -f "${cfg}.bak"
+  fi
 
-with open(cfg, encoding='utf-8') as f:
-    content = f.read()
+  # ado.org_url — empty string placeholder.
+  if [[ -n "$DETECTED_ADO_ORG" ]]; then
+    sed -i.bak "s|org_url: \"\"|org_url: \"${DETECTED_ADO_ORG}\"|" "$cfg" \
+      && rm -f "${cfg}.bak"
+  fi
 
-def subst(pattern, value, text, flags=0):
-    """Replace the captured group 1 placeholder with value, only when value is set."""
-    if not value:
-        return text
-    return re.sub(pattern, value, text, count=1, flags=flags)
+  # ado.project — first empty project: "" in the file.
+  if [[ -n "$DETECTED_ADO_PROJECT" ]]; then
+    awk -v val="$DETECTED_ADO_PROJECT" \
+      '!done && /project: ""/{sub(/project: ""/, "project: \"" val "\""); done=1} 1' \
+      "$cfg" > "${cfg}.tmp" && mv "${cfg}.tmp" "$cfg"
+  fi
 
-# tracker.type
-if tracker:
-    content = re.sub(
-        r'(tracker:\s*\n\s*type:\s*)"[^"]*"',
-        lambda m: m.group(0).replace(m.group(0).split('"')[-2], tracker),
-        content)
+  # stack.languages — first "    - """.
+  if [[ -n "$DETECTED_LANG" ]]; then
+    awk -v val="$DETECTED_LANG" \
+      '!done && /    - ""/{sub(/    - ""/, "    - \"" val "\""); done=1} 1' \
+      "$cfg" > "${cfg}.tmp" && mv "${cfg}.tmp" "$cfg"
+  fi
 
-# ado.org_url
-if ado_org:
-    content = re.sub(r'(org_url:\s*)"[^"]*"', f'\\1"{ado_org}"', content)
+  # stack.frameworks — first remaining "    - """.
+  if [[ -n "$DETECTED_FRAMEWORK" ]]; then
+    awk -v val="$DETECTED_FRAMEWORK" \
+      '!done && /    - ""/{sub(/    - ""/, "    - \"" val "\""); done=1} 1' \
+      "$cfg" > "${cfg}.tmp" && mv "${cfg}.tmp" "$cfg"
+  fi
 
-# ado.project
-if ado_project:
-    content = re.sub(r'(project:\s*)"[^"]*"', f'\\1"{ado_project}"', content, count=1)
-
-# vcs.type
-if vcs:
-    content = re.sub(
-        r'(vcs:\s*\n\s*type:\s*)"[^"]*"',
-        lambda m: m.group(0).replace(m.group(0).split('"')[-2], vcs),
-        content, flags=re.DOTALL)
-
-# stack.languages first empty entry
-if lang:
-    content = re.sub(r'(languages:\s*\n\s*-\s*)"[^"]*"', f'\\1"{lang}"', content, count=1)
-
-# stack.frameworks first empty entry
-if framework:
-    content = re.sub(r'(frameworks:\s*\n\s*-\s*)"[^"]*"', f'\\1"{framework}"', content, count=1)
-
-# signals.intent.source
-if tracker:
-    content = re.sub(
-        r'(signals:\s*\n\s*intent:\s*\n\s*source:\s*)"[^"]*"',
-        f'\\1"{tracker}"',
-        content, flags=re.DOTALL)
-
-with open(cfg, 'w', encoding='utf-8') as f:
-    f.write(content)
-PYEOF
   ok "Config pre-filled : .dev-iq/config.yaml"
-} || warn "Config pre-fill skipped (unexpected error) — edit .dev-iq/config.yaml manually."
+}
 
 prefill_config "$TARGET/.dev-iq/config.yaml"
 
@@ -473,24 +418,15 @@ _inject_claude_md() {
   fi
 
   if grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
-    if [[ "$HAVE_PYTHON" == true ]]; then
-      python3 - "$CLAUDE_DST" "$CLAUDE_SRC" "$MARKER_START" "$MARKER_END" << 'PYEOF'
-import sys, re
-dst_path, src_path, ms, me = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-with open(dst_path) as f: original = f.read()
-with open(src_path) as f: new_content = f.read()
-new_block = ms + "\n" + new_content + "\n" + me
-start_idx = original.find(ms)
-end_idx   = original.find(me)
-after_end = end_idx + len(me)
-result = original[:start_idx] + new_block + original[after_end:]
-with open(dst_path, "w") as f: f.write(result)
-PYEOF
-      ok "Updated Dev.IQ block in existing CLAUDE.md."
-    else
-      warn "CLAUDE.md already contains a Dev.IQ block — skipped update (no python3)."
-      warn "To update it manually, delete the block between $MARKER_START and $MARKER_END and re-run."
-    fi
+    # Remove old block, re-append updated content at end.
+    sed -i.bak "/${MARKER_START//\//\\/}/,/${MARKER_END//\//\\/}/d" "$CLAUDE_DST" \
+      && rm -f "${CLAUDE_DST}.bak"
+    {
+      printf '\n\n%s\n' "$MARKER_START"
+      cat "$CLAUDE_SRC"
+      printf '%s\n' "$MARKER_END"
+    } >> "$CLAUDE_DST"
+    ok "Updated Dev.IQ block in existing CLAUDE.md."
   else
     {
       printf '\n\n'
@@ -535,31 +471,7 @@ HOOKS_BOOL=$( [[ "$INCLUDE_HOOKS" == true ]] && echo "true" || echo "false" )
 UPGRADE_BOOL=$( [[ "$IS_UPGRADE" == true ]] && echo "true" || echo "false" )
 
 _NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +%s)
-if [[ "$HAVE_PYTHON" == true ]]; then
-  python3 - << PYEOF
-import json, datetime
-
-manifest = {
-    "version":          "$PACK_VERSION",
-    "installed_at":     datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-    "mode":             "$MODE",
-    "pack_source":      "$PACK_ROOT",
-    "hooks_installed":  $HOOKS_BOOL,
-    "is_upgrade":       $UPGRADE_BOOL,
-    "detected": {
-        "tracker":      "${DETECTED_TRACKER}",
-        "vcs":          "${DETECTED_VCS}",
-        "language":     "${DETECTED_LANG}",
-        "framework":    "${DETECTED_FRAMEWORK}"
-    }
-}
-
-with open("$MANIFEST", "w") as f:
-    json.dump(manifest, f, indent=2)
-PYEOF
-else
-  # Bash heredoc fallback — no python3 required.
-  cat > "$MANIFEST" << EOF
+cat > "$MANIFEST" << EOF
 {
   "version": "$PACK_VERSION",
   "installed_at": "$_NOW",
@@ -575,7 +487,6 @@ else
   }
 }
 EOF
-fi
 ok "Manifest written : .dev-iq/.install-manifest.json"
 
 # ── Done ──────────────────────────────────────────────────────────
@@ -594,12 +505,6 @@ if [[ -n "$DETECTED_LANG" ]]; then
   echo -e "  Detected : ${DETECTED_LANG}${DETECTED_FRAMEWORK:+ / $DETECTED_FRAMEWORK} · ${DETECTED_TRACKER} · ${DETECTED_VCS}"
 else
   echo -e "  Language not detected — open ${C_BLD}.dev-iq/config.yaml${C_RST} and fill in ${C_BLD}stack.languages${C_RST}."
-fi
-
-if [[ "$HAVE_PYTHON" == false ]]; then
-  echo ""
-  echo -e "  Config pre-fill was skipped (python3 not found)."
-  echo -e "  Fill in ${C_BLD}.dev-iq/config.yaml${C_RST} — it takes about 2 minutes."
 fi
 
 echo ""
