@@ -6,6 +6,12 @@
 set -euo pipefail 2>/dev/null || true
 
 PACK_ROOT="${DI_PACK_ROOT:-$(cd "$(dirname "$0")/../.." 2>/dev/null && pwd)}"
+
+# Respect hindsight_enabled flag in .dev-iq/config.yaml (default: enabled)
+_ENABLED=$(grep -m1 "hindsight_enabled:" "${PACK_ROOT}/.dev-iq/config.yaml" 2>/dev/null \
+  | sed 's/.*:[[:space:]]*//' | tr -d '"' | xargs)
+[[ "$_ENABLED" == "false" ]] && exit 0
+
 SESSION_ID="${CLAUDE_SESSION_ID:-$$}"
 LESSONS_FILE="${PACK_ROOT}/hooks/state/dismissed-lessons.json"
 SESSION_LOG="${PACK_ROOT}/hooks/state/session-${SESSION_ID}.jsonl"
