@@ -1,0 +1,3 @@
+# Session logs are runtime state — created at session start, deleted at session end.
+# They must never be committed.
+session-*.jsonl
