@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Dev.IQ Agent Pack — Bootstrap Installer
 # Version : 0.9.0
-# Usage   : bash scripts/bootstrap.sh [--target=<path>] [--mode=trial|committed] [--preset=pod|solo|portable] [--graduate] [--uninstall] [--hooks]
+# Usage   : bash scripts/bootstrap.sh [--target=<path>] [--mode=trial|committed]
+#           [--preset=pod|solo|portable] [--graduate] [--uninstall] [--hooks]
 set -euo pipefail
 
 PACK_VERSION="0.9.0"
@@ -46,31 +47,21 @@ Usage:
   bash scripts/bootstrap.sh [options]
 
 Options:
-  --target=<path>              Target repository root (default: current directory)
-  --mode=trial                 Install without touching git history (uses .git/info/exclude)
-  --mode=committed             Install files visibly so the team can commit them
-  --preset=pod                 Team pod install: committed mode + hooks
-  --preset=solo                Individual developer: trial mode, no hooks
-  --preset=portable            Client handoff: committed mode, no hooks, minimal footprint
-  --graduate                   Convert a trial install to committed mode
-  --uninstall                  Remove Dev.IQ from the target repository
-  --hooks                      Also install the hooks/ directory
-  --help                       Show this help message
+  --target=<path>    Target repository root (default: current directory)
+  --mode=trial       Install locally, invisible to git until you graduate
+  --mode=committed   Install files visibly so the team can commit them
+  --preset=pod       Team pod: committed + hooks
+  --preset=solo      Solo dev: trial, no hooks
+  --preset=portable  Minimal: committed, no hooks
+  --graduate         Convert a trial install to committed mode
+  --uninstall        Remove Dev.IQ from the target repository
+  --hooks            Also install the hooks/ directory
 
 Examples:
-  # Fresh install, interactive mode selection:
   bash /path/to/dev-iq/scripts/bootstrap.sh
-
-  # Install for an individual developer (trial mode):
-  bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --preset=solo
-
-  # Install for a whole team (committed mode + hooks):
-  bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --preset=pod
-
-  # Graduate a trial install to committed:
+  bash /path/to/dev-iq/scripts/bootstrap.sh --preset=solo
+  bash /path/to/dev-iq/scripts/bootstrap.sh --preset=pod
   bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --graduate
-
-  # Remove Dev.IQ from a repository:
   bash /path/to/dev-iq/scripts/bootstrap.sh --target=/path/to/repo --uninstall
 EOF
       exit 0
@@ -79,7 +70,7 @@ EOF
   esac
 done
 
-# ── Apply preset (sets mode and hooks before validation) ──────────
+# ── Apply preset ──────────────────────────────────────────────────
 if [[ -n "$PRESET" ]]; then
   case "$PRESET" in
     pod)       MODE="committed"; INCLUDE_HOOKS=true  ;;
@@ -95,7 +86,93 @@ command -v git     >/dev/null 2>&1 || die "git is required but not found."
 
 [[ -d "$TARGET" ]]      || die "Target directory not found: $TARGET"
 [[ -d "$TARGET/.git" ]] || die "Target is not a git repository: $TARGET"
-TARGET="$(cd "$TARGET" && pwd)"  # normalise to absolute path
+TARGET="$(cd "$TARGET" && pwd)"
+
+# ── Auto-detect project context ───────────────────────────────────
+DETECTED_TRACKER="ado"
+DETECTED_VCS="github"
+DETECTED_ADO_ORG=""
+DETECTED_ADO_PROJECT=""
+DETECTED_LANG=""
+DETECTED_FRAMEWORK=""
+
+detect_context() {
+  local remote_url
+  remote_url=$(git -C "$TARGET" remote get-url origin 2>/dev/null || true)
+
+  # Tracker + VCS from git remote URL
+  if [[ "$remote_url" =~ dev\.azure\.com ]]; then
+    DETECTED_TRACKER="ado"
+    DETECTED_VCS="ado-repos"
+    # Handles: https://dev.azure.com/ORG/PROJECT/_git/REPO
+    #      and https://ORG@dev.azure.com/ORG/PROJECT/_git/REPO
+    if [[ "$remote_url" =~ dev\.azure\.com/([^/@]+)/([^/]+) ]]; then
+      DETECTED_ADO_ORG="https://dev.azure.com/${BASH_REMATCH[1]}"
+      DETECTED_ADO_PROJECT="${BASH_REMATCH[2]}"
+    fi
+  elif [[ "$remote_url" =~ github\.com ]]; then
+    DETECTED_VCS="github"
+    DETECTED_TRACKER="github-issues"
+  elif [[ "$remote_url" =~ gitlab\.com ]]; then
+    DETECTED_VCS="gitlab"
+  elif [[ "$remote_url" =~ bitbucket\.org ]]; then
+    DETECTED_VCS="bitbucket"
+  fi
+
+  # Language from project files (checked in priority order)
+  if [[ -f "$TARGET/package.json" ]]; then
+    if [[ -f "$TARGET/tsconfig.json" ]]; then
+      DETECTED_LANG="typescript"
+    else
+      DETECTED_LANG="javascript"
+    fi
+  elif [[ -f "$TARGET/requirements.txt" || -f "$TARGET/pyproject.toml" || -f "$TARGET/setup.py" ]]; then
+    DETECTED_LANG="python"
+  elif [[ -f "$TARGET/pom.xml" ]]; then
+    DETECTED_LANG="java"
+  elif ls "$TARGET"/*.csproj "$TARGET"/**/*.csproj 2>/dev/null | grep -q '.'; then
+    DETECTED_LANG="csharp"
+  elif ls "$TARGET"/build.gradle* 2>/dev/null | grep -q '.'; then
+    DETECTED_LANG="java"
+  elif [[ -f "$TARGET/go.mod" ]]; then
+    DETECTED_LANG="go"
+  elif [[ -f "$TARGET/Gemfile" ]]; then
+    DETECTED_LANG="ruby"
+  elif [[ -f "$TARGET/Cargo.toml" ]]; then
+    DETECTED_LANG="rust"
+  fi
+
+  # Framework from package.json dependencies
+  if [[ -f "$TARGET/package.json" ]]; then
+    local pkg
+    pkg=$(cat "$TARGET/package.json" 2>/dev/null || true)
+    if printf '%s' "$pkg" | grep -q '"next"'; then
+      DETECTED_FRAMEWORK="nextjs"
+    elif printf '%s' "$pkg" | grep -q '"react"'; then
+      DETECTED_FRAMEWORK="react"
+    elif printf '%s' "$pkg" | grep -q '"@angular/core"'; then
+      DETECTED_FRAMEWORK="angular"
+    elif printf '%s' "$pkg" | grep -q '"vue"'; then
+      DETECTED_FRAMEWORK="vue"
+    elif printf '%s' "$pkg" | grep -q '"@nestjs/core"'; then
+      DETECTED_FRAMEWORK="nestjs"
+    elif printf '%s' "$pkg" | grep -q '"express"'; then
+      DETECTED_FRAMEWORK="express"
+    fi
+  elif [[ -f "$TARGET/requirements.txt" ]]; then
+    local reqs
+    reqs=$(cat "$TARGET/requirements.txt" 2>/dev/null || true)
+    if printf '%s' "$reqs" | grep -qi "fastapi"; then
+      DETECTED_FRAMEWORK="fastapi"
+    elif printf '%s' "$reqs" | grep -qi "django"; then
+      DETECTED_FRAMEWORK="django"
+    elif printf '%s' "$reqs" | grep -qi "flask"; then
+      DETECTED_FRAMEWORK="flask"
+    fi
+  fi
+}
+
+detect_context
 
 # ── Detect existing install ───────────────────────────────────────
 MANIFEST="$TARGET/.dev-iq/.install-manifest.json"
@@ -119,7 +196,6 @@ if [[ "$GRADUATE" == true ]]; then
 
   EXCLUDE="$TARGET/.git/info/exclude"
   if [[ -f "$EXCLUDE" ]] && grep -qF "# dev-iq" "$EXCLUDE" 2>/dev/null; then
-    # Strip dev-iq block from exclude file
     grep -v "^# dev-iq" "$EXCLUDE" \
       | grep -v "^\.github/skills" \
       | grep -v "^\.github/instructions" \
@@ -147,11 +223,11 @@ PYEOF
   ok "Graduated to committed mode."
   echo ""
   log "Dev.IQ files are now visible to git."
-  log "Next: review the files, then git add and open a team PR."
+  log "Next: git add the dev-iq files and open a team PR."
   exit 0
 fi
 
-# ── Uninstall mode ───────────────────────────────────────────────
+# ── Uninstall mode ────────────────────────────────────────────────
 if [[ "$UNINSTALL" == true ]]; then
   echo ""
   log "Removing Dev.IQ Agent Pack from: $TARGET"
@@ -162,7 +238,6 @@ if [[ "$UNINSTALL" == true ]]; then
     [[ "${_confirm,,}" == "y" ]] || { log "Uninstall cancelled."; exit 0; }
   fi
 
-  # Remove pack-owned directories
   for dir in ".github/skills" ".github/instructions" ".github/agents" ".claude/agents"; do
     if [[ -d "$TARGET/$dir" ]]; then
       rm -rf "${TARGET:?}/$dir"
@@ -170,7 +245,6 @@ if [[ "$UNINSTALL" == true ]]; then
     fi
   done
 
-  # Remove pack-owned files
   for file in ".claude/skills.md"; do
     if [[ -f "$TARGET/$file" ]]; then
       rm -f "$TARGET/$file"
@@ -178,7 +252,6 @@ if [[ "$UNINSTALL" == true ]]; then
     fi
   done
 
-  # Remove dev-iq marker block from CLAUDE.md (preserve rest of file)
   CLAUDE_DST="$TARGET/CLAUDE.md"
   if [[ -f "$CLAUDE_DST" ]] && grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
     python3 - "$CLAUDE_DST" "$MARKER_START" "$MARKER_END" << 'PYEOF'
@@ -192,11 +265,9 @@ with open(dst, 'w', encoding='utf-8') as f:
     f.write(result + '\n' if result else '')
 PYEOF
     ok "Removed Dev.IQ block from CLAUDE.md."
-    # If CLAUDE.md is now empty, remove it entirely
     [[ -s "$CLAUDE_DST" ]] || { rm -f "$CLAUDE_DST"; ok "Removed empty CLAUDE.md."; }
   fi
 
-  # Remove trial mode entries from .git/info/exclude
   EXCLUDE="$TARGET/.git/info/exclude"
   if [[ -f "$EXCLUDE" ]] && grep -qF "# dev-iq" "$EXCLUDE" 2>/dev/null; then
     grep -v "^# dev-iq" "$EXCLUDE" \
@@ -212,7 +283,6 @@ PYEOF
     ok "Removed trial entries from .git/info/exclude."
   fi
 
-  # Remove .dev-iq/ directory
   if [[ -d "$TARGET/.dev-iq" ]]; then
     rm -rf "${TARGET:?}/.dev-iq"
     ok "Removed : .dev-iq/"
@@ -220,25 +290,20 @@ PYEOF
 
   echo ""
   ok "Dev.IQ removed from $TARGET."
-  echo ""
-  log "User-created files (your code, tests, configs) were not touched."
   exit 0
 fi
 
 # ── Select install mode ───────────────────────────────────────────
+# Single question — no jargon exposed unless user passes flags directly.
 if [[ -z "$MODE" ]]; then
   if [[ -t 0 ]]; then
     echo ""
-    log "Select install mode:"
+    echo -e "  ${C_BLD}Just you, or the whole team?${C_RST}"
     echo ""
-    echo -e "  ${C_BLD}[1] trial${C_RST}     — local only, completely invisible to git"
-    echo -e "            Files go in .git/info/exclude — the codebase is not modified."
-    echo -e "            Graduate to committed later when the team is ready."
+    echo -e "  ${C_BLD}[1]${C_RST} Just me    — installed locally, invisible to git until you're ready"
+    echo -e "  ${C_BLD}[2]${C_RST} Whole team — files go into git; commit and share straight away"
     echo ""
-    echo -e "  ${C_BLD}[2] committed${C_RST} — files visible to git"
-    echo -e "            Team can review, commit, and share the pack as a normal PR."
-    echo ""
-    read -rp "  Choice [1/2] (default: 1): " _choice
+    read -rp "  [1/2] (default: 1): " _choice
     [[ "${_choice:-1}" == "2" ]] && MODE="committed" || MODE="trial"
   else
     MODE="trial"
@@ -251,15 +316,15 @@ fi
 echo ""
 log "─────────────────────────────────────────────"
 log "  Dev.IQ Agent Pack v${PACK_VERSION}"
-log "  Target : $TARGET"
-log "  Mode   : $MODE${PRESET:+ (preset: $PRESET)}"
+log "  Target   : $TARGET"
+log "  Mode     : $MODE${PRESET:+ (preset: $PRESET)}"
+if [[ -n "$DETECTED_LANG" ]]; then
+log "  Detected : ${DETECTED_LANG}${DETECTED_FRAMEWORK:+ / $DETECTED_FRAMEWORK} · ${DETECTED_TRACKER} · ${DETECTED_VCS}"
+fi
 log "─────────────────────────────────────────────"
 echo ""
 
 # ── File copy helpers ─────────────────────────────────────────────
-
-# Copy a single file to dst.
-# If preserve=true and dst already exists, skip it (user has configured it).
 _copy_file() {
   local src="$1" dst="$2" preserve="${3:-false}"
   mkdir -p "$(dirname "$dst")"
@@ -271,7 +336,6 @@ _copy_file() {
   ok "Installed : ${dst#"$TARGET/"}"
 }
 
-# Recursively copy all files in src/ to dst/. Never preserves — pack owns these.
 _copy_dir() {
   local src="$1" dst="$2"
   while IFS= read -r -d '' file; do
@@ -280,7 +344,7 @@ _copy_dir() {
   done < <(find "$src" -type f -print0)
 }
 
-# ── Install pack-owned files (always up to date) ──────────────────
+# ── Install pack-owned files ──────────────────────────────────────
 _copy_dir "$PACK_ROOT/.github/skills"       "$TARGET/.github/skills"
 _copy_dir "$PACK_ROOT/.github/instructions" "$TARGET/.github/instructions"
 _copy_dir "$PACK_ROOT/.github/agents"       "$TARGET/.github/agents"
@@ -292,6 +356,73 @@ _copy_file "$PACK_ROOT/.dev-iq/config.yaml"          "$TARGET/.dev-iq/config.yam
 _copy_file "$PACK_ROOT/.dev-iq/governance.md"         "$TARGET/.dev-iq/governance.md"         true
 _copy_file "$PACK_ROOT/.dev-iq/maturity-profile.md"   "$TARGET/.dev-iq/maturity-profile.md"   true
 _copy_file "$PACK_ROOT/.dev-iq/telemetry-overlay.md"  "$TARGET/.dev-iq/telemetry-overlay.md"  true
+
+# ── Pre-fill config.yaml with auto-detected values ────────────────
+prefill_config() {
+  local cfg="$1"
+  [[ -f "$cfg" ]] || return
+
+  python3 - "$cfg" \
+    "$DETECTED_TRACKER" "$DETECTED_VCS" \
+    "${DETECTED_ADO_ORG:-}" "${DETECTED_ADO_PROJECT:-}" \
+    "${DETECTED_LANG:-}" "${DETECTED_FRAMEWORK:-}" << 'PYEOF'
+import sys, re
+
+cfg, tracker, vcs, ado_org, ado_project, lang, framework = sys.argv[1:8]
+
+with open(cfg, encoding='utf-8') as f:
+    content = f.read()
+
+def subst(pattern, value, text, flags=0):
+    """Replace the captured group 1 placeholder with value, only when value is set."""
+    if not value:
+        return text
+    return re.sub(pattern, value, text, count=1, flags=flags)
+
+# tracker.type
+if tracker:
+    content = re.sub(
+        r'(tracker:\s*\n\s*type:\s*)"[^"]*"',
+        lambda m: m.group(0).replace(m.group(0).split('"')[-2], tracker),
+        content)
+
+# ado.org_url
+if ado_org:
+    content = re.sub(r'(org_url:\s*)"[^"]*"', f'\\1"{ado_org}"', content)
+
+# ado.project
+if ado_project:
+    content = re.sub(r'(project:\s*)"[^"]*"', f'\\1"{ado_project}"', content, count=1)
+
+# vcs.type
+if vcs:
+    content = re.sub(
+        r'(vcs:\s*\n\s*type:\s*)"[^"]*"',
+        lambda m: m.group(0).replace(m.group(0).split('"')[-2], vcs),
+        content, flags=re.DOTALL)
+
+# stack.languages first empty entry
+if lang:
+    content = re.sub(r'(languages:\s*\n\s*-\s*)"[^"]*"', f'\\1"{lang}"', content, count=1)
+
+# stack.frameworks first empty entry
+if framework:
+    content = re.sub(r'(frameworks:\s*\n\s*-\s*)"[^"]*"', f'\\1"{framework}"', content, count=1)
+
+# signals.intent.source
+if tracker:
+    content = re.sub(
+        r'(signals:\s*\n\s*intent:\s*\n\s*source:\s*)"[^"]*"',
+        f'\\1"{tracker}"',
+        content, flags=re.DOTALL)
+
+with open(cfg, 'w', encoding='utf-8') as f:
+    f.write(content)
+PYEOF
+  ok "Config pre-filled : .dev-iq/config.yaml"
+}
+
+prefill_config "$TARGET/.dev-iq/config.yaml"
 
 # ── Install hooks (optional) ──────────────────────────────────────
 if [[ "$INCLUDE_HOOKS" == true ]]; then
@@ -305,7 +436,6 @@ CLAUDE_DST="$TARGET/CLAUDE.md"
 
 _inject_claude_md() {
   if [[ ! -f "$CLAUDE_DST" ]]; then
-    # No existing CLAUDE.md — create it with markers
     {
       printf '%s\n' "$MARKER_START"
       cat "$CLAUDE_SRC"
@@ -316,34 +446,20 @@ _inject_claude_md() {
   fi
 
   if grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
-    # Upgrade path — replace the existing marker block
     python3 - "$CLAUDE_DST" "$CLAUDE_SRC" "$MARKER_START" "$MARKER_END" << 'PYEOF'
-import sys
-
-dst_path, src_path, marker_start, marker_end = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-
-with open(dst_path) as f:
-    original = f.read()
-with open(src_path) as f:
-    new_content = f.read()
-
-new_block = marker_start + "\n" + new_content + "\n" + marker_end
-
-start_idx = original.find(marker_start)
-end_idx   = original.find(marker_end)
-
-if start_idx == -1 or end_idx == -1:
-    sys.exit("Marker not found — this should not happen.")
-
-after_end = end_idx + len(marker_end)
+import sys, re
+dst_path, src_path, ms, me = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+with open(dst_path) as f: original = f.read()
+with open(src_path) as f: new_content = f.read()
+new_block = ms + "\n" + new_content + "\n" + me
+start_idx = original.find(ms)
+end_idx   = original.find(me)
+after_end = end_idx + len(me)
 result = original[:start_idx] + new_block + original[after_end:]
-
-with open(dst_path, "w") as f:
-    f.write(result)
+with open(dst_path, "w") as f: f.write(result)
 PYEOF
     ok "Updated Dev.IQ block in existing CLAUDE.md."
   else
-    # First-time append — existing CLAUDE.md with no dev-iq section yet
     {
       printf '\n\n'
       printf '%s\n' "$MARKER_START"
@@ -395,7 +511,13 @@ manifest = {
     "mode":             "$MODE",
     "pack_source":      "$PACK_ROOT",
     "hooks_installed":  $HOOKS_BOOL,
-    "is_upgrade":       $UPGRADE_BOOL
+    "is_upgrade":       $UPGRADE_BOOL,
+    "detected": {
+        "tracker":      "${DETECTED_TRACKER}",
+        "vcs":          "${DETECTED_VCS}",
+        "language":     "${DETECTED_LANG}",
+        "framework":    "${DETECTED_FRAMEWORK}"
+    }
 }
 
 with open("$MANIFEST", "w") as f:
@@ -403,20 +525,18 @@ with open("$MANIFEST", "w") as f:
 PYEOF
 ok "Manifest written : .dev-iq/.install-manifest.json"
 
-# ── Summary ───────────────────────────────────────────────────────
+# ── Done ──────────────────────────────────────────────────────────
 echo ""
-echo -e "  ${C_GRN}${C_BLD}Dev.IQ Agent Pack v${PACK_VERSION} installed successfully. (${MODE} mode)${C_RST}"
+echo -e "  ${C_GRN}${C_BLD}Dev.IQ ${PACK_VERSION} is ready.${C_RST}"
 echo ""
-echo -e "  ${C_BLD}Next steps:${C_RST}"
-echo -e "  1. Edit ${C_BLD}.dev-iq/config.yaml${C_RST}"
-echo -e "     Set: client name · maturity tier (early/mid/higher) · tracker type (ado/jira)"
-echo -e "  2. Open VS Code in this project"
-echo -e "  3. In Copilot Chat or Claude Code, select the ${C_BLD}Dev-IQ${C_RST} agent"
-echo -e "  4. Type ${C_BLD}/${C_RST} to see all available skills"
-echo -e "  5. Run ${C_BLD}/explain-code${C_RST} on any file to verify the install"
+echo -e "  Open Copilot Chat or Claude Code, select ${C_BLD}Dev-IQ${C_RST}, and type:"
+echo ""
+echo -e "    ${C_BLD}/explain-code${C_RST}"
+echo ""
+echo -e "  That's it."
 echo ""
 if [[ "$MODE" == "trial" ]]; then
-  echo -e "  To share with your team when ready:"
-  echo -e "  ${C_BLD}bash /path/to/dev-iq/scripts/bootstrap.sh --target=$TARGET --graduate${C_RST}"
+  echo -e "  Share with the team later:"
+  echo -e "    ${C_BLD}bash /path/to/dev-iq/scripts/bootstrap.sh --target=$(pwd) --graduate${C_RST}"
   echo ""
 fi

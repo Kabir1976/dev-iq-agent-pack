@@ -64,6 +64,74 @@ if (-not (Test-Path $Target -PathType Container)) { Write-Fail "Target directory
 if (-not (Test-Path "$Target\.git" -PathType Container)) { Write-Fail "Target is not a git repository: $Target" }
 $Target = (Resolve-Path $Target).Path
 
+# ── Auto-detect project context ───────────────────────────────────
+$DetectedTracker   = "ado"
+$DetectedVcs       = "github"
+$DetectedAdoOrg    = ""
+$DetectedAdoProject = ""
+$DetectedLang      = ""
+$DetectedFramework = ""
+
+function Invoke-ContextDetection {
+    # Tracker + VCS from git remote URL
+    try {
+        $RemoteUrl = git -C $Target remote get-url origin 2>$null
+    } catch { $RemoteUrl = "" }
+
+    if ($RemoteUrl -match "dev\.azure\.com") {
+        $script:DetectedTracker = "ado"
+        $script:DetectedVcs     = "ado-repos"
+        if ($RemoteUrl -match "dev\.azure\.com/([^/@]+)/([^/]+)") {
+            $script:DetectedAdoOrg     = "https://dev.azure.com/$($Matches[1])"
+            $script:DetectedAdoProject = $Matches[2]
+        }
+    } elseif ($RemoteUrl -match "github\.com") {
+        $script:DetectedVcs     = "github"
+        $script:DetectedTracker = "github-issues"
+    } elseif ($RemoteUrl -match "gitlab\.com") {
+        $script:DetectedVcs = "gitlab"
+    } elseif ($RemoteUrl -match "bitbucket\.org") {
+        $script:DetectedVcs = "bitbucket"
+    }
+
+    # Language from project files
+    if (Test-Path "$Target\package.json") {
+        $script:DetectedLang = if (Test-Path "$Target\tsconfig.json") { "typescript" } else { "javascript" }
+    } elseif ((Test-Path "$Target\requirements.txt") -or (Test-Path "$Target\pyproject.toml") -or (Test-Path "$Target\setup.py")) {
+        $script:DetectedLang = "python"
+    } elseif (Test-Path "$Target\pom.xml") {
+        $script:DetectedLang = "java"
+    } elseif (Get-ChildItem "$Target\*.csproj" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1) {
+        $script:DetectedLang = "csharp"
+    } elseif (Get-ChildItem "$Target\build.gradle*" -ErrorAction SilentlyContinue | Select-Object -First 1) {
+        $script:DetectedLang = "java"
+    } elseif (Test-Path "$Target\go.mod") {
+        $script:DetectedLang = "go"
+    } elseif (Test-Path "$Target\Gemfile") {
+        $script:DetectedLang = "ruby"
+    } elseif (Test-Path "$Target\Cargo.toml") {
+        $script:DetectedLang = "rust"
+    }
+
+    # Framework from package.json
+    if (Test-Path "$Target\package.json") {
+        $Pkg = Get-Content "$Target\package.json" -Raw -ErrorAction SilentlyContinue
+        if     ($Pkg -match '"next"')           { $script:DetectedFramework = "nextjs" }
+        elseif ($Pkg -match '"react"')          { $script:DetectedFramework = "react" }
+        elseif ($Pkg -match '"@angular/core"')  { $script:DetectedFramework = "angular" }
+        elseif ($Pkg -match '"vue"')            { $script:DetectedFramework = "vue" }
+        elseif ($Pkg -match '"@nestjs/core"')   { $script:DetectedFramework = "nestjs" }
+        elseif ($Pkg -match '"express"')        { $script:DetectedFramework = "express" }
+    } elseif (Test-Path "$Target\requirements.txt") {
+        $Reqs = Get-Content "$Target\requirements.txt" -Raw -ErrorAction SilentlyContinue
+        if     ($Reqs -imatch "fastapi") { $script:DetectedFramework = "fastapi" }
+        elseif ($Reqs -imatch "django")  { $script:DetectedFramework = "django" }
+        elseif ($Reqs -imatch "flask")   { $script:DetectedFramework = "flask" }
+    }
+}
+
+Invoke-ContextDetection
+
 # ── Apply preset ─────────────────────────────────────────────────
 if ($Preset -ne "") {
     switch ($Preset) {
@@ -199,16 +267,7 @@ if ($Graduate) {
 # ── Select install mode ───────────────────────────────────────────
 if ($Mode -eq "") {
     Write-Host ""
-    Write-Log "Select install mode:"
-    Write-Host ""
-    Write-Host "  [1] trial     — local only, completely invisible to git"
-    Write-Host "            Files go in .git\info\exclude — the codebase is not modified."
-    Write-Host "            Graduate to committed later when the team is ready."
-    Write-Host ""
-    Write-Host "  [2] committed — files visible to git"
-    Write-Host "            Team can review, commit, and share the pack as a normal PR."
-    Write-Host ""
-    $Choice = Read-Host "  Choice [1/2] (default: 1)"
+    $Choice = Read-Host "  Just you, or the whole team?  [1] Just me  [2] Whole team  (default: 1)"
     $Mode   = if ($Choice -eq "2") { "committed" } else { "trial" }
 }
 
@@ -241,6 +300,45 @@ function Copy-PackDir {
     }
 }
 
+# ── Config pre-fill with auto-detected values ────────────────────
+function Invoke-PrefillConfig {
+    param([string]$ConfigPath)
+    if (-not (Test-Path $ConfigPath) -or -not $PythonExe) { return }
+
+    $PyScript = @"
+import sys, re
+
+path, tracker, ado_org, ado_proj, vcs, lang, fw = sys.argv[1:8]
+
+with open(path, encoding='utf-8') as f:
+    t = f.read()
+
+def fill_first(text, key, val):
+    if not val: return text
+    return re.sub(r'(' + re.escape(key) + r':\s*)""', r'\g<1>"' + val + '"', text, count=1)
+
+t = fill_first(t, '  type', tracker)
+if ado_org:
+    t = fill_first(t, '    org_url', ado_org)
+if ado_proj:
+    t = fill_first(t, '    project', ado_proj)
+t = re.sub(r'(vcs:\n  type:\s*)""', r'\g<1>"' + vcs + '"', t, count=1)
+if lang:
+    t = re.sub(r'(languages:\n    - )""', r'\g<1>"' + lang + '"', t, count=1)
+if fw:
+    t = re.sub(r'(frameworks:\n    - )""', r'\g<1>"' + fw + '"', t, count=1)
+
+with open(path, 'w', encoding='utf-8') as f:
+    f.write(t)
+"@
+    $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
+    $PyScript | Set-Content $TmpPy -Encoding UTF8
+    & $PythonExe $TmpPy $ConfigPath `
+        $DetectedTracker $DetectedAdoOrg $DetectedAdoProject `
+        $DetectedVcs $DetectedLang $DetectedFramework
+    Remove-Item $TmpPy -ErrorAction SilentlyContinue
+}
+
 # ── Install pack-owned files ──────────────────────────────────────
 Copy-PackDir "$PackRoot\.github\skills"       "$Target\.github\skills"
 Copy-PackDir "$PackRoot\.github\instructions" "$Target\.github\instructions"
@@ -250,6 +348,7 @@ Copy-PackFile "$PackRoot\.claude\skills.md"   "$Target\.claude\skills.md"
 
 # ── Install user-configured stubs ─────────────────────────────────
 Copy-PackFile "$PackRoot\.dev-iq\config.yaml"          "$Target\.dev-iq\config.yaml"          $true
+Invoke-PrefillConfig "$Target\.dev-iq\config.yaml"
 Copy-PackFile "$PackRoot\.dev-iq\governance.md"         "$Target\.dev-iq\governance.md"         $true
 Copy-PackFile "$PackRoot\.dev-iq\maturity-profile.md"   "$Target\.dev-iq\maturity-profile.md"   $true
 Copy-PackFile "$PackRoot\.dev-iq\telemetry-overlay.md"  "$Target\.dev-iq\telemetry-overlay.md"  $true
@@ -320,24 +419,26 @@ $ManifestData = [ordered]@{
     pack_source     = $PackRoot
     hooks_installed = $Hooks.IsPresent
     is_upgrade      = $IsUpgrade
+    detected        = [ordered]@{
+        tracker   = $DetectedTracker
+        vcs       = $DetectedVcs
+        language  = $DetectedLang
+        framework = $DetectedFramework
+    }
 }
 $ManifestData | ConvertTo-Json -Depth 5 | Set-Content $ManifestPath -Encoding UTF8
 Write-Ok "Manifest written : .dev-iq\.install-manifest.json"
 
 # ── Summary ───────────────────────────────────────────────────────
 Write-Host ""
-Write-Host "  Dev.IQ Agent Pack v$PackVersion installed successfully. ($Mode mode)" -ForegroundColor Green
+Write-Host "  Dev.IQ $PackVersion is ready." -ForegroundColor Green
+Write-Host "  Open Copilot Chat, select Dev-IQ, type /explain-code. That's it." -ForegroundColor Green
 Write-Host ""
-Write-Host "  Next steps:"
-Write-Host "  1. Edit .dev-iq\config.yaml"
-Write-Host "     Set: client name, maturity tier (early/mid/higher), tracker type (ado/jira)"
-Write-Host "  2. Open VS Code in this project"
-Write-Host "  3. In Copilot Chat or Claude Code, select the Dev-IQ agent"
-Write-Host "  4. Type / to see all available skills"
-Write-Host "  5. Run /explain-code on any file to verify the install"
-Write-Host ""
+if ($DetectedLang) {
+    Write-Host "  Detected: $DetectedLang$(if ($DetectedFramework) { " / $DetectedFramework" } else { '' })$(if ($DetectedTracker) { " | $DetectedTracker" } else { '' })"
+    Write-Host ""
+}
 if ($Mode -eq "trial") {
-    Write-Host "  To share with your team when ready:"
-    Write-Host "  .\path\to\dev-iq\scripts\bootstrap.ps1 -Target '$Target' -Graduate"
+    Write-Host "  When you're ready to share: run bootstrap.ps1 -Target '$Target' -Graduate"
     Write-Host ""
 }
