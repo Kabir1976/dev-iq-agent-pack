@@ -1,3 +1,8 @@
 {
-  "customization_roots": ["~/.agents/skills"]
+  "customization_roots": ["~/.agents/skills"],
+  "correction_window_seconds": 30,
+  "min_corrections_to_promote": 2,
+  "max_lessons": 20,
+  "session_log_retention_days": 7,
+  "output_prefix": "[DI Hindsight]"
 }

@@ -1,3 +1,63 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+
+    "azure-devops": {
+      "command": "npx",
+      "args": ["-y", "@tzkhan/mcp-server-azure-devops"],
+      "env": {
+        "AZURE_DEVOPS_ORG_URL": "${input:ADO_ORG_URL}",
+        "AZURE_DEVOPS_PAT": "${input:ADO_PAT}"
+      },
+      "_note": "Provides work item read/write, PR context, and AC resolution. Required for /generate-user-stories, /review-acceptance-criteria, /review-pr-readiness, and /generate-traceability-matrix to pull live ADO data rather than asking the developer to paste."
+    },
+
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:GITHUB_PAT}"
+      },
+      "_note": "Provides PR diff, branch, and repo context. Required when vcs.type = github in .dev-iq/config.yaml."
+    },
+
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"],
+      "_note": "Gives the agent explicit read access to the workspace file tree. Enables /explain-code and /blast-radius-estimator to traverse the repo structure without relying on diff context alone."
+    }
+
+  },
+
+  "_setup": "See .vscode/MCP.md for step-by-step credential setup and troubleshooting for each server.",
+
+  "_disabled_servers": {
+    "_note": "The servers below are pre-configured but disabled. To enable one, move it into mcpServers above and supply the required credentials.",
+
+    "jira": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-jira"],
+      "env": {
+        "JIRA_BASE_URL": "${input:JIRA_BASE_URL}",
+        "JIRA_EMAIL": "${input:JIRA_EMAIL}",
+        "JIRA_API_TOKEN": "${input:JIRA_API_TOKEN}"
+      },
+      "_note": "Use instead of azure-devops when tracker.type = jira in .dev-iq/config.yaml."
+    },
+
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "${workspaceFolder}"],
+      "_note": "Provides git log, blame, and diff access. Useful for /blast-radius-estimator and /generate-release-notes on repos with complex history."
+    },
+
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sentry"],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "${input:SENTRY_AUTH_TOKEN}",
+        "SENTRY_ORG_SLUG": "${input:SENTRY_ORG_SLUG}"
+      },
+      "_note": "Provides recent error events for /debug-issue. Enables the agent to correlate a bug report with live Sentry errors before diagnosing."
+    }
+  }
 }

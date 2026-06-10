@@ -1,3 +1,25 @@
 {
-  "hooks": {}
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${WORKSPACE_FOLDER}/hooks/scripts/skill-improve-detect.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${WORKSPACE_FOLDER}/hooks/scripts/skill-improve-session-end.sh"
+          }
+        ]
+      }
+    ]
+  }
 }

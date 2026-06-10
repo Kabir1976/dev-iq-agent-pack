@@ -1,3 +1,31 @@
-# PLACEHOLDER — To be built
-# This file is part of the Dev.IQ Agent Pack.
-# Content will be added in a future session.
+{
+  "_note": "Generated from hooks.template.json by bootstrap. Do not edit hooks.json directly — edit the template and re-run bootstrap.",
+  "_instructions": "bootstrap replaces {{PACK_ROOT}} with the absolute path to the Dev.IQ pack root when rendering to hooks/hooks.json.",
+  "version": "1.0",
+  "hooks": [
+    {
+      "event": "session.start",
+      "description": "Load Hindsight correction patterns and record session start.",
+      "command": "bash {{PACK_ROOT}}/hooks/scripts/skill-improve-session-start.sh",
+      "env": {
+        "DI_PACK_ROOT": "{{PACK_ROOT}}"
+      }
+    },
+    {
+      "event": "tool.use",
+      "description": "Detect correction edits after every Edit/Write/MultiEdit tool call.",
+      "command": "bash {{PACK_ROOT}}/hooks/scripts/skill-improve-detect.sh",
+      "env": {
+        "DI_PACK_ROOT": "{{PACK_ROOT}}"
+      }
+    },
+    {
+      "event": "session.end",
+      "description": "Consolidate session log, promote patterns, update frequency table.",
+      "command": "bash {{PACK_ROOT}}/hooks/scripts/skill-improve-session-end.sh",
+      "env": {
+        "DI_PACK_ROOT": "{{PACK_ROOT}}"
+      }
+    }
+  ]
+}
