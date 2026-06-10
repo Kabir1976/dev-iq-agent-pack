@@ -113,7 +113,7 @@ blast_radius:
 
 # ── Hooks ─────────────────────────────────────────────────────────
 hooks:
-  hindsight_enabled: true         # learn from corrections across sessions
+  hindsight_enabled: false         # learn from corrections across sessions
   telemetry_sink: "local"         # local | webhook | none
   telemetry_webhook_url: ""       # fill if sink: webhook
 
