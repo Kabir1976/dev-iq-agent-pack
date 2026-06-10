@@ -140,7 +140,7 @@ detect_context() {
     DETECTED_LANG="python"
   elif [[ -f "$TARGET/pom.xml" ]]; then
     DETECTED_LANG="java"
-  elif ls "$TARGET"/*.csproj "$TARGET"/**/*.csproj 2>/dev/null | grep -q '.'; then
+  elif find "$TARGET" -maxdepth 4 -name "*.csproj" -print -quit 2>/dev/null | grep -q '.'; then
     DETECTED_LANG="csharp"
   elif ls "$TARGET"/build.gradle* 2>/dev/null | grep -q '.'; then
     DETECTED_LANG="java"
@@ -219,16 +219,23 @@ if [[ "$GRADUATE" == true ]]; then
     ok "Removed trial entries from .git/info/exclude."
   fi
 
-  python3 - "$MANIFEST" << 'PYEOF'
-import json, datetime, sys
-path = sys.argv[1]
+  _GRAD_NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +%s)
+  if [[ "$HAVE_PYTHON" == true ]]; then
+    python3 - "$MANIFEST" "$_GRAD_NOW" << 'PYEOF'
+import json, sys
+path, ts = sys.argv[1], sys.argv[2]
 with open(path) as f:
     d = json.load(f)
 d["mode"] = "committed"
-d["graduated_at"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+d["graduated_at"] = ts
 with open(path, "w") as f:
     json.dump(d, f, indent=2)
 PYEOF
+  else
+    # Bash fallback — update mode field with sed (no python3 required).
+    sed -i.bak 's/"mode": "trial"/"mode": "committed"/' "$MANIFEST" 2>/dev/null \
+      && rm -f "${MANIFEST}.bak" || warn "Could not update manifest mode — edit .dev-iq/.install-manifest.json manually."
+  fi
 
   ok "Graduated to committed mode."
   echo ""
@@ -264,7 +271,8 @@ if [[ "$UNINSTALL" == true ]]; then
 
   CLAUDE_DST="$TARGET/CLAUDE.md"
   if [[ -f "$CLAUDE_DST" ]] && grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
-    python3 - "$CLAUDE_DST" "$MARKER_START" "$MARKER_END" << 'PYEOF'
+    if [[ "$HAVE_PYTHON" == true ]]; then
+      python3 - "$CLAUDE_DST" "$MARKER_START" "$MARKER_END" << 'PYEOF'
 import sys, re
 dst, ms, me = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(dst, encoding='utf-8') as f:
@@ -274,6 +282,12 @@ result = re.sub(pattern, '', content, flags=re.DOTALL).strip()
 with open(dst, 'w', encoding='utf-8') as f:
     f.write(result + '\n' if result else '')
 PYEOF
+    else
+      # sed fallback: delete from start marker to end marker (inclusive).
+      sed -i.bak "/${MARKER_START//\//\\/}/,/${MARKER_END//\//\\/}/d" "$CLAUDE_DST" 2>/dev/null \
+        && rm -f "${CLAUDE_DST}.bak" \
+        || warn "Could not remove Dev.IQ block from CLAUDE.md (no python3/sed). Delete the block between $MARKER_START and $MARKER_END manually."
+    fi
     ok "Removed Dev.IQ block from CLAUDE.md."
     [[ -s "$CLAUDE_DST" ]] || { rm -f "$CLAUDE_DST"; ok "Removed empty CLAUDE.md."; }
   fi

@@ -190,7 +190,8 @@ if ($Uninstall) {
     # Remove dev-iq marker block from CLAUDE.md
     $ClaudeDst = "$Target\CLAUDE.md"
     if ((Test-Path $ClaudeDst) -and ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart))) {
-        $PyScript = @"
+        if ($HavePython) {
+            $PyScript = @"
 import sys, re
 dst, ms, me = sys.argv[1], sys.argv[2], sys.argv[3]
 with open(dst, encoding='utf-8') as f: content = f.read()
@@ -198,12 +199,23 @@ pattern = re.escape(ms) + r'.*?' + re.escape(me)
 result = re.sub(pattern, '', content, flags=re.DOTALL).strip()
 with open(dst, 'w', encoding='utf-8') as f: f.write(result + '\n' if result else '')
 "@
-        $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
-        $PyScript | Set-Content $TmpPy -Encoding UTF8
-        & $PythonExe $TmpPy $ClaudeDst $MarkerStart $MarkerEnd
-        Remove-Item $TmpPy -ErrorAction SilentlyContinue
+            $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
+            $PyScript | Set-Content $TmpPy -Encoding UTF8
+            & $PythonExe $TmpPy $ClaudeDst $MarkerStart $MarkerEnd
+            Remove-Item $TmpPy -ErrorAction SilentlyContinue
+        } else {
+            # PowerShell fallback: filter out the marker block line by line.
+            $Lines   = Get-Content $ClaudeDst -Encoding UTF8
+            $Inside  = $false
+            $Kept    = foreach ($Line in $Lines) {
+                if ($Line -match [regex]::Escape($MarkerStart)) { $Inside = $true; continue }
+                if ($Line -match [regex]::Escape($MarkerEnd))   { $Inside = $false; continue }
+                if (-not $Inside) { $Line }
+            }
+            ($Kept -join "`n").Trim() | Set-Content $ClaudeDst -Encoding UTF8
+        }
         Write-Ok "Removed Dev.IQ block from CLAUDE.md."
-        if (-not (Get-Content $ClaudeDst -Raw).Trim()) {
+        if (-not (Get-Content $ClaudeDst -Raw -ErrorAction SilentlyContinue).Trim()) {
             Remove-Item -Force $ClaudeDst; Write-Ok "Removed empty CLAUDE.md."
         }
     }
