@@ -56,13 +56,20 @@ function Write-Warn  { param($Msg) Write-Host "[dev-iq] ! $Msg" -ForegroundColor
 function Write-Fail  { param($Msg) Write-Host "[dev-iq] x $Msg" -ForegroundColor Red; exit 1 }
 
 # ── Validate prerequisites ────────────────────────────────────────
-$PythonExe = if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" }
-             elseif (Get-Command python -ErrorAction SilentlyContinue) { "python" }
-             else { Write-Fail "Python 3 is required but not found. Install from https://python.org"; "" }
-
 if (-not (Test-Path $Target -PathType Container)) { Write-Fail "Target directory not found: $Target" }
 if (-not (Test-Path "$Target\.git" -PathType Container)) { Write-Fail "Target is not a git repository: $Target" }
 $Target = (Resolve-Path $Target).Path
+
+# python3 is optional — used for config pre-fill and CLAUDE.md update.
+# If missing, install still completes; those steps are skipped with a note.
+$PythonExe = if (Get-Command python3 -ErrorAction SilentlyContinue) { "python3" }
+             elseif (Get-Command python -ErrorAction SilentlyContinue) { "python" }
+             else { "" }
+$HavePython = $PythonExe -ne ""
+if (-not $HavePython) {
+    Write-Warn "Python 3 not found — config pre-fill and CLAUDE.md update will be skipped."
+    Write-Warn "The install will still complete. Edit .dev-iq\config.yaml manually afterwards."
+}
 
 # ── Auto-detect project context ───────────────────────────────────
 $DetectedTracker   = "ado"
@@ -303,7 +310,9 @@ function Copy-PackDir {
 # ── Config pre-fill with auto-detected values ────────────────────
 function Invoke-PrefillConfig {
     param([string]$ConfigPath)
-    if (-not (Test-Path $ConfigPath) -or -not $PythonExe) { return }
+    # Skip if no python3, if config doesn't exist, or if this is an upgrade
+    # (the user's existing config has already been configured).
+    if (-not $HavePython -or -not (Test-Path $ConfigPath) -or $IsUpgrade) { return }
 
     $PyScript = @"
 import sys, re
@@ -348,7 +357,8 @@ Copy-PackFile "$PackRoot\.claude\skills.md"   "$Target\.claude\skills.md"
 
 # ── Install user-configured stubs ─────────────────────────────────
 Copy-PackFile "$PackRoot\.dev-iq\config.yaml"          "$Target\.dev-iq\config.yaml"          $true
-Invoke-PrefillConfig "$Target\.dev-iq\config.yaml"
+try { Invoke-PrefillConfig "$Target\.dev-iq\config.yaml" }
+catch { Write-Warn "Config pre-fill skipped (unexpected error) — edit .dev-iq\config.yaml manually." }
 Copy-PackFile "$PackRoot\.dev-iq\governance.md"         "$Target\.dev-iq\governance.md"         $true
 Copy-PackFile "$PackRoot\.dev-iq\maturity-profile.md"   "$Target\.dev-iq\maturity-profile.md"   $true
 Copy-PackFile "$PackRoot\.dev-iq\telemetry-overlay.md"  "$Target\.dev-iq\telemetry-overlay.md"  $true
@@ -368,7 +378,8 @@ if (-not (Test-Path $ClaudeDst)) {
     "$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
     Write-Ok "Created CLAUDE.md with Dev.IQ instructions."
 } elseif ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart)) {
-    $PyScript = @"
+    if ($HavePython) {
+        $PyScript = @"
 import sys
 dst, src = sys.argv[1], sys.argv[2]
 ms, me = '$MarkerStart', '$MarkerEnd'
@@ -379,11 +390,14 @@ si, ei = orig.find(ms), orig.find(me)
 result = orig[:si] + block + orig[ei + len(me):]
 with open(dst, 'w', encoding='utf-8') as f: f.write(result)
 "@
-    $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
-    $PyScript | Set-Content $TmpPy -Encoding UTF8
-    & $PythonExe $TmpPy $ClaudeDst $ClaudeSrc
-    Remove-Item $TmpPy -ErrorAction SilentlyContinue
-    Write-Ok "Updated Dev.IQ block in existing CLAUDE.md."
+        $TmpPy = [System.IO.Path]::GetTempFileName() + ".py"
+        $PyScript | Set-Content $TmpPy -Encoding UTF8
+        & $PythonExe $TmpPy $ClaudeDst $ClaudeSrc
+        Remove-Item $TmpPy -ErrorAction SilentlyContinue
+        Write-Ok "Updated Dev.IQ block in existing CLAUDE.md."
+    } else {
+        Write-Warn "CLAUDE.md already has a Dev.IQ block — skipped update (no python3)."
+    }
 } else {
     $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
     "$Existing`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
@@ -435,9 +449,19 @@ Write-Host "  Dev.IQ $PackVersion is ready." -ForegroundColor Green
 Write-Host "  Open Copilot Chat, select Dev-IQ, type /explain-code. That's it." -ForegroundColor Green
 Write-Host ""
 if ($DetectedLang) {
-    Write-Host "  Detected: $DetectedLang$(if ($DetectedFramework) { " / $DetectedFramework" } else { '' })$(if ($DetectedTracker) { " | $DetectedTracker" } else { '' })"
-    Write-Host ""
+    $DetectedLine = "  Detected: $DetectedLang"
+    if ($DetectedFramework) { $DetectedLine += " / $DetectedFramework" }
+    if ($DetectedTracker)   { $DetectedLine += " | $DetectedTracker" }
+    Write-Host $DetectedLine
+} else {
+    Write-Host "  Language not detected — open .dev-iq\config.yaml and fill in stack.languages."
 }
+if (-not $HavePython) {
+    Write-Host ""
+    Write-Host "  Config pre-fill was skipped (python3 not found)."
+    Write-Host "  Fill in .dev-iq\config.yaml — it takes about 2 minutes."
+}
+Write-Host ""
 if ($Mode -eq "trial") {
     Write-Host "  When you're ready to share: run bootstrap.ps1 -Target '$Target' -Graduate"
     Write-Host ""

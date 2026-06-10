@@ -81,8 +81,18 @@ if [[ -n "$PRESET" ]]; then
 fi
 
 # ── Validate prerequisites ────────────────────────────────────────
-command -v python3 >/dev/null 2>&1 || die "python3 is required but not found."
-command -v git     >/dev/null 2>&1 || die "git is required but not found."
+# git is required for .git/info/exclude (trial mode) and remote detection.
+command -v git >/dev/null 2>&1 || die "git is required but not found."
+
+# python3 is optional — used for config pre-fill and CLAUDE.md update.
+# If missing, install still completes; those steps are skipped with a note.
+if command -v python3 >/dev/null 2>&1; then
+  HAVE_PYTHON=true
+else
+  HAVE_PYTHON=false
+  warn "python3 not found — config pre-fill and CLAUDE.md update will be skipped."
+  warn "The install will still complete. Edit .dev-iq/config.yaml manually afterwards."
+fi
 
 [[ -d "$TARGET" ]]      || die "Target directory not found: $TARGET"
 [[ -d "$TARGET/.git" ]] || die "Target is not a git repository: $TARGET"
@@ -360,7 +370,10 @@ _copy_file "$PACK_ROOT/.dev-iq/telemetry-overlay.md"  "$TARGET/.dev-iq/telemetry
 # ── Pre-fill config.yaml with auto-detected values ────────────────
 prefill_config() {
   local cfg="$1"
-  [[ -f "$cfg" ]] || return
+  [[ -f "$cfg" ]]         || return
+  [[ "$HAVE_PYTHON" == true ]] || return
+  # Skip on upgrade — the user's existing config is already configured.
+  [[ "$IS_UPGRADE" == false ]] || return
 
   python3 - "$cfg" \
     "$DETECTED_TRACKER" "$DETECTED_VCS" \
@@ -420,7 +433,7 @@ with open(cfg, 'w', encoding='utf-8') as f:
     f.write(content)
 PYEOF
   ok "Config pre-filled : .dev-iq/config.yaml"
-}
+} || warn "Config pre-fill skipped (unexpected error) — edit .dev-iq/config.yaml manually."
 
 prefill_config "$TARGET/.dev-iq/config.yaml"
 
@@ -446,7 +459,8 @@ _inject_claude_md() {
   fi
 
   if grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
-    python3 - "$CLAUDE_DST" "$CLAUDE_SRC" "$MARKER_START" "$MARKER_END" << 'PYEOF'
+    if [[ "$HAVE_PYTHON" == true ]]; then
+      python3 - "$CLAUDE_DST" "$CLAUDE_SRC" "$MARKER_START" "$MARKER_END" << 'PYEOF'
 import sys, re
 dst_path, src_path, ms, me = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 with open(dst_path) as f: original = f.read()
@@ -458,7 +472,11 @@ after_end = end_idx + len(me)
 result = original[:start_idx] + new_block + original[after_end:]
 with open(dst_path, "w") as f: f.write(result)
 PYEOF
-    ok "Updated Dev.IQ block in existing CLAUDE.md."
+      ok "Updated Dev.IQ block in existing CLAUDE.md."
+    else
+      warn "CLAUDE.md already contains a Dev.IQ block — skipped update (no python3)."
+      warn "To update it manually, delete the block between $MARKER_START and $MARKER_END and re-run."
+    fi
   else
     {
       printf '\n\n'
@@ -502,7 +520,9 @@ mkdir -p "$TARGET/.dev-iq"
 HOOKS_BOOL=$( [[ "$INCLUDE_HOOKS" == true ]] && echo "true" || echo "false" )
 UPGRADE_BOOL=$( [[ "$IS_UPGRADE" == true ]] && echo "true" || echo "false" )
 
-python3 - << PYEOF
+_NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +%s)
+if [[ "$HAVE_PYTHON" == true ]]; then
+  python3 - << PYEOF
 import json, datetime
 
 manifest = {
@@ -523,6 +543,25 @@ manifest = {
 with open("$MANIFEST", "w") as f:
     json.dump(manifest, f, indent=2)
 PYEOF
+else
+  # Bash heredoc fallback — no python3 required.
+  cat > "$MANIFEST" << EOF
+{
+  "version": "$PACK_VERSION",
+  "installed_at": "$_NOW",
+  "mode": "$MODE",
+  "pack_source": "$PACK_ROOT",
+  "hooks_installed": $HOOKS_BOOL,
+  "is_upgrade": $UPGRADE_BOOL,
+  "detected": {
+    "tracker": "${DETECTED_TRACKER}",
+    "vcs": "${DETECTED_VCS}",
+    "language": "${DETECTED_LANG}",
+    "framework": "${DETECTED_FRAMEWORK}"
+  }
+}
+EOF
+fi
 ok "Manifest written : .dev-iq/.install-manifest.json"
 
 # ── Done ──────────────────────────────────────────────────────────
@@ -534,6 +573,21 @@ echo ""
 echo -e "    ${C_BLD}/explain-code${C_RST}"
 echo ""
 echo -e "  That's it."
+echo ""
+
+# Detection summary — guide the user only for fields that need attention.
+if [[ -n "$DETECTED_LANG" ]]; then
+  echo -e "  Detected : ${DETECTED_LANG}${DETECTED_FRAMEWORK:+ / $DETECTED_FRAMEWORK} · ${DETECTED_TRACKER} · ${DETECTED_VCS}"
+else
+  echo -e "  Language not detected — open ${C_BLD}.dev-iq/config.yaml${C_RST} and fill in ${C_BLD}stack.languages${C_RST}."
+fi
+
+if [[ "$HAVE_PYTHON" == false ]]; then
+  echo ""
+  echo -e "  Config pre-fill was skipped (python3 not found)."
+  echo -e "  Fill in ${C_BLD}.dev-iq/config.yaml${C_RST} — it takes about 2 minutes."
+fi
+
 echo ""
 if [[ "$MODE" == "trial" ]]; then
   echo -e "  Share with the team later:"
