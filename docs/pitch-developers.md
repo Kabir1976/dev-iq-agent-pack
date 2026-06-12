@@ -89,7 +89,7 @@ We'll run three live skills on your actual code in the session. Bring a PR you r
 
 `/explain-code` · `/code-review` · `/review-pr-readiness`
 
-Questions: **kabir.chugh@teamsparq.com**
+Questions: speak to the consultant who shared this with you.
 
 ---
 

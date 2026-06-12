@@ -156,4 +156,4 @@ Send within 24 hours:
 
 ---
 
-*Dev.IQ Agent Pack v0.9.0 · Demo facilitator: Kabir Chugh, kabir.chugh@teamsparq.com*
+*Dev.IQ Agent Pack v0.9.0*

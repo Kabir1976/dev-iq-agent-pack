@@ -1,5 +1,27 @@
 # MCP Server Setup Guide
 
+## Security boundary — read this first
+
+Dev.IQ MCP servers are IDE-resident. They do not transmit data outside
+your machine beyond what GitHub Copilot already sends to the configured
+LLM provider.
+
+| Credential | How it is stored | Where it goes |
+|-----------|-----------------|---------------|
+| ADO Personal Access Token | OS keychain (VS Code secure input) | Sent only to your ADO org over HTTPS |
+| GitHub PAT | OS keychain (VS Code secure input) | Sent only to github.com over HTTPS |
+
+**Credentials are never written to `mcp.json`, never committed, and never
+logged.** VS Code's `${input:NAME}` mechanism prompts you once and stores
+the value in your operating system's keychain — the same store used by
+your browser and password manager. To clear a stored credential:
+`Ctrl+Shift+P` → **MCP: Clear Stored Inputs**.
+
+The `filesystem` server is scoped to `${workspaceFolder}` — it cannot
+read files outside the repository you have open in VS Code.
+
+---
+
 This guide covers credential setup for each MCP server declared in
 `.vscode/mcp.json`. Three servers are **enabled by default** for a
 standard ADO + GitHub shop. The rest are pre-configured but disabled —

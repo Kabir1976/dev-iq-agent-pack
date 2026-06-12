@@ -134,4 +134,4 @@ bootstrap:
   preset: "pod"                   # solo | pod
                                   # solo → individual contributor defaults
                                   # pod  → cross-functional team defaults
-  version: "0.1.0"
+  version: "0.9.0"

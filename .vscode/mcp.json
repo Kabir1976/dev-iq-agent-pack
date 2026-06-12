@@ -1,4 +1,6 @@
 {
+  "_security": "Credentials are stored in the OS keychain by VS Code — never written to this file or committed. See .vscode/MCP.md before adding credentials.",
+
   "mcpServers": {
 
     "azure-devops": {

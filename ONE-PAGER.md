@@ -1,10 +1,10 @@
-SPARQ  ·  INTELLIGENCE STUDIO  ·  CAPABILITY ONE-PAGER
+INTELLIGENCE STUDIO  ·  CAPABILITY ONE-PAGER
 **Dev.IQ Agent Pack**
 Developer Intelligence, dropped into your developers' IDE — works with GitHub Copilot Chat and Claude Code.
 
 ---
 
-**What it is.**  A versioned set of files — markdown, YAML, JSON — that drops into a client codebase and turns GitHub Copilot Chat and Claude Code into a Developer Intelligence-aware delivery partner. Sparq's four-layer DI signal model (Intent → Design → Quality → Risk → Decision Confidence) is loaded as the AI's reasoning lens on every interaction. Not a SaaS. The client owns the pack.
+**What it is.**  A versioned set of files — markdown, YAML, JSON — that drops into a client codebase and turns GitHub Copilot Chat and Claude Code into a Developer Intelligence-aware delivery partner. The four-layer DI signal model (Intent → Design → Quality → Risk → Decision Confidence) is loaded as the AI's reasoning lens on every interaction. Not a SaaS. The client owns the pack.
 
 ---
 
@@ -12,7 +12,7 @@ Developer Intelligence, dropped into your developers' IDE — works with GitHub 
 
 **Developer Intelligence (DI)** — the operating model. Moves software delivery from reactive execution into proactive decision support across four signal layers: intent, design, quality, and risk.
 
-**Dev.IQ** — the commercialized Sparq capability inside Intelligence Studio that operationalizes DI with AI-assisted code review, PR readiness assessment, security review, blast radius estimation, and workflow-integrated traceability.
+**Dev.IQ** — the capability inside Intelligence Studio that operationalizes DI with AI-assisted code review, PR readiness assessment, security review, blast radius estimation, and workflow-integrated traceability.
 
 **Dev.IQ Agent Pack** — the capability layer inside the IDE. 22 skills, 5 always-on instruction files, two agents (Dev-IQ for action, Dev-IQ-PLAN for plan-first work), MCP wiring for GitHub and ADO, and maturity gating so capabilities only fire where the team is ready.
 
@@ -59,12 +59,10 @@ Developer Intelligence, dropped into your developers' IDE — works with GitHub 
 
 **Safe by design**
 
-Every generated artifact is human-reviewable and carries a `@di-review-required` header. No code is applied to the repository without developer approval — the agent proposes, the developer decides. Capabilities are gated by a maturity tier (Early / Mid / Higher) configured per repo. Security findings rated Critical or High always block the PR verdict regardless of tier or delivery pressure. No prompt exfiltrates code, secrets, or proprietary data outside the IDE/CI boundary. All files are markdown, YAML, and JSON — portable across LLM IDE tools. The client owns the pack; if Sparq rotates off, it stays.
+Every generated artifact is human-reviewable and carries a `@di-review-required` header. No code is applied to the repository without developer approval — the agent proposes, the developer decides. Capabilities are gated by a maturity tier (Early / Mid / Higher) configured per repo. Security findings rated Critical or High always block the PR verdict regardless of tier or delivery pressure. No prompt exfiltrates code, secrets, or proprietary data outside the IDE/CI boundary. All files are markdown, YAML, and JSON — portable across LLM IDE tools. The client owns the pack; if the consulting team rotates off, it stays.
 
 ---
 
-**Get started.**  Sparq runs a Developer Intelligence diagnostic, sets the maturity tier, drops the pack into one or more pilot repositories, and begins measurable signal capture inside 30 days. Expand from there.
+**Get started.**  Run the Developer Intelligence diagnostic, set the maturity tier, drop the pack into one or more pilot repositories, and begin measurable signal capture inside 30 days. Expand from there.
 
-Pack: github.com/Kabir1976/dev-iq  ·  v0.9.0  ·  
-Pack owner: Kabir Chugh, Sparq  ·  
-Companion: Assert.IQ Agent Pack (Quality Intelligence)
+Pack: v0.9.0  ·  Companion: Assert.IQ Agent Pack (Quality Intelligence)
