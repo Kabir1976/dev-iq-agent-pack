@@ -135,13 +135,11 @@ chat-driven prompts.
 |--------|--------------------|----------|
 | `pod` | Committed + hooks | Cross-functional teams adopting DI together |
 | `solo` | Trial, no hooks, instructions user-global | Individual contributor evaluating solo |
-| `portable` | Skills user-globally, minimal workspace footprint | Developer who works across many repos |
+| `portable` | Committed mode, no hooks — minimal footprint | Client handoff or read-only install |
 
-**Portable mode** installs skills to `~/.agents/skills/` (Copilot) and
-`~/.claude/skills/` (Claude Code) so every workspace gets the 22 DI skills.
-Workspace footprint shrinks to just the Dev-IQ agent files and the install
-manifest — no instructions, hooks, settings, or `CLAUDE.md` written to the
-repo.
+**Portable mode** installs files visibly into git (committed) without the hooks
+directory. Use it when you want the team to be able to commit the pack but don't
+need the session-end hook scripts.
 
 ```bash
 bash ~/dev-iq/scripts/bootstrap.sh --preset=portable
@@ -638,33 +636,10 @@ matches your actual tools and file paths.
 ## What Dev.IQ Is Not
 
 - It is not a runtime. There is no service to deploy.
-- It is not a SaaS. The client owns the files — if Sparq rotates off the account, the pack stays.
+- It is not a SaaS. The client owns the files — if the consulting team rotates off, the pack stays.
 - It is not a replacement for engineering judgment. Every output is a draft; human review is required.
 - It is not a replacement for Assert.IQ. Use both packs together for full SDLC + QE coverage.
 - It is not a tooling pitch. Use it where the maturity supports it. Lead with DI thinking, not with this pack.
-
----
-
-## The Feedback Loop
-
-Skills improve from production experience. When a DI signal issues a
-**High Confidence** outcome but a production incident still occurs:
-
-```
-1. Post-Mortem Skill Audit is triggered
-2. Skill author analyzes why the signal missed
-3. Prompt template is updated with new constraint or example
-4. Skill is returned to REVIEW status
-5. Updated skill re-enters approval workflow
-```
-
-**Ownership:**
-
-| Role | Responsibility |
-|------|---------------|
-| Primary | Skill author |
-| Fallback | Team Lead / Competency Council |
-| Escalation | Pack Maintainer |
 
 ---
 
@@ -681,49 +656,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 ## Dev.IQ + Assert.IQ
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     INTELLIGENCE STUDIO                          │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   ┌──────────────────────────┐  ┌──────────────────────────┐   │
-│   │         DEV.IQ           │  │       ASSERT.IQ           │   │
-│   │  Developer Intelligence  │  │  Quality Intelligence     │   │
-│   │                          │  │                           │   │
-│   │  Requirements            │  │  Plan                     │   │
-│   │  Design                  │  │  Develop (testing)        │   │
-│   │  Development             │  │  Review                   │   │
-│   │  Code Review / PR        │  │  Execute                  │   │
-│   │  Deployment              │  │  Learn                    │   │
-│   │                          │  │                           │   │
-│   │  Primary: Developers     │  │  Primary: QE Engineers    │   │
-│   │  Signal: DI (4 layers)   │  │  Signal: QI (4 layers)   │   │
-│   └──────────────────────────┘  └──────────────────────────┘   │
-│                                                                  │
-│   Same pack architecture. Same hooks. Same MCP wiring.          │
-│   Different roles. Different signals. Different skills.         │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Ownership
-
-| Role | Responsibility |
-|------|---------------|
-| Pack Technical Owner | Kabir Chugh |
-| DI Framework Sponsor | TBD |
-| Pilot Account Lead | TBD |
-| Governance Review | DI Sponsor + InfoSec |
-| Versioning and Release | Kabir Chugh |
-| Collaboration | Assert.IQ / Jarius Hayes |
-
----
-
-## Where to Learn More
-
-- Assert.IQ Agent Pack — the QE capability layer this pack complements
-- Quality Intelligence Kit — the operating model that inspired DI
-- DI Diagnostic Guide — how to set the right maturity tier
-- DI Skills Library — human-readable prompts that informed these agent skills
+Dev.IQ and Assert.IQ are complementary packs within Intelligence Studio.
+Dev.IQ owns the developer lifecycle (requirements, design, code, deployment).
+Assert.IQ owns the QE lifecycle (test planning, defect analysis, release confidence).
+They share the same pack architecture and can be installed independently or together.

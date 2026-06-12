@@ -206,7 +206,7 @@ each `input:` variable in that server's env block. The value is stored in
 the OS keychain under a key derived from the workspace folder — it is never
 written to disk or to `mcp.json` itself.
 
-To reset a stored credential: `Cmd+Shift+P` → **Keychain: Clear MCP Secrets**.
+To reset a stored credential: `Ctrl+Shift+P` → **MCP: Clear Stored Inputs**.
 
 ---
 

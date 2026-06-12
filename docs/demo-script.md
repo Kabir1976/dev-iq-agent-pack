@@ -151,7 +151,7 @@ Ask the team:
 
 Send within 24 hours:
 - `docs/pitch-developers.md` (the written pitch)
-- `INSTALL.md` link with the `--preset=solo` command for self-service individual install
+- `docs/trial-install-guide.md` with the bootstrap command for self-service individual install
 - A calendar invite for a 30-day check-in: "What signals are you seeing?"
 
 ---

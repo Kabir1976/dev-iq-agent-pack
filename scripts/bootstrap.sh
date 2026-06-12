@@ -276,11 +276,11 @@ if [[ "$UNINSTALL" == true ]]; then
 
   echo ""
   ok "Dev.IQ removed from $TARGET."
+  log "Your code, tests, and configs were not touched."
   exit 0
 fi
 
 # ── Select install mode ───────────────────────────────────────────
-# Single question — no jargon exposed unless user passes flags directly.
 if [[ -z "$MODE" ]]; then
   if [[ -t 0 ]]; then
     echo ""
@@ -349,6 +349,8 @@ prefill_config() {
   [[ -f "$cfg" ]]              || return
   [[ "$IS_UPGRADE" == false ]] || return
 
+  local _filled=false
+
   # tracker.type: config default is "ado"; overwrite with detected value.
   if [[ -n "$DETECTED_TRACKER" ]]; then
     sed -i.bak "s/type: \"ado\"/type: \"${DETECTED_TRACKER}\"/" "$cfg" \
@@ -356,18 +358,21 @@ prefill_config() {
     # signals.intent.source mirrors tracker
     sed -i.bak "s/source: \"ado\"/source: \"${DETECTED_TRACKER}\"/" "$cfg" \
       && rm -f "${cfg}.bak"
+    _filled=true
   fi
 
   # vcs.type: config default is "github"; only overwrite when different.
   if [[ -n "$DETECTED_VCS" && "$DETECTED_VCS" != "github" ]]; then
     sed -i.bak "s/type: \"github\"/type: \"${DETECTED_VCS}\"/" "$cfg" \
       && rm -f "${cfg}.bak"
+    _filled=true
   fi
 
   # ado.org_url — empty string placeholder.
   if [[ -n "$DETECTED_ADO_ORG" ]]; then
     sed -i.bak "s|org_url: \"\"|org_url: \"${DETECTED_ADO_ORG}\"|" "$cfg" \
       && rm -f "${cfg}.bak"
+    _filled=true
   fi
 
   # ado.project — first empty project: "" in the file.
@@ -375,6 +380,7 @@ prefill_config() {
     awk -v val="$DETECTED_ADO_PROJECT" \
       '!done && /project: ""/{sub(/project: ""/, "project: \"" val "\""); done=1} 1' \
       "$cfg" > "${cfg}.tmp" && mv "${cfg}.tmp" "$cfg"
+    _filled=true
   fi
 
   # stack.languages — first "    - """.
@@ -382,6 +388,7 @@ prefill_config() {
     awk -v val="$DETECTED_LANG" \
       '!done && /    - ""/{sub(/    - ""/, "    - \"" val "\""); done=1} 1' \
       "$cfg" > "${cfg}.tmp" && mv "${cfg}.tmp" "$cfg"
+    _filled=true
   fi
 
   # stack.frameworks — first remaining "    - """.
@@ -389,9 +396,10 @@ prefill_config() {
     awk -v val="$DETECTED_FRAMEWORK" \
       '!done && /    - ""/{sub(/    - ""/, "    - \"" val "\""); done=1} 1' \
       "$cfg" > "${cfg}.tmp" && mv "${cfg}.tmp" "$cfg"
+    _filled=true
   fi
 
-  ok "Config pre-filled : .dev-iq/config.yaml"
+  [[ "$_filled" == true ]] && ok "Config pre-filled : .dev-iq/config.yaml"
 }
 
 prefill_config "$TARGET/.dev-iq/config.yaml"
@@ -499,15 +507,10 @@ echo -e "    ${C_BLD}/explain-code${C_RST}"
 echo ""
 echo -e "  That's it."
 echo ""
-
-# Detection summary — guide the user only for fields that need attention.
-if [[ -n "$DETECTED_LANG" ]]; then
-  echo -e "  Detected : ${DETECTED_LANG}${DETECTED_FRAMEWORK:+ / $DETECTED_FRAMEWORK} · ${DETECTED_TRACKER} · ${DETECTED_VCS}"
-else
+if [[ -z "$DETECTED_LANG" ]]; then
   echo -e "  Language not detected — open ${C_BLD}.dev-iq/config.yaml${C_RST} and fill in ${C_BLD}stack.languages${C_RST}."
+  echo ""
 fi
-
-echo ""
 if [[ "$MODE" == "trial" ]]; then
   echo -e "  Share with the team later:"
   echo -e "    ${C_BLD}bash /path/to/dev-iq/scripts/bootstrap.sh --target=$(pwd) --graduate${C_RST}"

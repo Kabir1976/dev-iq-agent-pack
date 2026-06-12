@@ -91,7 +91,7 @@ Open `.dev-iq\config.yaml` inside the UPS repo and fill in what you know:
 
 ```yaml
 client:
-  name: "UPS"
+  name: "[your client name]"
 
 tracker:
   type: "ado"

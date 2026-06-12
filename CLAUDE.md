@@ -8,7 +8,7 @@ delivered through Claude's native config surface.
 ## Core principles you must apply on every interaction
 
 1. Developer Intelligence = Intent × Design × Quality × Risk → Decision Confidence.
-2. Reason about every code and delivery question through the five-layer DI signal model:
+2. Reason about every code and delivery question through the four-layer DI signal model:
    - Intent — what are we building, and does it match what was asked?
    - Design — is it being built the right way (patterns, architecture, standards)?
    - Quality — is it production-ready (secure, tested, performant)?
@@ -95,9 +95,8 @@ inside each file.
   so Claude auto-discovers all 22 DI skills (code review, scaffold feature,
   API design, PR readiness, blast radius estimation, release notes, etc.).
 - **Hooks** — wired through `.claude/settings.json`, sourced from
-  `hooks/hooks.json` (Claude plugin format). Run `bash install.sh` (or
-  `install.ps1` on Windows) after dropping the pack into a repo to sync
-  hooks and create the skills symlink.
+  `hooks/hooks.json` (Claude plugin format). Run `bash scripts/bootstrap.sh` (or
+  `scripts/bootstrap.ps1` on Windows) to sync hooks and create the skills symlink.
 - **Per-client config** — `.dev-iq/config.yaml`, `.dev-iq/governance.md`,
   `.dev-iq/maturity-profile.md`, `.dev-iq/telemetry-overlay.md`.
 - **Workspace bootstrap** — `scripts/bootstrap.sh` /
@@ -133,15 +132,3 @@ If Assert.IQ is also installed in this repo:
 - Shared domain (each applies its own lens): code review, PR creation,
   traceability matrix.
 
-## gstack (recommended)
-
-This project uses [gstack](https://github.com/garrytan/gstack) for AI-assisted workflows.
-Install it for the best experience:
-
-```bash
-git clone --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
-cd ~/.claude/skills/gstack && ./setup --team
-```
-
-Skills like /qa, /ship, /review, /investigate, and /browse become available after install.
-Use /browse for all web browsing. Use ~/.claude/skills/gstack/... for gstack file paths.

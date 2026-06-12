@@ -20,9 +20,9 @@ not run as a service and it does not transmit data outside the IDE boundary.
 
 **What does leave the IDE:** The text of your prompt and any context you explicitly
 include (e.g. a code snippet you paste, or a file the agent reads at your
-instruction) is sent to the configured LLM provider (GitHub Copilot / Azure OpenAI)
-over your organisation's standard HTTPS connection. This is identical to what
-happens when you use Copilot Chat without Dev.IQ.
+instruction) is sent to the configured LLM provider (GitHub Copilot, Azure OpenAI,
+or Anthropic Claude) over your organisation's standard HTTPS connection. This is
+identical to what happens when you use Copilot Chat or Claude Code without Dev.IQ.
 
 ---
 
