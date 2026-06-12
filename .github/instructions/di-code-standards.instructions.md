@@ -25,7 +25,17 @@ and tooling overrides. These rules are defaults — client config takes preceden
 - Names must communicate intent: `getUserById` not `getUser`, `OrderNotificationError` not `Error`.
 - Boolean variables and parameters: prefix with `is`, `has`, `can`, `should`.
 - Collections: plural nouns. Single items: singular nouns.
-- Constants: `UPPER_SNAKE_CASE`. Classes: `PascalCase`. Functions/methods: `camelCase` (JS/TS/Java/Go) or `snake_case` (Python/Ruby).
+- **Naming conventions must follow the established standards for each language:**
+  - **Constants:** `UPPER_SNAKE_CASE` (all languages)
+  - **Classes/Types:** `PascalCase` (all languages)
+  - **Functions/methods and properties:**
+    - `camelCase`: JavaScript, TypeScript, Java, Go
+    - `snake_case`: Python, Ruby
+    - `PascalCase`: C#, Kotlin, Swift
+  - **Internal/private members:**
+    - Prefix with `_` (underscore): C# properties, Kotlin, Swift (convention-based privacy)
+    - Prefix with `__` (dunder): Python private members
+    - Use access modifiers: Java (`private`), Go (unexported by lowercase), C# (`private`)
 - Follow the client's established naming conventions over these defaults — read existing code before generating new code.
 
 ### Abstraction
