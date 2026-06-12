@@ -149,7 +149,7 @@ Upgrades are explicit and intentional:
 
 The three steps above are the fast path. When you're ready for the full picture:
 
-**[README.dev-iq.md →](README.dev-iq.md)** — detailed install options, full skill reference, maturity tier matrix, DI signal model, telemetry overlay guide, MCP server inventory, hooks architecture, and full release history.
+**[docs/reference.md →](docs/reference.md)** — detailed install options, full skill reference, maturity tier matrix, DI signal model, telemetry overlay guide, hooks architecture, customization guide, and troubleshooting.
 
 Tool-specific references:
 - VS Code / Copilot — [`.github/vscode-readme.md`](.github/vscode-readme.md)

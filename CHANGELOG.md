@@ -53,7 +53,8 @@ Initial pre-release of the Dev.IQ Agent Pack.
 **Bootstrap**
 - `scripts/bootstrap.sh` — bash installer with trial/committed modes, graduate, uninstall, presets
 - `scripts/bootstrap.ps1` — PowerShell mirror
-- `INSTALL.md` — client-facing installation guide
+- `docs/trial-install-guide.md` — Windows-first personal trial install guide
+- `docs/reference.md` — full reference (skill registry, workflows, customization, troubleshooting)
 
 **Presets** (`--preset` flag)
 - `pod` — team pod install: committed mode + hooks

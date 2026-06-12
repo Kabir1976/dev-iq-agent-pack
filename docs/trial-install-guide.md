@@ -72,7 +72,7 @@ Then run the Unblock-File command from the checklist above if you haven't alread
 
 Open PowerShell and run:
 ```powershell
-powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" -Target "C:\path\to\your-ups-repo" -Mode trial
+powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" -Target "C:\path\to\your-repo" -Mode trial
 ```
 
 Replace `C:\path\to\your-ups-repo` with the actual path to the UPS repo on

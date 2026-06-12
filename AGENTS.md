@@ -10,7 +10,7 @@ For the full, tool-specific entry points see:
 ## Core principles (summary)
 
 1. Developer Intelligence = Intent × Design × Quality × Risk → Decision Confidence.
-2. Reason through the five-layer DI signal model — Intent, Design, Quality,
+2. Reason through the four-layer DI signal model — Intent, Design, Quality,
    Risk — then synthesize Decision Confidence. Never reduce a delivery
    decision to a single metric.
 3. Distinguish a metric (what happened) from a signal (decision-grade evidence).

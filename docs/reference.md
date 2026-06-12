@@ -5,8 +5,6 @@
 > Claude Code into a delivery-aware engineering partner inside the IDE.
 
 **Version**: v0.9.0
-**Owner**: Kabir Chugh, Sparq
-**Repo**: https://github.com/Kabir1976/dev-iq
 
 ---
 
@@ -65,20 +63,19 @@ short installer that wires `.claude/settings.json` and the skills symlink.
 The pack supports two install paths. Pick based on whether you're evaluating
 Dev.IQ or deploying it into a team's repo.
 
-### Path A — Try it on the pack repo itself
+### Path A — Try it on the pack folder itself
 
 Best when you want to explore Dev.IQ without touching your team's repository.
-Clone the pack, run the bootstrap, and open the pack folder as your workspace.
+Extract the pack zip, then run the bootstrap from inside the pack folder.
 
 ```bash
-git clone https://github.com/Kabir1976/dev-iq
-cd dev-iq
-
 # macOS / Linux
+cd path/to/dev-iq
 bash scripts/bootstrap.sh --preset=solo
 
 # Windows PowerShell
-pwsh -File scripts/bootstrap.ps1 -Preset solo
+cd C:\Tools\dev-iq
+powershell -File scripts\bootstrap.ps1 -Preset solo
 ```
 
 What it does (all inside the pack folder):
@@ -98,17 +95,17 @@ skills, agents, instructions, hooks, and config from that codebase.
 Run from a terminal in your target repo. No editor required:
 
 ```bash
-# 1. Clone the pack somewhere on your machine (one time, anywhere)
-git clone https://github.com/Kabir1976/dev-iq ~/dev-iq
+# 1. Extract the pack zip somewhere on your machine (one time, anywhere)
+#    e.g. ~/tools/dev-iq  or  C:\Tools\dev-iq on Windows
 
 # 2. cd into YOUR repo
 cd ~/code/my-app
 
-# 3. Run the bootstrap from the clone
-bash ~/dev-iq/scripts/bootstrap.sh --mode=trial
+# 3. Run the bootstrap pointing at the extracted pack
+bash ~/tools/dev-iq/scripts/bootstrap.sh --mode=trial
 
 # Windows PowerShell
-pwsh -File ~\dev-iq\scripts\bootstrap.ps1 -Mode trial
+powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial
 ```
 
 The script is fully standalone — it accepts `--preset=solo|pod`, prompts
@@ -117,13 +114,11 @@ into your workspace. You do not need to open VS Code or Claude Code first, and
 `/dev-iq-bootstrap` does not need to be loaded — the script is what the skill
 calls under the hood.
 
-**Where does `--preset=solo` put the DI instructions?** Solo is designed for
-a single developer who wants DI rules to apply across every repo they open.
-The instruction files (`di-foundation`, `di-code-standards`, etc.) and
-`CLAUDE.md` install to your VS Code user prompts folder and
-`~/.claude/CLAUDE.md` — not to `.github/instructions/` in the workspace.
-Use `--preset=pod` if you want the instructions checked into this repo for
-the whole team.
+**What does `--preset=solo` do?** Solo sets trial mode (files are invisible to
+git via `.git/info/exclude`) with no hooks. Use it when you're evaluating
+Dev.IQ alone before sharing with the team. Graduate to committed at any time
+with `--graduate`. Use `--preset=pod` if the team has already agreed to adopt
+Dev.IQ and wants the files checked in.
 
 Already have the pack loaded in your editor? You can also run
 `/dev-iq-bootstrap` from Copilot Chat or Claude Code — same outcome,
@@ -195,7 +190,7 @@ recording `{version, installed_at, mode, paths[]}`.
 scripts/bootstrap.sh --graduate
 
 # Windows
-pwsh -File scripts/bootstrap.ps1 -Graduate
+powershell -File scripts\bootstrap.ps1 -Graduate
 
 # Then commit the pack files:
 git add .dev-iq .claude .github CLAUDE.md AGENTS.md
@@ -210,8 +205,8 @@ scripts/bootstrap.sh --uninstall
 scripts/bootstrap.sh --uninstall --dry-run  # preview without changing anything
 
 # Windows
-pwsh -File scripts/bootstrap.ps1 -Uninstall
-pwsh -File scripts/bootstrap.ps1 -Uninstall -DryRun
+powershell -File scripts\bootstrap.ps1 -Uninstall
+powershell -File scripts\bootstrap.ps1 -Uninstall -DryRun
 ```
 
 ---
@@ -279,7 +274,6 @@ dev-iq/
 │
 ├── CLAUDE.md                              # Always-on guidance for Claude Code
 ├── AGENTS.md                              # Always-on for Codex CLI / Cursor / Aider
-├── MANIFEST.md                            # Inventory of all pack files
 │
 ├── .github/
 │   ├── copilot-instructions.md            # Always-on guidance for Copilot
@@ -602,7 +596,7 @@ Every skill includes an explicit **Governance** section.
    - YAML frontmatter: `name`, `description`, `di_signal`, `maturity_required`
    - `## Overview`, `## When to Use`, `## Instructions`, `## Inputs Required`, `## Output Format`, `## Governance`
 2. Add supporting templates or references to the same folder.
-3. Update the skill registry in this README and `MANIFEST.md`.
+3. Update the skill registry in `docs/reference.md`.
 4. Claude Code picks up the skill automatically via the `.claude/skills/` symlink — no second copy needed.
 
 ---
