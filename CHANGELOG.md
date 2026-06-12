@@ -7,6 +7,35 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased] — post-0.9.0 maintenance (2026-06-12)
+
+### Changed
+
+- `docs/reference.md` — renamed from `README.dev-iq.md`; fixed stale content:
+  Sparq branding removed, private GitHub URL replaced with zip-extract instructions,
+  python3 prerequisite removed, `--preset=solo` description corrected,
+  `pwsh` → `powershell` throughout, `MANIFEST.md` references removed
+- `.dev-iq/telemetry-overlay.md` — written from 3-line placeholder to full
+  signal-mapping template with tables for INTENT, DESIGN, QUALITY, RISK, and
+  Signal Sink sections
+- `scripts/bootstrap.sh` — `prefill_config` now only emits "Config pre-filled"
+  when at least one value was actually written; uninstall now prints "Your code,
+  tests, and configs were not touched"
+- `README.md` — fixed stale `README.dev-iq.md` header link → `docs/reference.md`
+- `AGENTS.md` — corrected "five-layer DI signal model" → "four-layer"
+- `docs/trial-install-guide.md` — fixed `your-ups-repo` placeholder → `your-repo`
+- `docs/demo-script.md` — fixed broken `INSTALL.md` reference
+
+### Removed
+
+- `install.sh`, `install.ps1` — 3-line placeholders; real scripts are in `scripts/`
+- `MANIFEST.md` — 3-line placeholder with no content
+- `ONE-PAGER.md` — executive/sales artifact, wrong audience for a developer repo
+- `INSTALL.md` — stale: listed Python 3.8+ as a prerequisite, referenced a private
+  GitHub URL; functionality covered by `docs/trial-install-guide.md` and `README.md`
+
+---
+
 ## [0.9.0] — 2026-06-06
 
 Initial pre-release of the Dev.IQ Agent Pack.

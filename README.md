@@ -1,6 +1,6 @@
 # Dev.IQ
 
-**v0.9.0** · [Full documentation →](README.dev-iq.md)
+**v0.9.0** · [Full documentation →](docs/reference.md)
 
 ---
 
