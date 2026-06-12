@@ -8,6 +8,102 @@
 
 ---
 
+## At a Glance
+
+Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and give GitHub Copilot Chat and Claude Code a Developer Intelligence reasoning layer — 22 skills, two agents, and MCP wiring for ADO and GitHub — without deploying any runtime or service.
+
+**Fastest path to first value:** extract the zip → run `bootstrap.sh --preset=solo` against your repo → open Copilot Chat → select Dev-IQ → run `/review-pr-readiness` on a branch with changes. Under 20 minutes, requires nothing beyond VS Code and Git.
+
+**Skills work without MCP.** If Node.js isn't installed or credentials aren't configured, every skill that needs external data falls back to asking you to paste the content inline. Nothing is blocking.
+
+---
+
+## Prerequisites — What You Need
+
+### Required
+
+| Dependency | Minimum version | Notes |
+|------------|-----------------|-------|
+| VS Code | 1.99 | Host for Copilot Chat and MCP servers |
+| GitHub Copilot Chat extension | v0.22 | Agent mode, skill invocation, custom agents. Check: `Help → About` |
+| Git | Any recent | Branch detection, diff context for skills |
+| dev-iq pack | v0.9.0 | Provided as a zip by your engagement lead |
+
+> **Claude Code alternative:** Claude Code CLI works instead of or alongside Copilot Chat. Skills and agents behave identically. See `.claude/claude-readme.md` for Claude-specific setup.
+
+### Optional — needed for live data pull
+
+| Dependency | What it unlocks | Without it |
+|------------|-----------------|------------|
+| Node.js 18+ | All MCP servers (ADO, GitHub, filesystem) | Skills ask you to paste work item text and PR details manually |
+| ADO Personal Access Token | Live work item + PR fetch for `/review-pr-readiness`, `/generate-user-stories`, `/review-acceptance-criteria`, `/generate-traceability-matrix` | You paste the work item when prompted |
+| GitHub PAT | Live PR diff and repo context when `vcs.type: github` | Skills use the diff visible in your editor |
+
+**Creating an ADO PAT:** ADO → top-right avatar → Personal access tokens → New Token.
+Scopes needed: **Work Items (Read)**, **Code (Read)**, **Pull Request Threads (Read & Write)**.
+
+**Credentials are never written to files.** VS Code stores them in your OS keychain on first prompt. The `${input:ADO_PAT}` syntax in `mcp.json` triggers this — nothing is committed.
+
+### Windows checklist
+
+Do these before running bootstrap. These are the most common blockers on corporate machines.
+
+**1. PowerShell execution policy**
+```powershell
+Get-ExecutionPolicy -Scope CurrentUser
+# If Restricted or AllSigned:
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+If you get "Access denied", your machine is managed by Group Policy — speak to your IT contact.
+
+**2. Unblock zip contents** (after extracting the zip)
+```powershell
+Get-ChildItem "C:\Tools\dev-iq" -Recurse | Unblock-File
+```
+
+**3. Developer Mode** (recommended, not required)
+Settings → Privacy & security → For developers → Developer Mode On.
+Enables directory symlinks without an admin shell. Without it, bootstrap falls back to copying skill files — safe but requires re-running after edits.
+
+---
+
+## What's Disabled in v0.9.0
+
+These features are built and wired but explicitly turned off. The flag is in `.dev-iq/config.yaml` unless noted otherwise.
+
+| Feature | Config flag | Status | Notes |
+|---------|-------------|--------|-------|
+| **Hindsight Hooks** | `hooks.hindsight_enabled: false` | Off by default | Hook scripts fire on session events but capture no patterns until enabled. Enable after verifying the pack is stable in your repo. |
+| **Decision Confidence signal** | `signals.confidence.enabled: false` | Phase 2 — not built | Do not enable. Referenced in skill output format but not computed. Ships in a future release. |
+| **Blast Radius full mode** | `blast_radius.enabled: false` | Disabled at Early maturity | The `/blast-radius-estimator` skill still runs in advisory mode. Full dependency-graph traversal requires `blast_radius.dependency_map_path` and Mid+ maturity. |
+| **Auto-assign reviewer on Yellow** | `pr.auto_assign_on_yellow: false` | Off | Requires ADO/GitHub PAT with write access and Mid+ maturity. |
+| **Signal emission to `.dev-iq/signals/`** | — | Planned for 0.10.0 | Skills don't yet write structured JSONL signal records. The directory doesn't exist yet. |
+| **Webhook telemetry sink** | `hooks.telemetry_sink: local` | Local only | Signals written to local logs only. Set `telemetry_sink: webhook` and add a URL in `hooks.telemetry_webhook_url` to push externally. |
+
+### MCP servers: what's active vs. disabled
+
+**Active by default (3 servers):**
+
+| Server | What it provides | Credential needed |
+|--------|-----------------|-------------------|
+| `azure-devops` | Live ADO work items, ACs, PR context | ADO PAT via `${input:ADO_PAT}` |
+| `github` | PR diff, branch, repo context | GitHub PAT via `${input:GITHUB_PAT}` |
+| `filesystem` | Workspace file tree read access (scoped to `${workspaceFolder}`) | None |
+
+**Disabled — pre-configured in `_disabled_servers` in `.vscode/mcp.json`:**
+
+To enable any of these, move the server block into the `mcpServers` object and supply credentials.
+
+| Server | What it provides | Enable when |
+|--------|-----------------|-------------|
+| `jira` | Live Jira issues and sprints | `tracker.type: jira` in config.yaml — replaces `azure-devops` |
+| `git` | Git log, blame, structured diff | Useful for `/blast-radius-estimator` and `/generate-release-notes` on complex histories |
+| `sentry` | Error tracking and issue context | Useful for `/debug-issue` on production incidents |
+
+See `.vscode/MCP.md` for step-by-step credential setup for each server.
+
+---
+
 ## What This Is
 
 This pack drops into a client codebase and gives the development team an
@@ -141,12 +237,13 @@ bash ~/dev-iq/scripts/bootstrap.sh --preset=portable
 # Reverse with: --uninstall
 ```
 
-### Pinning to a tag
+### Pinning to a version
 
-Use `git checkout v0.9.0` (or `git clone --branch v0.9.0`) on the cloned copy.
-Use the latest tag from the Releases page. Bootstrap CLI flags, manifest schema,
-skill names, and workspace surface layout will not change incompatibly without
-a major-version bump (after v1.0.0).
+v0.9.0 is a pre-release — no git tags have been cut yet. Use the zip provided
+by your engagement lead, which is pinned to a specific commit. Once the repo
+moves to tagged releases (v1.0.0+), bootstrap CLI flags, manifest schema, skill
+names, and workspace surface layout will not change incompatibly without a
+major-version bump.
 
 ---
 
@@ -442,24 +539,20 @@ Open `.dev-iq/maturity-profile.md` and document the rationale for the chosen tie
 
 ### Wire the telemetry overlay
 
-Open `.dev-iq/telemetry-overlay.md` and map each DI signal to your client's
-actual data sources:
+Open `.dev-iq/telemetry-overlay.md`. It contains five tables — one per DI signal layer — mapping each signal to your client's actual data sources. Fill in the `Value` column for each field that applies; leave fields blank if the tool isn't in use (the agent marks that signal UNGRADED rather than fabricating data).
 
-```yaml
-signals:
-  intent:
-    source: ado                          # ado | jira | linear | github-issues
-    work_item_types: [User Story, Task]
-  design:
-    architecture_docs: docs/architecture/
-    pattern_library: docs/patterns/
-  quality:
-    coverage_tool: sonarqube             # sonarqube | codecov | coveralls
-    lint_tool: eslint                    # eslint | pylint | rubocop
-  risk:
-    dependency_file: package.json        # package.json | requirements.txt | pom.xml
-    schema_path: db/migrations/
-```
+Example fields you'll fill in:
+
+| Signal | Field | Example value |
+|--------|-------|---------------|
+| INTENT | Tracker | `ado` |
+| INTENT | Base URL | `https://dev.azure.com/my-org` |
+| QUALITY | Coverage tool | `sonarqube` |
+| QUALITY | SAST tool | `snyk` |
+| RISK | Primary dependency file | `package.json` |
+| RISK | Schema / migration path | `db/migrations/` |
+
+Or attach the file to Copilot Chat and say: "Customize this telemetry overlay for my codebase and stack." The agent asks targeted questions and fills the blanks.
 
 ### Validate
 
@@ -641,10 +734,9 @@ matches your actual tools and file paths.
 
 | Version | Notes |
 |---------|-------|
-| 0.9.0 | Pre-release. 22 skills complete. Bootstrap with `--preset` and `--uninstall`. VERSION + CHANGELOG at repo root. All Copilot and Claude Code surfaces wired. |
-| 0.1.0 | Initial release. DI four-layer signal model. Pack structure established. Foundation and instruction files. |
+| 0.9.0 | Pre-release. 22 skills complete. Bootstrap with `--preset` and `--uninstall`. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired. |
 
-See [CHANGELOG.md](CHANGELOG.md) for the full release history.
+See [CHANGELOG.md](../CHANGELOG.md) for the full release history including post-0.9.0 maintenance.
 
 ---
 
