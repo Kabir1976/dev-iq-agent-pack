@@ -63,7 +63,7 @@ Initial pre-release of the Dev.IQ Agent Pack.
 
 **Configuration**
 - `.dev-iq/config.yaml` — client-specific stack, maturity, and governance config
-- `.dev-iq/governance.md` — compliance posture stub
+- `.dev-iq/governance.md` — compliance posture document (data boundary, access controls, AI output controls)
 - `.dev-iq/maturity-profile.md` — maturity tier behavior definition
 - `.dev-iq/telemetry-overlay.md` — signal sink configuration
 
