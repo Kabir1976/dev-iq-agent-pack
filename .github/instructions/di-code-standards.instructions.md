@@ -29,11 +29,11 @@ and tooling overrides. These rules are defaults — client config takes preceden
   - **Constants:** `UPPER_SNAKE_CASE` (all languages)
   - **Classes/Types:** `PascalCase` (all languages)
   - **Functions/methods and properties:**
-    - `camelCase`: JavaScript, TypeScript, Java, Go
+    - `camelCase`: JavaScript, TypeScript, Java, Go, Kotlin, Swift
     - `snake_case`: Python, Ruby
-    - `PascalCase`: C#, Kotlin, Swift
+    - `PascalCase`: C# (public methods and properties)
   - **Internal/private members:**
-    - Prefix with `_` (underscore): C# properties, Kotlin, Swift (convention-based privacy)
+    - Prefix with `_` (underscore): C# private fields (`_camelCase`), Kotlin backing properties
     - Prefix with `__` (dunder): Python private members
     - Use access modifiers: Java (`private`), Go (unexported by lowercase), C# (`private`)
 - Follow the client's established naming conventions over these defaults — read existing code before generating new code.
