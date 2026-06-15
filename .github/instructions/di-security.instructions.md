@@ -48,6 +48,12 @@ Top 10 within the DI signal model.
 - Deserialization of untrusted data without validation is always a High finding.
 - File uploads: validate MIME type server-side (not just extension), scan for malware, store outside the web root.
 
+### A10 — Server-Side Request Forgery (SSRF)
+- Any endpoint that fetches a URL supplied or influenced by user input is an SSRF candidate. Flag it.
+- Block requests to private IP ranges: `10.x`, `172.16–31.x`, `192.168.x`, `127.x`, `169.254.x`, `::1`, and cloud metadata endpoints (`169.254.169.254`).
+- **TOCTOU caveat:** The pattern of resolving DNS, checking the resolved IP, then making the request has a time-of-check/time-of-use gap — the DNS record can change between the check and the fetch, resolving to a private IP on the second lookup. Fix: resolve DNS once, pin the IP, and make the HTTP request directly to that pinned IP with the original `Host` header. Or use a dedicated SSRF-safe HTTP client library instead of manual IP checks.
+- Flag any code that makes an outbound HTTP request to a user-supplied URL without one of the above controls as High.
+
 ### A09 — Security Logging Failures
 - Authentication failures, authorization failures, and input validation failures must be logged.
 - Logs must not contain PII, passwords, tokens, or session IDs in cleartext.
@@ -75,6 +81,53 @@ Top 10 within the DI signal model.
 - PII transmitted without TLS: Critical finding.
 - Retention policy: if PII is stored with no documented deletion mechanism, flag as Medium.
 - Third-party data sharing: flag any new integration that sends user data to an external service.
+
+## AI and LLM Feature Security
+
+When reviewing or generating code that calls an LLM API, uses prompt-based logic, or builds agentic workflows, apply the OWASP LLM Top 10 as a minimum baseline.
+
+| Item | Vulnerability | What to check |
+|------|--------------|---------------|
+| LLM01 | Prompt Injection | User input reaching an LLM prompt without sanitization — attacker can hijack model behavior or extract the system prompt |
+| LLM02 | Sensitive Information Disclosure | LLM outputs containing training data, system prompt contents, or PII from context windows |
+| LLM03 | Supply Chain | Third-party model providers or plugins without documented provenance, SLAs, or data-handling commitments |
+| LLM04 | Data and Model Poisoning | Fine-tuning or RAG pipelines that ingest user-controlled content that could corrupt model behavior |
+| LLM05 | Improper Output Handling | LLM output used in SQL queries, shell commands, HTML templates, or code execution without treating it as untrusted input |
+| LLM06 | Excessive Agency | Agents with write access to external systems that can take destructive actions without human-in-the-loop approval |
+| LLM07 | System Prompt Leakage | System prompts exposed via user manipulation, reflection attacks, or model output |
+| LLM08 | Vector and Embedding Weaknesses | RAG pipelines that retrieve and inject user-controlled documents without sanitization before prompt assembly |
+| LLM09 | Misinformation | High-stakes decisions (medical, legal, financial) made on unverified LLM output without a human verification step |
+| LLM10 | Unbounded Consumption | No rate limits, token caps, or cost controls on LLM API calls — risk of cost-exhaustion denial of service |
+
+**Key rule:** LLM output is untrusted input. Any LLM response used in a database query, shell command, template render, or downstream code execution path must be validated and escaped as if it came from an external attacker.
+
+## Three-Tier Security Boundary
+
+When reviewing or generating security-sensitive code, apply this enforcement hierarchy before issuing any verdict.
+
+### Always Do
+- Validate all input at system boundaries before use
+- Use parameterized queries for all database access
+- Source secrets from environment variables or a secrets manager — never hardcode
+- Verify both authentication and authorization on every protected route
+- Use HTTPS for all external communication
+- Log security-relevant events: auth failures, access denials, input rejections
+
+### Ask First — requires explicit human approval before proceeding
+- Disabling or weakening an existing security control for any reason
+- Storing PII in a new location or new format
+- Adding a new external service that receives user data
+- Granting a new permission scope to an API key or service account
+- Bypassing an existing rate limit or access check
+- Introducing a new authentication or session management pattern
+
+### Never Do
+- Hardcode secrets, API keys, or credentials in source
+- Log passwords, tokens, session IDs, or PII
+- Trust user-supplied identity — derive from verified session token only
+- Accept `algorithm: none` in JWT verification
+- Return stack traces or internal error details to the caller in production
+- Downgrade a Critical or High security finding due to delivery pressure or timeline
 
 ## When Generating Security-Sensitive Code
 

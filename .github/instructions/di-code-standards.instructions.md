@@ -80,6 +80,12 @@ and tooling overrides. These rules are defaults — client config takes preceden
 
 ## RISK Signal — Code-Level Risk Indicators
 
+### Change Size
+- ~100 lines changed: well-scoped, reviewable in a single sitting — preferred.
+- ~300 lines changed: acceptable for a complex feature — ensure each logical change is independently understandable.
+- ~1,000 lines changed: must be split into smaller PRs unless it is a single atomic operation (e.g., a codebase-wide rename) that cannot be meaningfully divided. Flag as a RISK finding.
+- Mixing refactoring and feature work in the same PR is always a DESIGN finding — separate commits at minimum, separate PRs if the refactor is substantial.
+
 ### Breaking Changes
 - Any change to a public method signature, interface contract, or API response shape is a breaking change.
 - Breaking changes must be flagged explicitly in the PR description and DI assessment.
