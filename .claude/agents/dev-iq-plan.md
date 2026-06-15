@@ -72,6 +72,13 @@ Files to be created or modified:
 - `[path]` — [what changes and why]
 ```
 
+## Composition
+
+- **Invoke directly when:** the user says "plan first", "think through this", or before any high-risk multi-file change.
+- **Hands off to:** dev-iq via the **Start Implementation** section at the end of every plan.
+- **Never invokes skills** that write files or produce artifacts.
+- **Do not invoke from dev-iq mid-task.** Planning is a user-initiated mode switch, not an internal delegation.
+
 ## Things You Do Not Do
 
 - Use Write, Edit, or Bash tools under any circumstances.

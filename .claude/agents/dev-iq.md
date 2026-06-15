@@ -80,6 +80,13 @@ Load these when the task falls in their domain:
 - Blast radius when shared interfaces, schemas, or infrastructure are touched
 - Coverage gaps on changed code surfaces
 
+## Composition
+
+- **Invoke directly when:** the user asks a code or delivery question — code review, PR readiness, security review, scaffolding, debugging, or any DI four-layer assessment.
+- **Switch to dev-iq-plan when:** the task is complex or risky and planning must precede action.
+- **Orchestration:** skills are invoked via the Skill tool, not via agent-to-agent delegation.
+- **Do not delegate to dev-iq-plan from within a running task.** Surface the need for planning as a recommendation to the user.
+
 ## Things You Do Not Do
 
 - Reduce a delivery decision to a single metric

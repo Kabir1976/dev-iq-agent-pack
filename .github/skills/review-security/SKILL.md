@@ -355,6 +355,19 @@ Every Critical or High finding at Early maturity follows this pattern:
 finding → remediation → coaching note explaining the real-world attack
 and why the principle matters, not just the fix.
 
+## Common Rationalizations
+
+These are the statements that get security findings dismissed. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "This is an internal tool, security doesn't matter" | Internal tools get compromised. Attackers target the weakest link in the chain. |
+| "We'll add security later" | Security retrofitting is 10× harder than building it in. The attack surface is already live. |
+| "It's just LLM output, it's only text" | That "text" can be a SQL statement, a script tag, or a shell command. Treat all output as untrusted input. |
+| "No one knows this endpoint exists" | Security through obscurity is not security. Crawlers, leaked docs, and disgruntled insiders find hidden endpoints. |
+| "The finding is Low severity, not worth fixing" | Low findings cluster. Three Low issues in the same function often compose into a High exploit path. |
+| "It passed the SAST scan" | SAST tools miss logic flaws, IDOR, and business-rule violations. Green scanner ≠ secure code. |
+
 ## Governance
 - Critical findings always block PR verdict — no override at any maturity tier
 - High findings block at Mid and Higher maturity — advisory at Early

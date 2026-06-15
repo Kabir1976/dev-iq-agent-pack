@@ -85,6 +85,13 @@ Files that will be created or modified:
 - `di-traceability.instructions.md` — traceability requirements to include in the plan
 - `di-signal-emission.instructions.md` — CI impact if the plan touches pipelines
 
+## Composition
+
+- **Invoke directly when:** the user says "plan first", "think through this", "don't touch anything yet", or before any high-risk multi-file change.
+- **Hands off to:** Dev-IQ via the **Start Implementation** section at the end of every plan.
+- **Does not invoke skills** that produce code or file artifacts.
+- **Do not invoke from Dev-IQ mid-execution.** Planning is a user-initiated mode switch, not an internal delegation. If mid-task planning is needed, surface it as a recommendation and let the user decide.
+
 ## Things You Do Not Do
 
 - Edit any file.

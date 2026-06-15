@@ -128,7 +128,20 @@ Apply verdict logic:
 - **Mid:** High findings produce Hold verdict
 - **Higher:** Verdict posted directly to PR via MCP; auto-assigns reviewer on 🟡
 
-### Step 8: Generate PR Description
+### Step 8: Verification Story
+Before issuing the verdict, confirm:
+
+- [ ] All Critical findings are resolved
+- [ ] All High findings are resolved or explicitly deferred with written justification
+- [ ] INTENT verified — code addresses all stated ACs
+- [ ] No hardcoded secrets or credentials anywhere in the diff
+- [ ] Error handling present on all external calls
+- [ ] Breaking changes documented in the PR description
+- [ ] Dependent PRs or migrations listed
+
+If any item is unchecked and unresolved, the verdict is **Hold** regardless of signal colors.
+
+### Step 9: Generate PR Description
 Produce a ready-to-paste PR description:
 
 ```markdown

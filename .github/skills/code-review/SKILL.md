@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Reviews code through the DI five-layer lens covering design, quality, security, and risk. Use when asked to "review this code", "check my PR", "review this file", "look at these changes", or "is this ready to merge".
+description: Reviews code through the DI four-layer lens covering intent, design, quality, and risk. Use when asked to "review this code", "check my PR", "review this file", "look at these changes", or "is this ready to merge".
 di_signal: DESIGN + QUALITY
 maturity_required: early
 status: approved
@@ -121,6 +121,16 @@ Severity definitions:
 | 🟡 Medium | Code smell, performance concern, minor pattern deviation |
 | 🔵 Low | Style issue, naming improvement, minor readability suggestion |
 
+When writing inline comments on individual lines, prefix each with its action weight:
+
+| Prefix | Meaning | Author action |
+|--------|---------|---------------|
+| `Critical:` | Must fix — blocks merge | Fix before merge |
+| `High:` | Should fix — blocks at Mid+ maturity | Fix before merge at Mid+ |
+| `Nit:` | Minor style or naming issue | May ignore |
+| `Optional:` | Suggestion — no wrong answer | No action required |
+| `FYI:` | Informational context — not a finding | No action required |
+
 ### Step 7: Issue Verdict
 After all findings, produce the DI Signal Summary and Verdict:
 
@@ -178,6 +188,14 @@ Reviewed: [date]
 ### Verdict
 [🟢 Approve / 🟡 Approve with comments / 🔴 Request changes]
 [One sentence rationale]
+
+### Pre-Approval Checklist
+- [ ] All Critical findings resolved
+- [ ] All High findings resolved or explicitly deferred with justification
+- [ ] INTENT verified — code addresses the stated work item
+- [ ] No hardcoded secrets or credentials
+- [ ] Error handling present on all external calls
+- [ ] Tests added or test stubs documented
 
 @di-review-required
 ```
@@ -280,6 +298,19 @@ At Early maturity, every finding includes a coaching note:
   Controllers handle HTTP concerns only; services handle business logic.
   This follows the Service/Controller pattern in di-code-standards.instructions.md.
 ```
+
+## Common Rationalizations
+
+These are the statements that get review findings dismissed. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "AI-generated code is probably fine" | AI code needs more scrutiny, not less. It's confident and plausible — even when wrong. |
+| "The tests pass, so it's good" | Tests are necessary but not sufficient. They don't catch architecture problems, security issues, or readability failures. |
+| "It's a small change, doesn't need a full review" | Small changes introduce the majority of production bugs. Size is not a proxy for risk. |
+| "I'll clean it up later" | Later never comes. Technical debt compounds. Flag it now and track it as a follow-up. |
+| "The CI is green" | CI validates that code runs — not that it's correct, secure, or maintainable. |
+| "The reviewer approved it already" | A human approval is not a DI signal assessment. Both add value independently. |
 
 ## Governance
 - Critical and High security findings always block — regardless of maturity tier
