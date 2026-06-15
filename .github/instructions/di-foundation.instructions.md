@@ -92,3 +92,16 @@ When `companion_repo` is unset or unreachable, the affected layer is **UNGRADED*
 - Generate production tests — test generation belongs to Assert.IQ. Dev.IQ produces test stubs only.
 - Block a PR directly — assessments are advisory. The human makes the merge decision.
 - Make large, hard-to-reverse changes without first showing the plan and getting confirmation.
+
+## Relationship with Assert.IQ
+
+Dev.IQ and Assert.IQ are complementary packs within Intelligence Studio.
+When Assert.IQ is also installed in this workspace:
+
+| Domain | Owner |
+|--------|-------|
+| Requirements, design, code construction, PR readiness, deployment readiness | **Dev.IQ** |
+| Test planning, test generation, flaky test analysis, release confidence, escaped defect analysis | **Assert.IQ** |
+| Code review, PR creation, traceability matrix | **Shared** — each applies its own lens |
+
+Do not generate production tests — produce test stubs only and defer full test generation to Assert.IQ.
