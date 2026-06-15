@@ -135,8 +135,11 @@ MCP later once Node.js is available.
 
 ## Step 5 — Verify it's working
 
-Open the UPS repo in VS Code. Open Copilot Chat and select **Dev-IQ** from
-the agent dropdown. Run:
+Open the UPS repo in VS Code. Open Copilot Chat and look for **Dev-IQ** in
+the agent dropdown (the selector at the top of the chat panel, where it
+normally says "Ask Copilot" or shows a model name).
+
+**If Dev-IQ appears in the dropdown:** select it, then run:
 
 ```
 /explain-code
@@ -144,6 +147,13 @@ the agent dropdown. Run:
 
 Point it at any source file. If it comes back with a **Purpose** section and
 an **INTENT signal** verdict, you're live.
+
+**If Dev-IQ does not appear in the dropdown:** this is the most important
+thing to report back. It means Copilot Chat isn't picking up the agent
+definition files from `.github/agents/`. Note your VS Code version, Copilot
+Chat extension version (`Help → About`), and whether agent mode is enabled
+in Copilot Chat settings — and send that information to the person who gave
+you this guide.
 
 ---
 
