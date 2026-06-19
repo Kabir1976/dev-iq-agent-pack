@@ -63,6 +63,19 @@ to flag:
 - Packages with a history of supply chain attacks (typosquats, dependency
   confusion): flag the naming pattern if suspicious
 
+**CVE citation guardrail:**
+Do NOT cite a specific CVE number (e.g. CVE-2021-44228) unless it is:
+- Retrieved via an MCP tool call to a CVE or advisory database, OR
+- Explicitly stated in the user's input, PR description, or security advisory
+  they have provided
+
+LLM training data contains CVE information that is frequently misattributed,
+version-mismatched, or stale. Instead, describe the vulnerability class and
+direct the team to verify:
+- ✅ "This version of [package] has known vulnerabilities — check the npm
+     advisory (npmjs.com/advisories) or osv.dev before acting."
+- ❌ "CVE-2019-10744 applies here" (do not write this unless confirmed via tool or user input)
+
 **License Compatibility**
 Check the package license against the project's license posture:
 - MIT, BSD-2, BSD-3, Apache-2.0, ISC: generally safe for commercial use
@@ -142,9 +155,12 @@ Scope: [new dependencies only | full manifest]
 ### Findings
 
 **🔴 Critical — [package]@[version]**
-- CVE: [CVE-YYYY-NNNNN] — [brief description]
-- Affected versions: [range]
-- Fixed version: [version]
+- Vulnerability: [describe the vulnerability class, e.g. "prototype pollution",
+  "path traversal", "ReDoS" — do NOT cite a CVE number unless confirmed via
+  MCP tool or explicit user input]
+- Advisory: Verify at npmjs.com/advisories, osv.dev, or nvd.nist.gov
+- Affected versions: [range if known from advisory]
+- Fixed version: [version if known from advisory]
 - Action: Upgrade to [version] before merge
 
 **🟠 High — [package]@[version range]**
@@ -351,6 +367,11 @@ v9 breaking change for empty secrets must be verified before merge.
   vulnerabilities; the team must verify before relying on the assessment
 - Transitive (indirect) dependencies with known CVEs should be noted; Direct
   dependencies with known CVEs must be resolved
+- **Do not cite specific CVE numbers from LLM training knowledge.** CVE records
+  in training data are frequently misattributed, version-mismatched, or stale.
+  Describe the vulnerability class and direct the team to verify at a live
+  advisory source (osv.dev, nvd.nist.gov, the package registry advisory page).
+  Only cite a CVE number when confirmed via MCP tool call or explicit user input.
 
 ## Related Skills
 - `/review-security` — dependency review is one layer of the full security review;

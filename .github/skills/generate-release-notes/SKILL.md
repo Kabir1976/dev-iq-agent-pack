@@ -39,8 +39,24 @@ Ask for (if not provided):
 - Run the equivalent of `git log v1.4.2..HEAD --oneline --merges` to get
   merged PRs and commits in the range
 - If PR descriptions are available: read them for categorized change data
-- If only commit messages are available: infer categories from commit message
-  prefixes (feat, fix, perf, chore, breaking, etc.)
+- If only commit messages are available: use the commit message text verbatim
+  as the basis for the note — do not synthesise, interpret, or expand on it
+
+**Read before generating:**
+- Check for an existing `CHANGELOG.md` or `RELEASES.md` in the workspace root.
+  Read the most recent entry to confirm the starting version boundary and avoid
+  duplicating items from previous releases.
+
+**Hallucination guardrail — uninformative commits:**
+If a commit message is uninformative (e.g. "fix", "wip", "update", "misc",
+"changes", "stuff"), do NOT synthesise what it might have fixed or changed.
+Instead, list it as:
+```
+- [commit hash] — REQUIRES CLARIFICATION: commit message is uninformative.
+  Developer must confirm what this commit contains before release notes are published.
+```
+Do not guess the content. Do not expand an uninformative message into a
+plausible-sounding description. The commit author must clarify.
 
 ### Step 2: Group Changes by Category
 Categorize each change into one of the following groups:
@@ -142,7 +158,9 @@ At **Mid/Higher maturity**: structured output only.
 
 - **[Security improvement]** — [what was addressed]
   Work Item: [AB#XXXX]
-  CVE: [CVE-YYYY-NNNN if applicable]
+  CVE: [include only if a specific CVE number appears in the commit message,
+  PR description, or linked work item — never infer or cite a CVE number from
+  LLM training knowledge; if uncertain write "CVE reference: REQUIRES VERIFICATION"]
 
 ---
 
@@ -367,6 +385,14 @@ documentation — undocumented configuration changes accumulate as invisible deb
   config changes — state UNGRADED if the check was not performed
 - Release notes are a public-facing artifact — do not include internal team
   notes, developer names, or implementation details that belong in commit messages
+- **Do not synthesise commit messages.** Use commit text verbatim. If a commit
+  message does not describe its change clearly, mark it REQUIRES CLARIFICATION
+  and ask the developer to provide the description. A plausible-sounding release
+  note generated from a vague commit is worse than an honest "REQUIRES CLARIFICATION"
+  because it will be published as fact.
+- **Do not cite CVE numbers** from LLM training knowledge. Only include a CVE
+  reference when it appears explicitly in the commit message, PR description,
+  or linked work item. Fabricated CVE citations undermine audit integrity.
 
 ## Related Skills
 - `/review-deployment-readiness` — run before cutting a release; if there are

@@ -47,6 +47,12 @@ Load context:
 - `.github/instructions/di-security.instructions.md` → client-specific
   security standards and compliance posture
 
+**Grounding guardrail:** Before issuing findings, read the actual file(s) from
+the workspace (via file path, IDE selection, or paste). Do not review a verbal
+description of code as if it were the code itself. Findings must reference
+specific lines or functions observed in the code, not inferred from what code
+in that category "typically" looks like.
+
 ### Step 2: Run QUALITY Security Checks
 Assess code-level vulnerabilities:
 
@@ -107,6 +113,19 @@ Assess contextual and structural security concerns:
 - New packages introduced — note name and version for CVE check
 - Flag if no lock file is present or if the version is unpinned (`^`, `~`, `*`)
 - Flag packages with known active CVEs if identifiable from name/version
+
+**CVE citation guardrail:**
+Do NOT cite a specific CVE number (e.g. CVE-2021-44228) unless it is:
+- Retrieved via an MCP tool call to a CVE database, OR
+- Explicitly stated in the user's input, commit message, or linked work item
+
+LLM training data contains CVE information that may be incorrect, misattributed,
+or outdated. Citing an invented or misremembered CVE number is worse than not
+citing one — it undermines the audit trail and may cause the team to apply the
+wrong fix. Instead, describe the vulnerability class:
+- ✅ "This version of [package] has a known prototype pollution vulnerability —
+     verify against the npm advisory database before acting."
+- ❌ "CVE-2019-10744 applies here" (do not write this unless confirmed via tool)
 
 **Data Handling**
 - PII stored without encryption at rest
@@ -377,6 +396,11 @@ These are the statements that get security findings dismissed. Rebut them.
 - Never suppress or omit a finding because the fix seems complex
 - Secrets found in code must be treated as compromised immediately —
   rotation is required even after the code is fixed
+- **Do not cite specific CVE numbers from LLM training knowledge.** CVE data
+  in training is frequently misattributed, version-mismatched, or stale.
+  Describe the vulnerability class and flag for verification against a live
+  CVE database (nvd.nist.gov, osv.dev, or the package registry advisory page).
+  Only cite a CVE when confirmed via MCP tool call or explicit user input.
 
 ## Related Skills
 - `/code-review` — general line-level review; use for non-security concerns

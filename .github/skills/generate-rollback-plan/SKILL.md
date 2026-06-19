@@ -88,6 +88,26 @@ Not acceptable:
 - "If the team decides" (no threshold — will not be acted on consistently)
 
 ### Step 4: Write the Step-by-Step Rollback Procedure
+
+**Platform confirmation guardrail — read before writing commands:**
+Before prescribing specific rollback commands, confirm the deployment platform
+from the workspace:
+- Check `.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`, `Dockerfile`,
+  `helm/`, `terraform/`, or equivalent CI/CD configuration files
+- Check `.dev-iq/config.yaml` or `telemetry-overlay.md` for declared infrastructure
+
+If the deployment platform **cannot be confirmed** from workspace files or
+explicit user input:
+- Write rollback steps in **infrastructure-agnostic terms** (e.g. "revert the
+  application to the previous build using your CI/CD pipeline")
+- Do NOT prescribe specific commands (e.g. `helm rollback`, `kubectl rollout undo`,
+  `eb deploy`, `flyway undo`) without platform confirmation
+- Add a warning block to every step:
+  ```
+  ⚠️ Platform not confirmed. This command is illustrative.
+  Verify it matches your actual infrastructure before executing during an incident.
+  ```
+
 For each rollback-sensitive component, write numbered steps:
 - Specific commands or actions (not general descriptions)
 - Who executes each step (role, not name — "on-call engineer", "DBA", "release manager")
@@ -101,6 +121,18 @@ List explicitly what cannot be undone even after rollback:
 - Webhook deliveries to external systems
 - Data deleted without a backup
 - Messages published to a queue that has already been consumed
+
+**Database migration reversibility guardrail:**
+Do NOT mark a database migration as reversible unless one of the following is
+confirmed from workspace files:
+- A `down` migration file exists (e.g. `migrate:rollback`, `flyway undo`
+  target, Liquibase rollback tag)
+- The migration is additive-only (new nullable column or new table with no
+  data transformation)
+
+If neither can be confirmed, mark the migration as **IRREVERSIBLE — UNVERIFIED**
+and state: "No down migration was found in the workspace. Treat as irreversible
+until a DBA confirms a reversal path exists."
 
 Irreversible actions require a communication plan — who gets notified if
 rollback is initiated and these actions are in a partial state?
@@ -376,6 +408,14 @@ financial remediation may take days. Plan accordingly.
   the schema but not the data loss
 - Never issue a RISK STRONG verdict when irreversible actions are present and
   the communication plan is not documented
+- **Do not prescribe platform-specific rollback commands** (e.g. `helm rollback`,
+  `kubectl rollout undo`, `flyway undo`, `eb deploy`) unless the deployment
+  platform is confirmed from workspace CI/CD configuration files or explicit
+  user input. Invented platform-specific commands executed during an incident
+  can cause more damage than the incident itself. Use infrastructure-agnostic
+  descriptions and mark all illustrative commands with a ⚠️ warning.
+- **Do not mark a migration reversible** without confirming a down migration
+  exists in the workspace. Assumption of reversibility is a production risk.
 
 ## Related Skills
 - `/review-deployment-readiness` — the rollback plan generated here is a required

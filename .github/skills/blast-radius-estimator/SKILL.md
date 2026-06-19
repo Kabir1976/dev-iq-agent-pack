@@ -55,6 +55,27 @@ rather than attempting to scan the full codebase. Produce an advisory map.
 | Internal implementation | Private function, no public interface change | Low |
 
 ### Step 3: Identify Consumers
+
+**INFERRED vs CONFIRMED distinction — apply to every consumer identified:**
+
+Consumer relationships have two confidence levels:
+
+| Level | Meaning | How to determine |
+|-------|---------|------------------|
+| **CONFIRMED** | Relationship verified by reading workspace files (imports, API calls, schema references found via code search) | Agent read the file and found the reference |
+| **INFERRED** | Relationship assumed from naming conventions, known architecture, or user description — not verified in workspace files | Agent did not verify in actual code |
+
+Always label each consumer row in the output with its confidence level.
+Do not present an INFERRED relationship as a confirmed impact.
+
+**If no dependency map is available (`blast_radius.dependency_map_path` not
+set in `.dev-iq/config.yaml`) and the workspace cannot be searched:**
+- Fall back to advisory mode regardless of maturity tier
+- State: "Full consumer scan unavailable — dependency map not configured and
+  workspace search could not be completed. The following assessment is INFERRED
+  and must be verified by the team before acting on it."
+- Do not produce a Breaking/Degraded/Transparent verdict table as if it were confirmed
+
 For each changed surface, find all consumers:
 
 **For API endpoints:**
@@ -120,6 +141,7 @@ Work Item: [AB#XXXX | PROJ-XXX | #456 | "none provided"]
 Change Type: [API contract | Schema | Interface | Shared utility | Config | Internal]
 Assessed: [date]
 Maturity: [Early (advisory) | Mid | Higher]
+Scan confidence: [CONFIRMED — workspace searched | INFERRED — advisory only]
 
 ---
 
@@ -132,11 +154,11 @@ or table, and what specifically is changing about it]
 
 ### Consumer Impact
 
-| Consumer | Type | Impact | Notes |
-|----------|------|--------|-------|
-| [service/component name] | [API / Schema / Interface] | Breaking | [what breaks] |
-| [service/component name] | [API] | Transparent | [why unaffected] |
-| [service/component name] | [Schema] | Degraded | [what behavior degrades] |
+| Consumer | Type | Confidence | Impact | Notes |
+|----------|------|------------|--------|-------|
+| [service/component name] | [API / Schema / Interface] | CONFIRMED | Breaking | [what breaks — verified in workspace] |
+| [service/component name] | [API] | CONFIRMED | Transparent | [why unaffected] |
+| [service/component name] | [Schema] | INFERRED | Degraded | [assumed from architecture — not verified in code] |
 
 ---
 
@@ -376,6 +398,14 @@ results.
   scan could not be completed
 - Feature flag strategies must be evaluated for every High blast radius change —
   coordinated big-bang releases are a risk multiplier
+- **Do not present an INFERRED consumer relationship as a confirmed impact.**
+  Every consumer in the output table must be labeled CONFIRMED or INFERRED.
+  INFERRED relationships must carry a note: "not verified in workspace files —
+  team must confirm before treating this as a blocking finding."
+- **Fall back to advisory mode** when a dependency map is not configured and
+  the workspace cannot be searched. Do not produce a structured Breaking/Degraded
+  verdict table based on inference alone — the team will act on it as if it
+  were confirmed.
 
 ## Related Skills
 - `/review-dependencies` — if the blast radius change involves package updates,
