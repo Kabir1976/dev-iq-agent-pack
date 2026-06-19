@@ -134,6 +134,50 @@ without ever becoming a tooling pitch.
 
 ---
 
+## Enterprise Governance: Agent Autonomy Classification
+
+Gartner's May 2026 research identifies four AI agent autonomy tiers — Observe,
+Advise, Act with Approval, Act Autonomously — and states that applying uniform
+governance across all four tiers is the primary cause of enterprise AI agent
+failure. The prescription: governance controls must be proportionate to the
+autonomy level of the specific agent.
+
+Dev.IQ operates at the **Advise** and **Act with Approval** tiers only.
+No skill operates at Act Autonomously. This is enforced by `governance.md`
+(`allow_ai_merge_without_review: false`) and the `@di-review-required` marker
+on all skill output.
+
+### Skill autonomy tier mapping
+
+| Gartner tier | What the agent does | Dev.IQ skills at this tier |
+|---|---|---|
+| **Observe** | Reads and surfaces information. No recommendations. | `explain-code`, `identify-dependencies`, `generate-traceability-matrix` |
+| **Advise** | Makes recommendations. Human decides and acts. | `code-review`, `review-security`, `review-pr-readiness`, `review-architecture`, `review-acceptance-criteria`, `refactor-code` *(plan phase)*, `blast-radius-estimator` |
+| **Act with Approval** | Produces a complete artifact (code, plan, ADR). Developer reviews and applies manually. | `scaffold-feature`, `generate-user-stories`, `generate-adr`, `design-data-model`, `generate-rollback-plan`, `generate-release-notes`, `debug-issue`, `review-deployment-readiness`, `refactor-code` *(apply phase)* |
+| **Act Autonomously** | Takes action without human review. | **None** — prohibited by `governance.md` |
+
+### What this means in practice
+
+- No skill can merge a PR, write files to the codebase, or post comments to ADO/GitHub without the developer initiating the action.
+- `scaffold-feature` outputs to the chat window — the developer pastes or applies. Nothing is written automatically.
+- PR verdicts (Go / Hold / No-Go) are advisory. The human makes the merge decision in every case.
+- The `@di-review-required` marker on every skill output is a formal signal that AI-generated content has not been human-reviewed yet, not a suggestion.
+
+### Governance configuration for security teams
+
+The controls that enforce this are in `.dev-iq/governance.md` in the client's repo:
+
+```yaml
+allow_ai_merge_without_review: false   # PR verdicts are advisory only
+allow_new_dependencies: false          # No new packages without developer confirmation
+mask_secrets_in_prompts: true          # Secrets never appear in skill I/O
+compliance_posture: enterprise         # Skills refuse requests that violate this posture
+```
+
+These are not configurable per-session — they are read at skill load time and govern all skill behavior for the team.
+
+---
+
 ## Dual-Target: Copilot and Claude Code
 
 The pack ships one canonical copy of every asset and exposes it through both

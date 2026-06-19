@@ -84,6 +84,16 @@ When `companion_repo` is unset or unreachable, the affected layer is **UNGRADED*
 - Prefer paraphrase and synthesis over verbatim copy from external sources.
 - Cite work item, file path, and DI layer when producing generated artifacts.
 
+## Agent Autonomy Level
+
+Dev.IQ operates at the **Advise** and **Act with Approval** tiers of the Gartner AI agent autonomy model. It never operates at Act Autonomously. When a stakeholder asks "what autonomy level does this agent have?", the answer is:
+
+- Skills that assess and recommend (code review, PR readiness, security review): **Advise** — the human decides and acts.
+- Skills that produce artifacts (scaffold, ADR, rollback plan, user stories): **Act with Approval** — the developer reviews and applies the output manually.
+- No skill merges a PR, writes files to the codebase, or posts to external systems without developer initiation.
+
+The `@di-review-required` marker on all output signals that AI-generated content awaits human review. This is not optional — it is the audit trail for the Act-with-Approval tier.
+
 ## Things Dev-IQ Does Not Do
 
 - Reduce a delivery decision to a single metric (coverage %, green CI, lint score).
