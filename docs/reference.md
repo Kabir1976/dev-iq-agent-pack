@@ -247,6 +247,44 @@ major-version bump.
 
 ---
 
+## Distributing to Colleagues
+
+Three options depending on your environment. For most corporate/restricted environments, Option 1 is the fastest path.
+
+### Option 1 — Zip file (no internet required)
+
+Create a clean zip from the pack and share via Teams, email, or SharePoint:
+
+```bash
+cd /path/to/dev-iq
+git archive --format=zip --output=~/Desktop/dev-iq-v0.9.0.zip HEAD
+```
+
+`git archive` includes only committed files — no `.git` folder, no machine-specific files (`.claude/settings.local.json`, `hooks/hooks.json`, `.DS_Store`) are included. The result is exactly what a colleague needs to run bootstrap.
+
+Colleagues receive the zip and follow [docs/trial-install-guide.md](trial-install-guide.md).
+
+### Option 2 — GitHub collaborator (if colleagues have GitHub access)
+
+Invite them to `github.com/Kabir1976/dev-iq`:
+
+> GitHub → Settings → Collaborators → Add people
+
+They clone once, then run bootstrap against their own repos. No zip needed; they get updates via `git pull`.
+
+### Option 3 — Internal Git server (enterprise long-term)
+
+If your organisation has an internal ADO or GitLab instance:
+
+```bash
+git remote add internal https://your-internal-git/dev-iq.git
+git push internal main
+```
+
+Colleagues clone from the internal URL and run bootstrap as normal. Updates are pushed to the internal remote.
+
+---
+
 ## What Bootstrap Delivers
 
 Bootstrap copies the complete workspace surface into the target repo.
