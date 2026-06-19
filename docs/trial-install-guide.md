@@ -72,7 +72,7 @@ Then run the Unblock-File command from the checklist above if you haven't alread
 
 Open PowerShell and run:
 ```powershell
-powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" -Target "C:\path\to\your-repo" -Mode trial
+powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" -Target "C:\path\to\your-ups-repo" -Preset solo
 ```
 
 Replace `C:\path\to\your-ups-repo` with the actual path to the UPS repo on
@@ -197,9 +197,23 @@ a Go / Hold / Discuss recommendation. This is the core of what Dev.IQ does.
 
 ## Feedback after 2–3 days
 
-No formal report needed. Just a quick message with:
-- Did the install work first try, or did you hit something?
-- Did the skill outputs feel useful or generic?
-- Anything that surprised you — good or bad?
+Send a short report back using these prompts — the more specific, the more useful.
 
-Reach out to the person who sent you this guide with any questions.
+**Install experience**
+- Did the bootstrap run without errors on the first try? If not, what error appeared and at which step?
+- Did the Dev-IQ agent appear in the Copilot Chat dropdown? (Step 5)
+- Did you need to change your PowerShell execution policy? Was that step clear?
+
+**Skill quality**
+- Which skills did you try? (`/explain-code`, `/review-pr-readiness`, `/code-review`, etc.)
+- Did the output feel useful and specific to your code, or generic?
+- Did any skill produce output that was wrong, confusing, or unhelpful — and if so, what did you ask and what did it say?
+
+**MCP / live data**
+- Did you wire the ADO credentials (Step 4)? If yes, did work item pull work?
+- If you skipped MCP, did the paste-mode fallback feel usable?
+
+**One overall rating** (optional but useful)
+> "I would / would not recommend this to a teammate on this project because _______"
+
+Reply directly to the person who sent you this guide. No formal write-up needed — bullet points are fine.
