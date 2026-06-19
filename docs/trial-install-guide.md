@@ -33,14 +33,24 @@ and will be blocked from running. After extracting the zip, run this once:
 Get-ChildItem "C:\Tools\dev-iq" -Recurse | Unblock-File
 ```
 
-**3. Check your VS Code version**
+**3. Check your IDE version**
 
-The Dev-IQ agent requires VS Code 1.99 or later and GitHub Copilot Chat
-extension v0.22 or later. Check: `Help → About` in VS Code.
+- **VS Code:** requires 1.99 or later + GitHub Copilot Chat extension v0.22 or later. Check: `Help → About`.
+- **Visual Studio 2022:** requires v17.14 or later. Check: `Help → About`.
 
-If you're behind on either, update before continuing.
+If you're behind, update before continuing.
 
-**4. Confirm you can create an ADO Personal Access Token**
+**4. Visual Studio 2022 only — enable repository instructions**
+
+This step is easy to miss and blocks everything if skipped.
+
+In Visual Studio: **Tools → Options → GitHub → Copilot → (General)**  
+Turn on **"Enable repository custom instructions"** and click OK.
+
+Without this, the DI reasoning layer (copilot-instructions.md) never loads,
+and Dev-IQ will respond like a generic Copilot agent with no DI context.
+
+**5. Confirm you can create an ADO Personal Access Token**
 
 Go to your ADO org → top-right avatar → **Personal access tokens**. If you can
 see this page, you're fine. If it's blocked, MCP won't connect to ADO — skills
