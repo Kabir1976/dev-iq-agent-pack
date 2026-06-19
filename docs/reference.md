@@ -134,6 +134,27 @@ without ever becoming a tooling pitch.
 
 ---
 
+## Market Context: Why This Pack Exists
+
+Three verified findings from 2025 primary research explain the problem Dev.IQ is built to solve.
+
+**Developer trust is falling as adoption grows** (Stack Overflow 2025 Developer Survey, n=49,000+):
+
+| Metric | 2024 | 2025 |
+|---|---|---|
+| AI tool usage | 76% | 84% |
+| Combined trust in AI accuracy | 43% | 33% |
+| Active distrust | 31% | **46%** |
+| Positive favorability | 72% | 60% |
+
+**Governance coverage lags adoption by 2:1** (IBM 2025 Cost of a Data Breach Report, ~600 orgs, first year tracking shadow AI as a distinct breach vector): only 37% of organizations have policies to manage AI tools or detect unsanctioned usage; of those, only 34% audit for shadow AI.
+
+**Unstructured adoption shows null productivity gains in real-world conditions.** A peer-reviewed RCT (SSRN/Management Science 2025, 4,867 developers, Microsoft + Accenture + Fortune 100) found a 26% increase in completed tasks under structured adoption. A two-year longitudinal study at NAV IT (703 repos, 26,317 commits) found no statistically significant improvement without governance structure — same tools, different outcomes.
+
+The trust gap, governance gap, and productivity variance are all addressed by the same thing: a structured, tiered reasoning layer that developers and organizations can trust.
+
+---
+
 ## Enterprise Governance: Agent Autonomy Classification
 
 Gartner's May 2026 research identifies four AI agent autonomy tiers — Observe,

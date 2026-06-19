@@ -45,6 +45,20 @@ DI is the operating model. Dev.IQ is how developers act on it — from day one, 
 
 ---
 
+## Why structured governance matters now
+
+The enterprise AI developer tooling market has a trust problem that is getting worse, not better.
+
+**Developer trust is falling as adoption grows.** Stack Overflow's 2025 Developer Survey (49,000+ respondents) found that combined developer trust in AI tool accuracy fell from 43% to 33% year-over-year, while AI adoption grew from 76% to 84%. Active distrust rose from 31% to 46% — nearly doubling. Positive favorability dropped 12 points (72% → 60%). Developers are using tools they trust less than they did twelve months ago.
+
+**Governance coverage is the gap.** IBM's 2025 Cost of a Data Breach Report (the first year tracking shadow AI as a distinct breach vector, ~600 organizations) found that only 37% of organizations have policies to manage AI tools or detect unsanctioned usage. Of those, only 34% perform regular audits.
+
+**Unstructured adoption doesn't move the needle.** A peer-reviewed RCT across 4,867 developers at Microsoft, Accenture, and a Fortune 100 firm (SSRN/Management Science 2025) found a 26% increase in completed tasks with structured AI adoption. A real-world longitudinal study at NAV IT (703 repositories, 26,317 commits, two years) found no statistically significant improvement without structured governance. The same tool, opposite outcomes.
+
+Dev.IQ addresses all three: the trust gap with explicit signal grounding (UNGRADED over invented confidence), the governance gap with maturity tiers and a governance posture file, and the adoption gap by giving teams a structured reasoning layer rather than an autocomplete shortcut.
+
+---
+
 ## Get started in three steps
 
 ### 1 · Install the plugin
