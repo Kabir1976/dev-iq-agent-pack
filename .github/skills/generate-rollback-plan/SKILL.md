@@ -223,10 +223,10 @@ If rollback is initiated and irreversible actions are in a partial state:
 
 ---
 
-### RISK Signal: [STRONG | WEAK]
-[STRONG = rollback plan covers all sensitive components with specific triggers
-and steps. WEAK = one or more components have irreversible actions or unclear
-rollback steps that were not resolvable.]
+### RISK Signal: [STRONG | WEAK | UNGRADED]
+STRONG = rollback plan covers all sensitive components with specific triggers and steps.
+WEAK = one or more components have irreversible actions or unclear rollback steps that were not resolvable.
+UNGRADED = trigger criteria cannot be defined (monitoring signals unknown), or the change set is too vague to identify rollback-sensitive components — a plan cannot be written without this data.
 
 @di-review-required
 ```
@@ -416,6 +416,7 @@ financial remediation may take days. Plan accordingly.
   descriptions and mark all illustrative commands with a ⚠️ warning.
 - **Do not mark a migration reversible** without confirming a down migration
   exists in the workspace. Assumption of reversibility is a production risk.
+- **RISK UNGRADED** when monitoring signals are unknown — trigger criteria cannot be specific without them; a rollback plan with vague triggers is not a rollback plan
 
 ## Related Skills
 - `/review-deployment-readiness` — the rollback plan generated here is a required

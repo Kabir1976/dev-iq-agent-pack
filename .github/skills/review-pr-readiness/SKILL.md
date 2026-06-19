@@ -44,6 +44,8 @@ Load context:
 - `.github/instructions/di-security.instructions.md`
 - `.github/instructions/di-traceability.instructions.md`
 
+**If no diff can be accessed** (no MCP, no paste, no file path): all four DI signals are UNGRADED — do not proceed to assessment. State the gap and ask the user to provide the code.
+
 ### Step 2: INTENT Check
 Verify the PR delivers what was asked:
 
@@ -119,9 +121,12 @@ Apply verdict logic:
 
 | Verdict | Condition |
 |---------|-----------|
-| 🟢 **Go** | All four signals Green — no Critical or High findings |
+| 🟢 **Go** | All four signals Green — no Critical or High findings, no UNGRADED signals |
 | 🟡 **Go with comments** | No Critical findings, Medium or Low only — mergeable, address before or after |
 | 🔴 **Hold** | Any Critical finding, two or more High findings, or INTENT gap (AC uncovered) |
+| ⬜ **UNGRADED** | Any DI signal layer could not be assessed — data was unavailable |
+
+**UNGRADED rule:** UNGRADED signals produce Hold at Mid+ maturity. At Early maturity: 'Go with comments' with the UNGRADED gap explicitly noted and the developer required to confirm the gap before merging. Never issue a Go verdict when any signal is UNGRADED — absence of data is not evidence of quality.
 
 **Maturity adjustment:**
 - **Early:** All verdicts advisory — append coaching note, developer decides
@@ -428,6 +433,7 @@ and loudly" principle — see di-code-standards.instructions.md.
 ## Governance
 - Critical findings always produce Hold — no exceptions, regardless of maturity
 - Never post a Go verdict on a PR with hardcoded secrets or credentials
+- Never post a Go verdict when any DI signal layer is UNGRADED — absence of evidence is not a passing signal; it is uncertainty that must be resolved before merge
 - `@di-review-required` on all output — human makes the final merge decision
 - At Higher maturity with MCP: verdict is posted to the PR as a comment;
   reviewer is auto-assigned on Go with comments

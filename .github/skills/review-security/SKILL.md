@@ -53,6 +53,8 @@ description of code as if it were the code itself. Findings must reference
 specific lines or functions observed in the code, not inferred from what code
 in that category "typically" looks like.
 
+If no code can be provided (no file, no paste, no MCP connection): all check areas are UNGRADED — do not issue any verdict. An UNGRADED security review is not a passing review. State the gap and stop.
+
 ### Step 2: Run QUALITY Security Checks
 Assess code-level vulnerabilities:
 
@@ -153,7 +155,10 @@ Access Control, A03:2021 Injection).
 | 🔴 Block | Any Critical finding |
 | 🟠 High Risk | One or more High findings |
 | 🟡 Review | Medium findings only, no Critical or High |
-| 🟢 Clear | No findings above Low severity |
+| 🟢 Clear | No findings above Low severity — all check areas assessed |
+| ⬜ UNGRADED | One or more check areas could not be assessed |
+
+**UNGRADED check areas:** If a check category cannot be assessed (no code accessible, no package manifest for Dependencies, no crypto calls visible for Cryptography), mark that row UNGRADED in the scorecard — not ✅. UNGRADED areas do not produce a Clear verdict. A scorecard with any UNGRADED row produces at minimum a Review verdict with the gap stated.
 
 **Maturity adjustment:**
 - **Early:** High Risk verdict is advisory — append coaching note,
@@ -401,6 +406,7 @@ These are the statements that get security findings dismissed. Rebut them.
   Describe the vulnerability class and flag for verification against a live
   CVE database (nvd.nist.gov, osv.dev, or the package registry advisory page).
   Only cite a CVE when confirmed via MCP tool call or explicit user input.
+- **UNGRADED check areas do not produce a Clear verdict** — an UNGRADED dependency scan is not a passing dependency scan. State the gap; the team decides whether to proceed without the data.
 
 ## Related Skills
 - `/code-review` — general line-level review; use for non-security concerns

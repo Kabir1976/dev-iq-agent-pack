@@ -352,6 +352,7 @@ coaching note explaining *why the pattern matters* in production systems.
 - Behavior is preserved unless the developer explicitly states otherwise
 - Test generation belongs to Assert.IQ — Dev.IQ produces test stubs only
   (function signatures + empty bodies) to mark what needs coverage
+- DESIGN signal is UNGRADED when `di-code-standards.instructions.md` cannot be loaded — do not invent naming conventions or structural rules for the project; surface the gap and ask the user to confirm the conventions before proceeding
 - Critical and High findings must be addressed before a Go verdict is
   issued on any downstream `/review-pr-readiness` assessment
 - `@di-review-required` on all output — human reviews before applying

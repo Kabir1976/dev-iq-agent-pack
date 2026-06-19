@@ -155,7 +155,8 @@ If ready: [brief confirmation + any advisory notes]
 
 ---
 
-### INTENT Signal: [STRONG | WEAK]
+### INTENT Signal: [STRONG | WEAK | UNGRADED]
+UNGRADED when: the work item cannot be accessed, no ACs were provided, or the story scope is undefined — not enough information to assess completeness.
 
 @di-review-required
 ```
@@ -333,6 +334,7 @@ story, add one AC for "what if it fails."
   explaining the production consequence, not just the recommended fix
 - Never rewrite ACs without presenting the assessment first — the team owns the ACs
   and must approve any changes
+- INTENT UNGRADED is distinct from INTENT WEAK — UNGRADED means there is insufficient data to assess; WEAK means the data exists but reveals a gap; UNGRADED produces a Not Ready verdict and blocks sprint commitment
 
 ## Related Skills
 - `/generate-user-stories` — use to generate the initial stories, then run this

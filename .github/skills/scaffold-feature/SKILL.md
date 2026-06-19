@@ -291,7 +291,7 @@ I'll proceed with ACs 1, 2, and 4 and leave a flagged TODO for AC3.
 - Never write files directly — output only; developer applies manually or via paste
 - Never introduce a new dependency without explicit confirmation from the developer
 - Always link to the work item in the traceability header — if no work item exists, warn before proceeding
-- Honor established patterns from `di-code-standards.instructions.md` — flag deviations, never silently bypass
+- Honor established patterns from `di-code-standards.instructions.md` — flag deviations, never silently bypass; if the file cannot be loaded, DESIGN signal is UNGRADED and the scaffold must note this explicitly so the developer applies their own convention review
 - Test stubs are structure only — direct developer to Assert.IQ `/generate-automated-unit-test` for full test generation
 - If operating at Early maturity tier, append a coaching note explaining each design decision made
 
