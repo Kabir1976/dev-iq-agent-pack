@@ -44,6 +44,15 @@ If the user provides only the chosen option: ask explicitly about alternatives
 before generating. An ADR that documents only the chosen path is incomplete —
 the value of an ADR is understanding why alternatives were rejected.
 
+**Strict rule on alternatives:** Only list alternatives the user explicitly
+confirms were evaluated by the team. Do not generate plausible alternatives
+from domain knowledge and present them as considered — this fabricates the
+decision record. If the user cannot name any alternatives, ask: "Which options
+did the team evaluate and reject?" If the answer is none, write the ADR with
+an explicit statement: "Alternatives Considered: None — only one option was
+evaluated." An honest single-option ADR is more valuable than an ADR with
+invented alternatives that no one actually weighed.
+
 Load context:
 - `.dev-iq/config.yaml` → check if an ADR directory convention is configured
   (`adr.path`, default: `docs/adr/` or `docs/decisions/`)
@@ -390,6 +399,10 @@ horizontal scaling" is worth more than a two-page decision statement.
   formally accepts it and assigns the Accepted status
 - Never fabricate alternatives or consequences — if the user cannot provide them,
   ask; document only what is known
+- Alternatives must be explicitly confirmed as evaluated by the user — never
+  inferred from the domain or generated from general knowledge; fabricated
+  alternatives create a false decision record that cannot be corrected by
+  future readers
 
 ## Related Skills
 - `/review-architecture` — if an architectural review surfaces a significant

@@ -37,8 +37,8 @@ Resolve the code to review:
 - Use the code provided directly in the chat
 - Ask for the linked work item ID if not provided: "Do you have a work item linked to this change? It helps me check Intent."
 
-Then load:
-- `.github/instructions/di-code-standards.instructions.md` → naming, patterns, structure rules
+Then load (mandatory — DESIGN layer is UNGRADED without these):
+- `.github/instructions/di-code-standards.instructions.md` → naming, patterns, structure rules. If this file cannot be loaded, the DESIGN layer is UNGRADED: do not invent coding standards for the project.
 - `.github/instructions/di-security.instructions.md` → security checklist
 - `.github/instructions/di-traceability.instructions.md` → traceability requirements
 - `.dev-iq/config.yaml` → language, framework, coverage threshold

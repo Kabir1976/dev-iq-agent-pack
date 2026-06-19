@@ -43,9 +43,10 @@ Ask for (if not determinable):
 - Whether audit fields (`created_at`, `updated_at`) are standard
 - Whether the existing schema is documented (read adjacent migration files)
 
-Load context:
-- `.dev-iq/config.yaml` → `stack.database`
-- Existing migration files or schema definitions to match established patterns
+Load context (required, not optional):
+- `.dev-iq/config.yaml` → `stack.database` and `stack.orm` (if configured)
+- **When extending or modifying an existing table:** read the most recent migration files for that table before proposing any changes. If migration files are inaccessible, mark the RISK layer UNGRADED — schema extension advice without reading the current state is speculative; state this explicitly and do not estimate blast radius.
+- **ORM assumption:** if `stack.orm` is not set and ORM usage is inferred from the stack, flag field type recommendations as ASSUMED until confirmed. ActiveRecord, Hibernate, Sequelize, SQLAlchemy, and Entity Framework each have different type-mapping conventions that affect the generated schema.
 
 ### Step 2: Assess INTENT Clarity
 **Clear enough when:**
@@ -360,6 +361,11 @@ developer will eventually "fix" it, breaking historical order accuracy.
   must approve before a migration file is written
 - Never propose dropping a column or changing a column type on a live table without
   flagging it as a breaking change and requiring a migration + rollback plan
+- When migration files cannot be read for an existing-table change, mark RISK as
+  UNGRADED — do not assess blast radius or reversibility without reading the
+  current schema state; state the gap explicitly
+- ORM-specific field types must not be assumed from the database type alone —
+  confirm the ORM or flag type recommendations as ASSUMED
 - At Early maturity, every DESIGN finding includes a coaching note explaining
   the production consequence
 

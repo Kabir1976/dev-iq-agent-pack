@@ -61,9 +61,23 @@ Before generating stories, evaluate whether the requirement is grounded enough:
 - The outcome is purely subjective ("make it better", "make it faster")
 - Conflicting goals are present with no priority signal
 
-If INTENT is too weak: surface the specific gap, ask the clarifying question,
-and wait for an answer before generating. Do not generate stories with placeholder
-ACs or "TBD" acceptance criteria.
+If INTENT is too weak for the entire requirement: surface the specific gap, ask
+the clarifying question, and wait for an answer. Do not generate stories with
+placeholder ACs or "TBD" acceptance criteria.
+
+**DRAFT status — for partially grounded requirements:**
+When some goals are clear but others are ambiguous, do not refuse the entire
+generation. Generate what is grounded with full ACs, and mark the ambiguous
+goals as DRAFT stories:
+
+```
+Story: As a [persona], I want [partially understood goal]...
+Status: DRAFT — AC cannot be written without clarifying: [specific question]
+```
+
+DRAFT stories must not be committed to a sprint until the gap is resolved.
+They are scope placeholders, not backlog items. Never fill a DRAFT story's ACs
+with invented details — leave the gap visible.
 
 ### Step 3: Generate Stories
 For each distinct user goal identified in the requirement:

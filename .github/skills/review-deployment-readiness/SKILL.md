@@ -68,14 +68,21 @@ Read:
 ### Step 3: Check the Deployment Checklist
 Verify the operational readiness items:
 
-| Item | Status |
-|------|--------|
-| Rollback plan documented | Yes / No |
-| Feature flags configured for gradual rollout | Yes / No / N/A |
-| Runbook for new service or significant change | Yes / No / N/A |
-| Monitoring/alerting covers new behavior | Yes / No |
-| On-call engineer notified and available | Yes / No |
-| Communication plan for breaking changes | Yes / No / N/A |
+| Item | Status | Notes |
+|------|--------|-------|
+| Rollback plan documented | ✓ Verified / ⚠ Unverified / ✗ Missing / N/A | [link or filename, or "claimed, no artifact"] |
+| Feature flags configured for gradual rollout | ✓ Verified / ⚠ Unverified / ✗ Missing / N/A | |
+| Runbook for new service or significant change | ✓ Verified / ⚠ Unverified / ✗ Missing / N/A | |
+| Monitoring/alerting covers new behavior | ✓ Verified / ⚠ Unverified / ✗ Missing / N/A | |
+| On-call engineer notified and available | ✓ Verified / ⚠ Unverified / ✗ Missing / N/A | |
+| Communication plan for breaking changes | ✓ Verified / ⚠ Unverified / ✗ Missing / N/A | |
+
+**UNVERIFIED vs. UNGRADED:**
+- **UNVERIFIED** — the team claims the item is complete but cannot provide an artifact (link, filename, CI run ID). Produces "Go with conditions" — confirm within a defined post-deploy window.
+- **UNGRADED** — no claim made and no data available. Produces No-Go when the item is required.
+
+**Artifact requirement for Go verdict:**
+A straight Go requires at least one confirmed artifact for the QUALITY layer — a CI run URL, test report filename, or coverage report. "The tests pass" is a claim, not evidence. UNVERIFIED QUALITY = Go with conditions; UNGRADED QUALITY = No-Go.
 
 ### Step 4: Issue Verdict
 

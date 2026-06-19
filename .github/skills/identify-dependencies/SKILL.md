@@ -80,6 +80,15 @@ Ask for (if not determinable):
 | **Risk** | Work can proceed but this could cause a mid-sprint stoppage or rework |
 | **FYI** | Worth noting for coordination; unlikely to block delivery |
 
+Assign a **confidence level** to every dependency:
+
+| Confidence | Meaning |
+|-----------|---------|
+| **ASSUMED** | Identified from the work item text or domain knowledge — not yet verified with the owning team |
+| **CONFIRMED** | Verified with the owning team — named contact and date recorded |
+
+A Blocker rated ASSUMED is still a Blocker — do not mark it resolved based on assumption. A Blocker can only be marked resolved when its status is CONFIRMED (owning team acknowledged, with a named contact).
+
 ### Step 4: Recommend Resolution Order
 1. Address Blockers first — resolve before committing to the sprint
 2. Assign owners and confirmation dates to Risks
@@ -116,11 +125,11 @@ State any gaps.]
 
 ### Dependency Table
 
-| # | Dependency | Type | Rating | Owner | Status | Notes |
-|---|-----------|------|--------|-------|--------|-------|
-| 1 | [description] | Technical | Blocker | [team/person] | Unknown | [context] |
-| 2 | [description] | Team | Risk | [team/person] | In Progress | [context] |
-| 3 | [description] | External | FYI | [team/person] | Known | [context] |
+| # | Dependency | Type | Rating | Confidence | Owner | Status | Notes |
+|---|-----------|------|--------|-----------|-------|--------|-------|
+| 1 | [description] | Technical | Blocker | ASSUMED | [team/person] | Unknown | [context] |
+| 2 | [description] | Team | Risk | CONFIRMED | [team/person] | In Progress | [confirmed by: name, date] |
+| 3 | [description] | External | FYI | ASSUMED | [team/person] | Known | [context] |
 
 ---
 

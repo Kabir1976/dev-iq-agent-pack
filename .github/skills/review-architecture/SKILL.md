@@ -42,6 +42,14 @@ changed safely over time.
 - Map the layers (controller/handler → service → repository/data access)
 - Map the dependencies (what calls what)
 
+**Grounding checkpoint — required before Step 2:**
+State explicitly which files you read. If assessing from a text description only (no files provided, no codebase accessible):
+- Mark **Coupling** UNGRADED — cannot confirm actual dependency call sites from a description
+- Mark **Scalability Assumptions** UNGRADED — cannot confirm stateful vs. stateless behaviour without reading the implementation
+- Mark **Data Flow** UNGRADED — cannot trace the request path without following actual code
+
+A description states what the author intends. Files show what was actually built. Do not rate a structural dimension STRONG from intent alone.
+
 Ask for (if not determinable):
 - The system's expected load characteristics (single-tenant, multi-tenant, batch, real-time)
 - Known non-functional requirements (availability SLA, latency targets, data volume)
@@ -138,6 +146,7 @@ At **Mid/Higher maturity**: structured assessment and verdict only.
 ## Architecture Review — [System or Feature Name]
 Work Item: [AB#XXXX | PROJ-XXX | #456 | "none provided"]
 Assessed: [date]
+Files Read: [list paths read, or "none — assessment based on description only"]
 
 ---
 
