@@ -1,0 +1,30 @@
+{
+  "_note": "Visual Studio 2022 reads this file for MCP server configuration. VS Code reads .vscode/mcp.json. Both files contain the same server definitions — edit .vscode/mcp.json and keep this file in sync.",
+  "_security": "Credentials are stored in the OS keychain — never written to this file or committed.",
+
+  "mcpServers": {
+
+    "azure-devops": {
+      "command": "npx",
+      "args": ["-y", "@tzkhan/mcp-server-azure-devops"],
+      "env": {
+        "AZURE_DEVOPS_ORG_URL": "${input:ADO_ORG_URL}",
+        "AZURE_DEVOPS_PAT": "${input:ADO_PAT}"
+      }
+    },
+
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:GITHUB_PAT}"
+      }
+    },
+
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"]
+    }
+
+  }
+}

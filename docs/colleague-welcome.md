@@ -34,40 +34,57 @@ ADO credentials) and troubleshooting steps.
 
 ## Step 2 — Verify the install worked
 
-Open the UPS repo in VS Code. Open Copilot Chat (`Ctrl+Alt+I`).
+**VS Code:**
+Open the UPS repo. Open Copilot Chat (`Ctrl+Alt+I`). Click the agent selector
+at the top of the chat panel — **Dev-IQ should appear in the dropdown.**
+Select it, then type `/explain-code` and point it at any source file.
 
-At the top of the chat panel, click the agent selector (where it says "Ask
-Copilot" or shows a model name). **Dev-IQ should appear in the dropdown.**
+**Visual Studio 2022:**
+Open the UPS repo. Open Copilot Chat (`Alt+/`). Type `@Dev-IQ` to invoke the
+agent — it autocompletes if the agent files were installed correctly.
+Then type `/explain-code` and point it at any source file.
 
-Select **Dev-IQ**, then type:
-```
-/explain-code
-```
-Point it at any source file. If the response includes a **Purpose** section
-and an **INTENT signal** verdict — you're live.
+> **Visual Studio one-time setup:** You must enable repository instructions
+> manually first. Go to **Tools → Options → GitHub → Copilot → (General)** and
+> turn on **"Enable repository custom instructions"**. Without this, the DI
+> reasoning layer will not load.
 
-**If Dev-IQ does not appear in the dropdown:** this is the first thing to
-report back. Include your VS Code version and Copilot Chat extension version
-(`Help → About`).
+**Pass for either IDE:** The response includes a **Purpose** section and an
+**INTENT signal** verdict — you're live.
+
+**If Dev-IQ does not appear / @Dev-IQ does not autocomplete:** this is the
+first thing to report back. Include your IDE, version (`Help → About`), and
+Copilot extension version.
 
 ---
 
-## Step 3 — Using Dev-IQ in VS Code
+## Step 3 — Using Dev-IQ in your IDE
 
-1. **Always select the Dev-IQ agent first.** Skills only run in Dev-IQ mode —
-   they will not respond in the default "Ask Copilot" mode.
+The workflow is the same in both VS Code and Visual Studio 2022. The only
+difference is how you invoke the Dev-IQ agent.
 
-2. **Invoke a skill by name.** Type `/skill-name` in the chat — Copilot Chat
-   will autocomplete. The agent reads your open files, the diff, and any connected
-   ADO work items automatically.
+| | VS Code | Visual Studio 2022 |
+|---|---|---|
+| **Open Copilot Chat** | `Ctrl+Alt+I` | `Alt+/` |
+| **Invoke Dev-IQ agent** | Select from dropdown | Type `@Dev-IQ` |
+| **Run a skill** | `/skill-name` | `/skill-name` |
+| **Min version** | VS Code 1.99 | Visual Studio 2022 v17.14 |
+
+**Five patterns to know:**
+
+1. **Invoke the agent first.** In VS Code: select Dev-IQ from the dropdown. In
+   Visual Studio: type `@Dev-IQ` at the start of your message. Skills will not
+   respond without the agent active.
+
+2. **Invoke a skill by name.** Type `/skill-name` — Copilot Chat autocompletes.
+   The agent reads your open files, the diff, and any connected ADO work items
+   automatically.
 
 3. **Select code before running a skill** to scope it. For `/code-review` or
-   `/explain-code`, highlight the function or class you care about before typing
-   the skill name.
+   `/explain-code`, highlight the function or class first.
 
 4. **Paste when prompted.** If ADO credentials aren't wired, skills ask you to
-   paste the work item or PR description inline. Everything still works — it just
-   requires one extra step.
+   paste the work item or PR description inline. Everything still works.
 
 5. **Output always ends with `@di-review-required`.** This is intentional — it
    marks AI-generated content as awaiting your review. The agent advises; you decide.

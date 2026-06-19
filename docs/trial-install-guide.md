@@ -51,9 +51,15 @@ fetching them automatically.
 
 ## What you need
 
-- VS Code with GitHub Copilot Chat (agent mode enabled)
+- **VS Code 1.99+** with GitHub Copilot Chat extension v0.22+ (agent mode enabled)  
+  **— or —**  
+  **Visual Studio 2022 v17.14+** with GitHub Copilot extension (latest)
 - Git on your PATH (`git --version` in a terminal should work)
 - The dev-iq zip I sent you
+
+> **Visual Studio 2022 one-time setup:** After install, go to  
+> **Tools → Options → GitHub → Copilot → (General)** and enable  
+> **"Enable repository custom instructions"** — otherwise the DI reasoning layer won't load.
 
 ---
 
@@ -135,25 +141,28 @@ MCP later once Node.js is available.
 
 ## Step 5 — Verify it's working
 
-Open the UPS repo in VS Code. Open Copilot Chat and look for **Dev-IQ** in
-the agent dropdown (the selector at the top of the chat panel, where it
-normally says "Ask Copilot" or shows a model name).
-
-**If Dev-IQ appears in the dropdown:** select it, then run:
-
+**VS Code:**
+Open the UPS repo. Open Copilot Chat (`Ctrl+Alt+I`). Look for **Dev-IQ** in
+the agent dropdown at the top of the chat panel. Select it, then run:
 ```
 /explain-code
 ```
 
-Point it at any source file. If it comes back with a **Purpose** section and
-an **INTENT signal** verdict, you're live.
+**Visual Studio 2022:**
+Open the UPS repo. Open Copilot Chat (`Alt+/`). Type `@Dev-IQ` to invoke the
+agent — it should autocomplete. Then type:
+```
+/explain-code
+```
 
-**If Dev-IQ does not appear in the dropdown:** this is the most important
-thing to report back. It means Copilot Chat isn't picking up the agent
-definition files from `.github/agents/`. Note your VS Code version, Copilot
-Chat extension version (`Help → About`), and whether agent mode is enabled
-in Copilot Chat settings — and send that information to the person who gave
-you this guide.
+**Pass for either IDE:** Point the skill at any source file. If the response
+includes a **Purpose** section and an **INTENT signal** verdict — you're live.
+
+**If Dev-IQ does not appear / `@Dev-IQ` does not autocomplete:** this is the
+most important thing to report back. In Visual Studio, also confirm you enabled
+**"Enable repository custom instructions"** in Tools → Options (see prerequisites
+above). Note your IDE version and Copilot extension version (`Help → About`)
+and send that to the person who gave you this guide.
 
 ---
 
