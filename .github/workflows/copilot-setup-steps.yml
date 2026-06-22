@@ -17,13 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js 18+
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Validate skill frontmatter
-        run: node scripts/validate-skills.js
+        run: bash scripts/validate-skills.sh
 
       - name: Check MCP server config
         run: |
