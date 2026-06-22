@@ -156,4 +156,4 @@ Send within 24 hours:
 
 ---
 
-*Dev.IQ Agent Pack v0.9.0*
+*Dev.IQ Agent Pack v0.10.0*

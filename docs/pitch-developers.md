@@ -93,4 +93,4 @@ Questions: speak to the consultant who shared this with you.
 
 ---
 
-*Dev.IQ Agent Pack v0.9.0 · 22 skills · GitHub Copilot Chat + Claude Code*
+*Dev.IQ Agent Pack v0.10.0 · 22 skills · GitHub Copilot Chat + Claude Code*

@@ -1,6 +1,6 @@
 # Dev.IQ — Telemetry Overlay
 
-**Pack version:** 0.9.0
+**Pack version:** 0.10.0
 **Client:** [fill in — matches config.yaml client.name]
 **Configured by:** [engagement lead name]
 **Last updated:** [date]

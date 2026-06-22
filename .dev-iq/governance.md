@@ -1,6 +1,6 @@
 # Dev.IQ Governance
 
-**Pack version:** 0.9.0
+**Pack version:** 0.10.0
 **Maturity tier:** Early
 **Review cadence:** Quarterly or after a major delivery milestone
 

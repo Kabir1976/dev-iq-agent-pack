@@ -7,32 +7,56 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [Unreleased] — post-0.9.0 maintenance (2026-06-12)
+## [0.10.0] — 2026-06-22
+
+### Added
+
+- **Visual Studio 2022 support** — `.mcp.json` at repo root (VS 2022 reads this; VS Code reads `.vscode/mcp.json`).
+  `docs/trial-install-guide.md` and `docs/colleague-welcome.md` updated with VS 2022 prerequisites,
+  one-time "Enable repository custom instructions" setup step, and IDE comparison table.
+- **`docs/colleague-welcome.md`** — self-contained onboarding doc for trial participants.
+  Covers install, IDE-specific verification, 22-skill reference table, and a tiered validation
+  checklist (Tier 1 Day 1 / Tier 2 Day 1-2 / Tier 3 Day 2-3) with explicit pass/fail criteria.
+- **`.github/PULL_REQUEST_TEMPLATE.md`** — PR template with DI four-layer signal table,
+  AI-generated artifact checkbox, and standard delivery checklist.
+- **`.dev-iq/artifacts/`** — gitignored local artifact store for generated ADRs, rollback plans,
+  user stories, and PR reviews. Bootstrap creates five subdirectories; `.gitignore` inside is
+  self-managing regardless of install mode.
+- **`scripts/validate-skills.sh`** — frontmatter validator for all 22 skills and 2 agents.
+  Bash + awk only — no Node.js or external runtime required. CI workflow updated to call it directly.
+- **`.github/workflows/copilot-setup-steps.yml`** — CI skill validator runs on every PR push.
+  Checks frontmatter on all SKILL.md and agent files; checks for both MCP config files.
+- **`docs/reference.md`** — "Market Context: Why This Pack Exists" section with verified
+  research stats (IBM 2025 CODB, Stack Overflow 2025, SSRN RCT). "Enterprise Governance:
+  Agent Autonomy Classification" section maps all 22 skills to Gartner autonomy tiers.
+  "Distributing to Colleagues" section with `git archive` and GitHub collaborator options.
+- **`README.md`** — "Why structured governance matters now" section with trust/adoption data
+  grounding the pack's governance rationale.
 
 ### Changed
 
+- `docs/trial-install-guide.md` — fixed bootstrap command (`-Preset solo`), consistent path
+  placeholder, structured feedback template, VS 2022 prerequisites in pre-flight checklist.
 - `docs/reference.md` — renamed from `README.dev-iq.md`; fixed stale content:
   Sparq branding removed, private GitHub URL replaced with zip-extract instructions,
   python3 prerequisite removed, `--preset=solo` description corrected,
-  `pwsh` → `powershell` throughout, `MANIFEST.md` references removed
+  `pwsh` → `powershell` throughout, `MANIFEST.md` references removed.
 - `.dev-iq/telemetry-overlay.md` — written from 3-line placeholder to full
-  signal-mapping template with tables for INTENT, DESIGN, QUALITY, RISK, and
-  Signal Sink sections
-- `scripts/bootstrap.sh` — `prefill_config` now only emits "Config pre-filled"
-  when at least one value was actually written; uninstall now prints "Your code,
-  tests, and configs were not touched"
-- `README.md` — fixed stale `README.dev-iq.md` header link → `docs/reference.md`
-- `AGENTS.md` — corrected "five-layer DI signal model" → "four-layer"
-- `docs/trial-install-guide.md` — fixed `your-ups-repo` placeholder → `your-repo`
-- `docs/demo-script.md` — fixed broken `INSTALL.md` reference
+  signal-mapping template with tables for INTENT, DESIGN, QUALITY, RISK, and Signal Sink.
+- `scripts/bootstrap.sh` / `bootstrap.ps1` — artifact store directories created on install;
+  `prefill_config` only emits "Config pre-filled" when at least one value was actually written.
+- `.github/instructions/di-foundation.instructions.md` — Artifact Persistence section added:
+  save-offer pattern for Claude Code and Copilot Chat, filename format, never-overwrite rule.
+- `README.md` — fixed stale `README.dev-iq.md` header link → `docs/reference.md`.
+- `AGENTS.md` — corrected "five-layer DI signal model" → "four-layer".
 
 ### Removed
 
-- `install.sh`, `install.ps1` — 3-line placeholders; real scripts are in `scripts/`
-- `MANIFEST.md` — 3-line placeholder with no content
-- `ONE-PAGER.md` — executive/sales artifact, wrong audience for a developer repo
-- `INSTALL.md` — stale: listed Python 3.8+ as a prerequisite, referenced a private
-  GitHub URL; functionality covered by `docs/trial-install-guide.md` and `README.md`
+- `scripts/validate-skills.js` — replaced by `scripts/validate-skills.sh` (no Node.js dependency).
+- `install.sh`, `install.ps1` — 3-line placeholders; real scripts are in `scripts/`.
+- `MANIFEST.md` — 3-line placeholder with no content.
+- `ONE-PAGER.md` — executive/sales artifact, wrong audience for a developer repo.
+- `INSTALL.md` — stale; functionality covered by `docs/trial-install-guide.md` and `README.md`.
 
 ---
 
