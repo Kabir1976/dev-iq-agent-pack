@@ -394,6 +394,15 @@ if ($Mode -eq "trial") {
     }
 }
 
+# ── Create artifact store ─────────────────────────────────────────
+foreach ($sub in @('adrs','rollback-plans','user-stories','pr-reviews','signals')) {
+    $dir = "$Target\.dev-iq\artifacts\$sub"
+    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+}
+Copy-PackFile "$PackRoot\.dev-iq\artifacts\.gitignore" "$Target\.dev-iq\artifacts\.gitignore" $false
+Copy-PackFile "$PackRoot\.dev-iq\artifacts\README.md"  "$Target\.dev-iq\artifacts\README.md"  $false
+Write-Ok "Artifact store created : .dev-iq\artifacts\"
+
 # ── Write install manifest ────────────────────────────────────────
 $ManifestDir = "$Target\.dev-iq"
 if (-not (Test-Path $ManifestDir)) { New-Item -ItemType Directory -Path $ManifestDir -Force | Out-Null }

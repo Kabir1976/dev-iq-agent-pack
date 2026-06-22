@@ -94,6 +94,29 @@ Dev.IQ operates at the **Advise** and **Act with Approval** tiers of the Gartner
 
 The `@di-review-required` marker on all output signals that AI-generated content awaits human review. This is not optional — it is the audit trail for the Act-with-Approval tier.
 
+## Artifact Persistence
+
+Generative skills (ADRs, rollback plans, user stories, PR reviews) may write
+their output to `.dev-iq/artifacts/` in the workspace — a gitignored local
+store created by bootstrap.
+
+| Artifact type | Directory |
+|---------------|-----------|
+| ADRs | `.dev-iq/artifacts/adrs/` |
+| Rollback plans | `.dev-iq/artifacts/rollback-plans/` |
+| User stories | `.dev-iq/artifacts/user-stories/` |
+| PR reviews | `.dev-iq/artifacts/pr-reviews/` |
+
+**Claude Code:** After generating an artifact, offer to save it: "Want me to
+write this to `.dev-iq/artifacts/adrs/[date]-[slug].md`?" Write only on
+explicit confirmation. Use the filename format `YYYY-MM-DD-[kebab-slug].md`.
+
+**Copilot Chat:** Write via the filesystem MCP server if connected. If MCP is
+not available, output to chat only — do not silently skip the save offer.
+
+All written artifacts carry the `@di-review-required` marker in their header.
+Never overwrite an existing artifact without confirming with the developer.
+
 ## Things Dev-IQ Does Not Do
 
 - Reduce a delivery decision to a single metric (coverage %, green CI, lint score).

@@ -1,0 +1,4 @@
+# Artifact outputs are session-local — never commit generated content
+*
+!.gitignore
+!README.md

@@ -473,6 +473,16 @@ EOF
   fi
 fi
 
+# ── Create artifact store ─────────────────────────────────────────
+mkdir -p "$TARGET/.dev-iq/artifacts/adrs"
+mkdir -p "$TARGET/.dev-iq/artifacts/rollback-plans"
+mkdir -p "$TARGET/.dev-iq/artifacts/user-stories"
+mkdir -p "$TARGET/.dev-iq/artifacts/pr-reviews"
+mkdir -p "$TARGET/.dev-iq/artifacts/signals"
+_copy_file "$PACK_ROOT/.dev-iq/artifacts/.gitignore" "$TARGET/.dev-iq/artifacts/.gitignore" false
+_copy_file "$PACK_ROOT/.dev-iq/artifacts/README.md"  "$TARGET/.dev-iq/artifacts/README.md"  false
+ok "Artifact store created : .dev-iq/artifacts/"
+
 # ── Write install manifest ────────────────────────────────────────
 mkdir -p "$TARGET/.dev-iq"
 HOOKS_BOOL=$( [[ "$INCLUDE_HOOKS" == true ]] && echo "true" || echo "false" )
