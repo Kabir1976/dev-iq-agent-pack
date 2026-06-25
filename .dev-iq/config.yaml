@@ -96,6 +96,28 @@ agents:
   auto_switch_threshold: "high"   # risk level that triggers plan-first suggestion
                                   # low | medium | high
 
+# ── Traceability ──────────────────────────────────────────────────
+# Controls how work-item markers are written and detected across the codebase.
+# marker_style: comment idiom used to link code to tracker work items.
+#   tracker_id_inline → // AB#1234  (default; works in JS/TS/Java/Go/C#)
+#   jsdoc_tag         → /** @di-trace AB#1234 */
+#   python_decorator  → @di_trace("JIRA-123")
+#   attribute         → [DiTrace("AB#1234")]  (.NET attributes)
+#   custom_regex      → use marker_regex below
+#   auto              → detect from repo language signals
+traceability:
+  marker_style: "tracker_id_inline"
+  marker_regex: ""                 # used only when marker_style: custom_regex
+  code_globs:
+    - "src/**/*.{ts,tsx,js,jsx,py,cs,java,go}"
+    - "lib/**/*.{ts,js,py}"
+  test_globs:
+    - "tests/**/*"
+    - "test/**/*"
+    - "**/*.test.*"
+    - "**/*.spec.*"
+    - "**/__tests__/**/*"
+
 # ── PR Behavior ───────────────────────────────────────────────────
 pr:
   require_work_item_link: true    # warn if PR has no linked work item
@@ -103,6 +125,17 @@ pr:
   auto_assign_on_yellow: false    # auto-assign reviewer on Yellow signal (Mid+)
   block_on_red: true              # block PR verdict on Red signal
   security_block_threshold: "high" # severity that always blocks: high | critical
+  # Risk thresholds: line-count and path heuristics that bump the risk band.
+  risk_thresholds:
+    lines_amber: 300               # changes above this → amber risk signal
+    lines_red: 1000                # changes above this → red risk signal
+    sensitive_paths:               # paths that always receive extra scrutiny
+      - "scripts/bootstrap"
+      - ".github/workflows"
+      - ".dev-iq/governance"
+      - "**/*.env"
+      - "**/secrets*"
+      - "**/credentials*"
 
 # ── Blast Radius ──────────────────────────────────────────────────
 blast_radius:
@@ -135,3 +168,64 @@ bootstrap:
                                   # solo → individual contributor defaults
                                   # pod  → cross-functional team defaults
   version: "0.10.0"
+
+# ── Code Review ────────────────────────────────────────────────────
+# Tunes the code-review skill output, severity filtering, and thread
+# reconciliation behaviour. Mirrors the Assert.IQ code_review block.
+code_review:
+  # disabled_categories: skip these review categories.
+  # Allowed values: readability | kiss | dry | yagni | documentation |
+  #                 error_handling | performance | security | code_smells
+  disabled_categories: []
+  # severity_floor: suppress findings below this level in the rendered report.
+  #   low     → show everything including informational notes (default)
+  #   medium  → hide low-severity notes
+  #   high    → only high and critical findings
+  severity_floor: "low"
+  # default_output_format: shape of the rendered report.
+  #   detailed      → full section-by-section report (default)
+  #   summary       → summary table + top priorities only
+  #   pr_comment    → condensed PR-comment form (no green OK rows)
+  #   json          → machine-readable
+  default_output_format: "detailed"
+  # include_thread_reconciliation: when true, the skill cross-references
+  # previously opened review threads and reports which are now resolved.
+  include_thread_reconciliation: true
+  # compact_threshold: file line count below which a compact review is used.
+  compact_threshold: 20
+  # deep_threshold: file line count above which a deep, section-level review
+  # is always used regardless of the requested format.
+  deep_threshold: 200
+
+# ── MCP Servers ────────────────────────────────────────────────────
+# Declares which Model Context Protocol servers Dev.IQ skills may call
+# and which skills are permitted to use each server.
+# Connection details live in .vscode/mcp.json / .cursor/mcp.json;
+# this block governs skill-level access, not connectivity.
+mcp:
+  servers:
+    - key: "azure-devops"
+      purpose: "Work item lookup, AC retrieval, PR creation, and release note delivery via ADO"
+      allowed_skills:
+        - "review-acceptance-criteria"
+        - "generate-user-stories"
+        - "new-pull-request"
+        - "review-pr-readiness"
+        - "generate-traceability-matrix"
+        - "generate-release-notes"
+    - key: "github"
+      purpose: "PR creation, diff retrieval, issue linking, and release note delivery via GitHub"
+      allowed_skills:
+        - "new-pull-request"
+        - "review-pr-readiness"
+        - "generate-traceability-matrix"
+        - "generate-release-notes"
+        - "code-review"
+    - key: "filesystem"
+      purpose: "Read and write local workspace artifacts (ADRs, rollback plans, user stories)"
+      allowed_skills:
+        - "generate-adr"
+        - "generate-rollback-plan"
+        - "generate-user-stories"
+        - "generate-release-notes"
+        - "review-pr-readiness"

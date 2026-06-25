@@ -7,6 +7,11 @@ tools:
   - githubRepo
   - azureDevOps
   - atlassian
+handoffs:
+  - label: Start Implementation
+    agent: Dev-IQ
+    prompt: "Execute the approved plan above. Follow each step in order. After implementation, return a Recommendation / Next Steps / Owners / Timeline summary."
+    send: false
 ---
 
 # Dev-IQ-PLAN

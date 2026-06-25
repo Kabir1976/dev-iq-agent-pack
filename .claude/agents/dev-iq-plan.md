@@ -1,11 +1,22 @@
 ---
 name: dev-iq-plan
 description: Dev-IQ-PLAN read-only planning agent. Use when the user wants to think through a complex or risky change before touching any files. Produces a structured DI four-layer plan and ends with a Start Implementation handoff to dev-iq. Invoke when the user says "plan first", "think through this", "don't touch anything yet", or before any high-risk multi-file change.
+argument-hint: "Outline the goal, problem, or change to plan"
 tools:
   - Read
   - Glob
   - Grep
   - WebFetch
+handoffs:
+  - label: Start Implementation
+    agent: dev-iq
+    prompt: "Start implementation"
+    send: true
+  - label: Open in Editor
+    agent: dev-iq
+    prompt: "#createFile the plan into an untitled file for further refinement."
+    send: true
+    showContinueOn: false
 ---
 
 # Dev-IQ-PLAN — Planning Agent (Claude Code)

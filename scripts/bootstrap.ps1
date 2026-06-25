@@ -19,6 +19,10 @@
   Remove Dev.IQ from the target repository.
 .PARAMETER Hooks
   Also install the hooks/ directory.
+.PARAMETER DryRun
+  Preview what would be installed without writing any files.
+.PARAMETER Yes
+  Skip interactive confirmation prompts (default to trial mode).
 .EXAMPLE
   .\scripts\bootstrap.ps1
 .EXAMPLE
@@ -38,7 +42,9 @@ param(
     [string]$Preset  = "",
     [switch]$Graduate,
     [switch]$Uninstall,
-    [switch]$Hooks
+    [switch]$Hooks,
+    [switch]$DryRun,
+    [switch]$Yes
 )
 
 Set-StrictMode -Version Latest
@@ -160,21 +166,57 @@ if ($Uninstall) {
     Write-Log "Removing Dev.IQ Agent Pack from: $Target"
     Write-Host ""
 
-    $Confirm = Read-Host "  This will delete Dev.IQ files from $Target. Continue? [y/N]"
-    if ($Confirm -ne "y") { Write-Log "Uninstall cancelled."; exit 0 }
+    if (-not $Yes) {
+        $Confirm = Read-Host "  This will delete Dev.IQ files from $Target. Continue? [y/N]"
+        if ($Confirm -ne "y") { Write-Log "Uninstall cancelled."; exit 0 }
+    }
 
-    # Remove pack-owned directories
+    $Restored = 0
+    $Deleted  = 0
+
+    # Restore or delete pack-owned files inside pack-owned directories.
     foreach ($Dir in @(".github\skills", ".github\instructions", ".github\agents", ".claude\agents")) {
         $FullDir = "$Target\$Dir"
         if (Test-Path $FullDir) {
-            Remove-Item -Recurse -Force $FullDir
-            Write-Ok "Removed : $Dir"
+            Get-ChildItem -Path $FullDir -Recurse -File |
+                Where-Object { $_.Name -notmatch '\.di\.pre-install$' } |
+                ForEach-Object {
+                    $PreInstall = "$($_.FullName).di.pre-install"
+                    if (Test-Path $PreInstall) {
+                        Move-Item -Path $PreInstall -Destination $_.FullName -Force
+                        $script:Restored++
+                    } else {
+                        Remove-Item -Force $_.FullName
+                        $script:Deleted++
+                    }
+                }
+            # Remove now-empty subdirectories.
+            Get-ChildItem -Path $FullDir -Recurse -Directory |
+                Sort-Object FullName -Descending |
+                Where-Object { (Get-ChildItem $_.FullName -Force | Measure-Object).Count -eq 0 } |
+                ForEach-Object { Remove-Item -Force $_.FullName }
+            if (Test-Path $FullDir) {
+                if ((Get-ChildItem $FullDir -Force | Measure-Object).Count -eq 0) {
+                    Remove-Item -Force $FullDir
+                }
+            }
+            Write-Ok "Processed : $Dir"
         }
     }
 
-    # Remove pack-owned files
+    # Restore or delete individual pack-owned files.
     $SkillsMd = "$Target\.claude\skills.md"
-    if (Test-Path $SkillsMd) { Remove-Item -Force $SkillsMd; Write-Ok "Removed : .claude\skills.md" }
+    if (Test-Path $SkillsMd) {
+        $PreInstall = "$SkillsMd.di.pre-install"
+        if (Test-Path $PreInstall) {
+            Move-Item -Path $PreInstall -Destination $SkillsMd -Force
+            $Restored++
+        } else {
+            Remove-Item -Force $SkillsMd
+            $Deleted++
+        }
+        Write-Ok "Processed : .claude\skills.md"
+    }
 
     # Remove dev-iq marker block from CLAUDE.md
     $ClaudeDst = "$Target\CLAUDE.md"
@@ -218,6 +260,7 @@ if ($Uninstall) {
 
     Write-Host ""
     Write-Ok "Dev.IQ removed from $Target."
+    Write-Log "Restored $Restored pre-install files, deleted $Deleted."
     Write-Host ""
     Write-Log "User-created files (your code, tests, configs) were not touched."
     exit 0
@@ -258,9 +301,13 @@ if ($Graduate) {
 
 # ── Select install mode ───────────────────────────────────────────
 if ($Mode -eq "") {
-    Write-Host ""
-    $Choice = Read-Host "  Just you, or the whole team?  [1] Just me  [2] Whole team  (default: 1)"
-    $Mode   = if ($Choice -eq "2") { "committed" } else { "trial" }
+    if ($Yes) {
+        $Mode = "trial"
+    } else {
+        Write-Host ""
+        $Choice = Read-Host "  Just you, or the whole team?  [1] Just me  [2] Whole team  (default: 1)"
+        $Mode   = if ($Choice -eq "2") { "committed" } else { "trial" }
+    }
 }
 
 Write-Host ""
@@ -274,11 +321,19 @@ Write-Host ""
 # ── File copy helpers ─────────────────────────────────────────────
 function Copy-PackFile {
     param([string]$Src, [string]$Dst, [bool]$Preserve = $false)
+    if ($DryRun) {
+        Write-Host "  [dry-run] would copy: $Src -> $($Dst.Replace($Target + '\', ''))"
+        return
+    }
     $DstDir = Split-Path $Dst -Parent
     if (-not (Test-Path $DstDir)) { New-Item -ItemType Directory -Path $DstDir -Force | Out-Null }
     if ($Preserve -and (Test-Path $Dst)) {
         Write-Warn "Preserved existing : $($Dst.Replace($Target + '\', ''))"
         return
+    }
+    # Save pre-install snapshot before overwriting an existing file.
+    if (Test-Path $Dst) {
+        Copy-Item -Path $Dst -Destination "$Dst.di.pre-install" -Force
     }
     Copy-Item -Path $Src -Destination $Dst -Force
     Write-Ok "Installed : $($Dst.Replace($Target + '\', ''))"
@@ -358,87 +413,109 @@ if ($Hooks) {
 # ── CLAUDE.md injection ───────────────────────────────────────────
 $ClaudeSrc     = "$PackRoot\CLAUDE.md"
 $ClaudeDst     = "$Target\CLAUDE.md"
-$ClaudeContent = Get-Content $ClaudeSrc -Raw -Encoding UTF8
 
-if (-not (Test-Path $ClaudeDst)) {
-    "$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
-    Write-Ok "Created CLAUDE.md with Dev.IQ instructions."
-} elseif ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart)) {
-    # Remove old block, re-append updated content at end.
-    $Pattern  = [regex]::Escape($MarkerStart) + '[\s\S]*?' + [regex]::Escape($MarkerEnd)
-    $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
-    $Cleaned  = [regex]::Replace($Existing, $Pattern, '').Trim()
-    "$Cleaned`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
-    Write-Ok "Updated Dev.IQ block in existing CLAUDE.md."
+if ($DryRun) {
+    Write-Host "  [dry-run] would copy: $ClaudeSrc -> CLAUDE.md"
 } else {
-    $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
-    "$Existing`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
-    Write-Ok "Appended Dev.IQ instructions to existing CLAUDE.md."
+    $ClaudeContent = Get-Content $ClaudeSrc -Raw -Encoding UTF8
+    if (-not (Test-Path $ClaudeDst)) {
+        "$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
+        Write-Ok "Created CLAUDE.md with Dev.IQ instructions."
+    } elseif ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart)) {
+        # Remove old block, re-append updated content at end.
+        $Pattern  = [regex]::Escape($MarkerStart) + '[\s\S]*?' + [regex]::Escape($MarkerEnd)
+        $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
+        $Cleaned  = [regex]::Replace($Existing, $Pattern, '').Trim()
+        "$Cleaned`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
+        Write-Ok "Updated Dev.IQ block in existing CLAUDE.md."
+    } else {
+        $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
+        "$Existing`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
+        Write-Ok "Appended Dev.IQ instructions to existing CLAUDE.md."
+    }
 }
 
 # ── Trial mode: add paths to .git\info\exclude ───────────────────
 if ($Mode -eq "trial") {
-    $ExcludePath = "$Target\.git\info\exclude"
-    $ExcludeDir  = Split-Path $ExcludePath -Parent
-    if (-not (Test-Path $ExcludeDir)) { New-Item -ItemType Directory -Path $ExcludeDir -Force | Out-Null }
-    if (-not (Test-Path $ExcludePath)) { New-Item -ItemType File -Path $ExcludePath -Force | Out-Null }
-
-    $ExcludeContent = Get-Content $ExcludePath -Raw -ErrorAction SilentlyContinue
-    if ($ExcludeContent -match "# dev-iq") {
-        Write-Warn "Trial mode entries already present in .git\info\exclude."
+    if ($DryRun) {
+        Write-Host "  [dry-run] would update: .git\info\exclude (trial mode entries)"
     } else {
-        $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.claude/agents/`n.claude/skills.md`n.dev-iq/`nCLAUDE.md"
-        if ($Hooks) { $Block += "`nhooks/" }
-        Add-Content $ExcludePath $Block -Encoding UTF8
-        Write-Ok "Dev.IQ paths added to .git\info\exclude (invisible to git)."
+        $ExcludePath = "$Target\.git\info\exclude"
+        $ExcludeDir  = Split-Path $ExcludePath -Parent
+        if (-not (Test-Path $ExcludeDir)) { New-Item -ItemType Directory -Path $ExcludeDir -Force | Out-Null }
+        if (-not (Test-Path $ExcludePath)) { New-Item -ItemType File -Path $ExcludePath -Force | Out-Null }
+
+        $ExcludeContent = Get-Content $ExcludePath -Raw -ErrorAction SilentlyContinue
+        if ($ExcludeContent -match "# dev-iq") {
+            Write-Warn "Trial mode entries already present in .git\info\exclude."
+        } else {
+            $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.claude/agents/`n.claude/skills.md`n.dev-iq/`nCLAUDE.md"
+            if ($Hooks) { $Block += "`nhooks/" }
+            Add-Content $ExcludePath $Block -Encoding UTF8
+            Write-Ok "Dev.IQ paths added to .git\info\exclude (invisible to git)."
+        }
     }
 }
 
 # ── Create artifact store ─────────────────────────────────────────
 foreach ($sub in @('adrs','rollback-plans','user-stories','pr-reviews','signals')) {
     $dir = "$Target\.dev-iq\artifacts\$sub"
-    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    if ($DryRun) {
+        Write-Host "  [dry-run] would create: .dev-iq\artifacts\$sub"
+    } elseif (-not (Test-Path $dir)) {
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    }
 }
 Copy-PackFile "$PackRoot\.dev-iq\artifacts\.gitignore" "$Target\.dev-iq\artifacts\.gitignore" $false
 Copy-PackFile "$PackRoot\.dev-iq\artifacts\README.md"  "$Target\.dev-iq\artifacts\README.md"  $false
-Write-Ok "Artifact store created : .dev-iq\artifacts\"
+if (-not $DryRun) { Write-Ok "Artifact store created : .dev-iq\artifacts\" }
 
 # ── Write install manifest ────────────────────────────────────────
-$ManifestDir = "$Target\.dev-iq"
-if (-not (Test-Path $ManifestDir)) { New-Item -ItemType Directory -Path $ManifestDir -Force | Out-Null }
+if ($DryRun) {
+    Write-Host "  [dry-run] would write: .dev-iq\.install-manifest.json"
+} else {
+    $ManifestDir = "$Target\.dev-iq"
+    if (-not (Test-Path $ManifestDir)) { New-Item -ItemType Directory -Path $ManifestDir -Force | Out-Null }
 
-$ManifestData = [ordered]@{
-    version         = $PackVersion
-    installed_at    = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
-    mode            = $Mode
-    pack_source     = $PackRoot
-    hooks_installed = $Hooks.IsPresent
-    is_upgrade      = $IsUpgrade
-    detected        = [ordered]@{
-        tracker   = $DetectedTracker
-        vcs       = $DetectedVcs
-        language  = $DetectedLang
-        framework = $DetectedFramework
+    $ManifestData = [ordered]@{
+        version         = $PackVersion
+        installed_at    = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+        mode            = $Mode
+        pack_source     = $PackRoot
+        hooks_installed = $Hooks.IsPresent
+        is_upgrade      = $IsUpgrade
+        detected        = [ordered]@{
+            tracker   = $DetectedTracker
+            vcs       = $DetectedVcs
+            language  = $DetectedLang
+            framework = $DetectedFramework
+        }
     }
+    $ManifestData | ConvertTo-Json -Depth 5 | Set-Content $ManifestPath -Encoding UTF8
+    Write-Ok "Manifest written : .dev-iq\.install-manifest.json"
 }
-$ManifestData | ConvertTo-Json -Depth 5 | Set-Content $ManifestPath -Encoding UTF8
-Write-Ok "Manifest written : .dev-iq\.install-manifest.json"
 
 # ── Summary ───────────────────────────────────────────────────────
-Write-Host ""
-Write-Host "  Dev.IQ $PackVersion is ready." -ForegroundColor Green
-Write-Host "  Open Copilot Chat, select Dev-IQ, type /explain-code. That's it." -ForegroundColor Green
-Write-Host ""
-if ($DetectedLang) {
-    $DetectedLine = "  Detected: $DetectedLang"
-    if ($DetectedFramework) { $DetectedLine += " / $DetectedFramework" }
-    if ($DetectedTracker)   { $DetectedLine += " | $DetectedTracker" }
-    Write-Host $DetectedLine
-} else {
-    Write-Host "  Language not detected — open .dev-iq\config.yaml and fill in stack.languages."
-}
-Write-Host ""
-if ($Mode -eq "trial") {
-    Write-Host "  When you're ready to share: run bootstrap.ps1 -Target '$Target' -Graduate"
+if ($DryRun) {
     Write-Host ""
+    Write-Log "Dry run complete. Re-run without -DryRun to apply."
+    Write-Host ""
+} else {
+    Write-Host ""
+    Write-Host "  Dev.IQ $PackVersion is ready." -ForegroundColor Green
+    Write-Host "  Open Copilot Chat, select Dev-IQ, type /explain-code. That's it." -ForegroundColor Green
+    Write-Host ""
+    if ($DetectedLang) {
+        $DetectedLine = "  Detected: $DetectedLang"
+        if ($DetectedFramework) { $DetectedLine += " / $DetectedFramework" }
+        if ($DetectedTracker)   { $DetectedLine += " | $DetectedTracker" }
+        Write-Host $DetectedLine
+    } else {
+        Write-Host "  Language not detected — open .dev-iq\config.yaml and fill in stack.languages."
+    }
+    Write-Host ""
+    if ($Mode -eq "trial") {
+        Write-Host "  When you're ready to share: run bootstrap.ps1 -Target '$Target' -Graduate"
+        Write-Host ""
+    }
 }

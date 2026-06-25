@@ -2,30 +2,33 @@
   "_note": "Generated from hooks.template.json by bootstrap. Do not edit hooks.json directly — edit the template and re-run bootstrap.",
   "_instructions": "bootstrap replaces {{PACK_ROOT}} with the absolute path to the Dev.IQ pack root when rendering to hooks/hooks.json.",
   "version": "1.0",
-  "hooks": [
-    {
-      "event": "session.start",
-      "description": "Load Hindsight correction patterns and record session start.",
-      "command": "bash {{PACK_ROOT}}/hooks/scripts/skill-improve-session-start.sh",
-      "env": {
-        "DI_PACK_ROOT": "{{PACK_ROOT}}"
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-session-start.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "osx": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-session-start.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "linux": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-session-start.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "windows": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& { $r = '{{PACK_ROOT}}'; $env:SKILL_IMPROVE_ROOT = (Join-Path $r 'hooks'); $s = Join-Path $r 'hooks\\scripts\\skill-improve-session-start.ps1'; if (-not (Test-Path $s)) { exit 0 }; & $s }\""
       }
-    },
-    {
-      "event": "tool.use",
-      "description": "Detect correction edits after every Edit/Write/MultiEdit tool call.",
-      "command": "bash {{PACK_ROOT}}/hooks/scripts/skill-improve-detect.sh",
-      "env": {
-        "DI_PACK_ROOT": "{{PACK_ROOT}}"
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-detect.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "osx": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-detect.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "linux": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-detect.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "windows": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& { $r = '{{PACK_ROOT}}'; $env:SKILL_IMPROVE_ROOT = (Join-Path $r 'hooks'); $s = Join-Path $r 'hooks\\scripts\\skill-improve-detect.ps1'; if (-not (Test-Path $s)) { exit 0 }; & $s }\""
       }
-    },
-    {
-      "event": "session.end",
-      "description": "Consolidate session log, promote patterns, update frequency table.",
-      "command": "bash {{PACK_ROOT}}/hooks/scripts/skill-improve-session-end.sh",
-      "env": {
-        "DI_PACK_ROOT": "{{PACK_ROOT}}"
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-session-end.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "osx": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-session-end.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "linux": "bash --noprofile --norc -c 'R=\"{{PACK_ROOT}}\"; export SKILL_IMPROVE_ROOT=\"$R/hooks\"; S=\"$R/hooks/scripts/skill-improve-session-end.sh\"; [ -f \"$S\" ] || exit 0; chmod +x \"$S\" && \"$S\"'",
+        "windows": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"& { $r = '{{PACK_ROOT}}'; $env:SKILL_IMPROVE_ROOT = (Join-Path $r 'hooks'); $s = Join-Path $r 'hooks\\scripts\\skill-improve-session-end.ps1'; if (-not (Test-Path $s)) { exit 0 }; & $s }\""
       }
-    }
-  ]
+    ]
+  }
 }

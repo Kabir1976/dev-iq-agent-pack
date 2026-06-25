@@ -26,6 +26,11 @@ coverage signals. Both can be run on the same PR — they complement each other.
 
 ## Instructions
 
+Calibrate review depth by input size:
+- **< 20 lines:** compact mode — one finding per category max, no sub-bullets
+- **20–200 lines:** standard mode — full category-by-category review
+- **> 200 lines:** deep mode — extended review, flag large PR as RISK finding, suggest splitting
+
 ### Step 1: Read Context
 Resolve the code to review:
 
@@ -42,6 +47,54 @@ Then load (mandatory — DESIGN layer is UNGRADED without these):
 - `.github/instructions/di-security.instructions.md` → security checklist
 - `.github/instructions/di-traceability.instructions.md` → traceability requirements
 - `.dev-iq/config.yaml` → language, framework, coverage threshold
+
+## PR Context Gathering Protocol
+
+Run this protocol whenever a PR number is provided or a diff is available, before writing any findings.
+
+**Step 1 — Fetch the diff:** Run `git diff main...HEAD` (substituting the actual base branch if configured in `.dev-iq/config.yaml`). If no git context is available, ask the user to paste the diff.
+
+**Step 2 — Fetch PR comment threads:** Try in this order:
+1. GitHub MCP tool (preferred when MCP is connected)
+2. `gh pr view --comments` via the CLI
+3. GitHub REST API using stored credentials
+4. Ask the user to paste the thread list
+
+For each thread, capture: thread ID, status (`active` / `resolved` / `fixed`), file path, line number, and the comment content. Skip system comments (status-change events only).
+
+**Step 3 — Build the iteration timeline:** List all commits on the branch with one-line summaries (`git log --oneline main..HEAD`). Note commits whose message references "fix review comment", "address feedback", "address review", or similar — these indicate claimed fixes that must be verified.
+
+**Step 4 — Reconcile threads against the diff:** For every non-system thread, check whether the code at that location has changed in the cumulative diff:
+- Thread is `resolved` or `fixed` and the diff contains a corresponding change → **OK**
+- Thread is `resolved` or `fixed` but the diff shows no corresponding change → **MISMATCH** — escalate to 🔴 Critical in the relevant review category
+- Thread is `active` / `pending` with no change → **OPEN** — include in reconciliation table for awareness
+
+If PR threads were fetched, include a **PR Comment Reconciliation** table in the output after the main findings:
+
+| Thread | Location | Status in code | Flag |
+|--------|----------|---------------|------|
+
+**Flag values:** OK (change found) · OPEN (no change found) · MISMATCH (marked resolved but code unchanged)
+
+---
+
+## Anti-Patterns Pre-flight
+
+Run these six checks before the category-by-category review. Report each hit as a QUALITY finding ahead of the main review.
+
+1. **Wrapper helpers re-implementing standard library functions** — flag any helper whose body is a thin pass-through to a well-known framework or standard-library call (file copy, directory create, deep clone, group-by, regex compile). Recommend deleting the helper and calling the built-in directly. Severity: 🟡 Medium.
+
+2. **Invariant work inside loops** — flag computations whose result does not change per iteration but are recomputed every iteration (string normalization, `ToUpper`/`ToLower`/`toLowerCase`, regex compilation, reflection lookups, repeated service calls). Hoist to a local variable before the loop or switch to a case-insensitive comparer. Severity: 🟡 Medium; 🔴 High if the loop is unbounded or the call performs I/O.
+
+3. **Untyped traversal of typed data** — flag code that navigates a dynamic, weakly-typed representation (`JObject` indexing, `dict.get(...)`, `map[string]interface{}`, `any`-typed JSON access) when a typed model for the same payload already exists in the codebase or is trivial to introduce. Recommend deserializing once and reading properties. Severity: 🟡 Medium.
+
+4. **Over-defensive try/catch that swallows errors** — flag try/catch blocks that wrap code with no realistic failure mode, or that catch `Exception` (or equivalent) at the top level and then return null/empty/default without a real recovery path. Either delete the try/catch or narrow it to the specific exception type with a real recovery action. Severity: 🟡 Medium; 🔴 High when the swallow hides a data-integrity or correctness failure.
+
+5. **Unused parameters in function signatures** — flag parameters that callers must supply but the method body never reads. Remove them and simplify call sites. Severity: 🟡 Medium.
+
+6. **Repo hygiene issues in production paths** — flag `console.log` / `print` / `fmt.Println` in non-debug paths; TODO comments in production code paths; commented-out code blocks left in place. Severity: 🟡 Medium.
+
+---
 
 ### Step 2: INTENT Check
 Verify the code does what was asked:
@@ -174,6 +227,18 @@ Reviewed: [date]
 
 ### 🔵 Low Issues
 [findings]
+
+---
+
+### PR Comment Reconciliation
+> Include this section only when PR threads were fetched in the PR Context Gathering Protocol.
+> Omit entirely for file-only reviews with no PR context.
+
+| Thread | Location | Status in code | Flag |
+|--------|----------|---------------|------|
+| #N     | file.ts:42 | [change found / no change found] | OK / OPEN / MISMATCH |
+
+**Flag values:** OK (change found) · OPEN (no change found) · MISMATCH (marked resolved but code unchanged)
 
 ---
 
@@ -326,3 +391,14 @@ These are the statements that get review findings dismissed. Rebut them.
 - `/review-pr-readiness` — full PR assessment including DI risk band
 - `/blast-radius-estimator` — assess downstream impact of this change
 - Assert.IQ `/review-test-quality` — review test coverage and quality (QE signal)
+
+## Post-Review Follow-Up
+
+After delivering the review output, offer these options:
+
+- "Want me to run /new-pull-request and attach this review to the PR description?"
+- "Want me to run /review-security for a dedicated security pass?"
+- "Want me to fix the Critical and High findings now?"
+- "Want me to generate test stubs for the functions flagged in this review?"
+
+Keep the offer to one or two options — pick the highest-impact follow-up based on the findings. MISMATCH threads in the PR Comment Reconciliation table take precedence over general code findings.

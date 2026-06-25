@@ -30,6 +30,8 @@ GRADUATE=false
 UNINSTALL=false
 INCLUDE_HOOKS=false
 PRESET=""
+DRY_RUN=false
+YES=false
 
 for arg in "$@"; do
   case "$arg" in
@@ -39,6 +41,8 @@ for arg in "$@"; do
     --graduate)   GRADUATE=true ;;
     --uninstall)  UNINSTALL=true ;;
     --hooks)      INCLUDE_HOOKS=true ;;
+    --dry-run)    DRY_RUN=true ;;
+    --yes|-y)     YES=true ;;
     --help|-h)
       cat << EOF
 Dev.IQ Agent Pack — Bootstrap Installer v${PACK_VERSION}
@@ -56,6 +60,8 @@ Options:
   --graduate         Convert a trial install to committed mode
   --uninstall        Remove Dev.IQ from the target repository
   --hooks            Also install the hooks/ directory
+  --dry-run          Preview what would be installed without writing any files
+  --yes, -y          Skip interactive confirmation prompts
 
 Examples:
   bash /path/to/dev-iq/scripts/bootstrap.sh
@@ -226,22 +232,43 @@ if [[ "$UNINSTALL" == true ]]; then
   log "Removing Dev.IQ Agent Pack from: $TARGET"
   echo ""
 
-  if [[ -t 0 ]]; then
+  if [[ "$YES" == false && -t 0 ]]; then
     read -rp "  This will delete Dev.IQ files from $TARGET. Continue? [y/N] " _confirm
     [[ "${_confirm,,}" == "y" ]] || { log "Uninstall cancelled."; exit 0; }
   fi
 
+  _restored=0
+  _deleted=0
+
+  # Restore or delete pack-owned files inside pack-owned directories.
   for dir in ".github/skills" ".github/instructions" ".github/agents" ".claude/agents"; do
     if [[ -d "$TARGET/$dir" ]]; then
-      rm -rf "${TARGET:?}/$dir"
-      ok "Removed : $dir"
+      while IFS= read -r -d '' _f; do
+        if [[ -f "${_f}.di.pre-install" ]]; then
+          mv "${_f}.di.pre-install" "$_f"
+          (( _restored++ )) || true
+        else
+          rm -f "$_f"
+          (( _deleted++ )) || true
+        fi
+      done < <(find "$TARGET/$dir" -type f -not -name "*.di.pre-install" -print0)
+      # Remove the directory if now empty.
+      find "${TARGET:?}/$dir" -depth -type d -empty -delete 2>/dev/null || true
+      ok "Processed : $dir"
     fi
   done
 
+  # Restore or delete individual pack-owned files.
   for file in ".claude/skills.md"; do
     if [[ -f "$TARGET/$file" ]]; then
-      rm -f "$TARGET/$file"
-      ok "Removed : $file"
+      if [[ -f "$TARGET/$file.di.pre-install" ]]; then
+        mv "$TARGET/$file.di.pre-install" "$TARGET/$file"
+        (( _restored++ )) || true
+      else
+        rm -f "$TARGET/$file"
+        (( _deleted++ )) || true
+      fi
+      ok "Processed : $file"
     fi
   done
 
@@ -276,13 +303,16 @@ if [[ "$UNINSTALL" == true ]]; then
 
   echo ""
   ok "Dev.IQ removed from $TARGET."
+  log "Restored ${_restored} pre-install files, deleted ${_deleted}."
   log "Your code, tests, and configs were not touched."
   exit 0
 fi
 
 # ── Select install mode ───────────────────────────────────────────
 if [[ -z "$MODE" ]]; then
-  if [[ -t 0 ]]; then
+  if [[ "$YES" == true ]]; then
+    MODE="trial"
+  elif [[ -t 0 ]]; then
     echo ""
     echo -e "  ${C_BLD}Just you, or the whole team?${C_RST}"
     echo ""
@@ -313,10 +343,18 @@ echo ""
 # ── File copy helpers ─────────────────────────────────────────────
 _copy_file() {
   local src="$1" dst="$2" preserve="${3:-false}"
+  if [[ "$DRY_RUN" == true ]]; then
+    echo "  [dry-run] would copy: $src -> ${dst#"$TARGET/"}"
+    return
+  fi
   mkdir -p "$(dirname "$dst")"
   if [[ "$preserve" == "true" && -f "$dst" ]]; then
     warn "Preserved existing : ${dst#"$TARGET/"}"
     return
+  fi
+  # Save pre-install snapshot before overwriting an existing file.
+  if [[ -f "$dst" ]]; then
+    cp "$dst" "${dst}.di.pre-install"
   fi
   cp "$src" "$dst"
   ok "Installed : ${dst#"$TARGET/"}"
@@ -328,6 +366,15 @@ _copy_dir() {
     rel="${file#"$src"/}"
     _copy_file "$file" "$dst/$rel" false
   done < <(find "$src" -type f -print0)
+}
+
+_make_dir() {
+  local dir="$1"
+  if [[ "$DRY_RUN" == true ]]; then
+    echo "  [dry-run] would create: ${dir#"$TARGET/"}"
+    return
+  fi
+  mkdir -p "$dir"
 }
 
 # ── Install pack-owned files ──────────────────────────────────────
@@ -446,18 +493,25 @@ _inject_claude_md() {
   fi
 }
 
-_inject_claude_md
+if [[ "$DRY_RUN" == true ]]; then
+  echo "  [dry-run] would copy: $CLAUDE_SRC -> CLAUDE.md"
+else
+  _inject_claude_md
+fi
 
 # ── Trial mode: add paths to .git/info/exclude ───────────────────
 if [[ "$MODE" == "trial" ]]; then
-  EXCLUDE="$TARGET/.git/info/exclude"
-  mkdir -p "$(dirname "$EXCLUDE")"
-  touch "$EXCLUDE"
-
-  if grep -qF "# dev-iq" "$EXCLUDE" 2>/dev/null; then
-    warn "Trial mode entries already present in .git/info/exclude."
+  if [[ "$DRY_RUN" == true ]]; then
+    echo "  [dry-run] would update: .git/info/exclude (trial mode entries)"
   else
-    cat >> "$EXCLUDE" << EOF
+    EXCLUDE="$TARGET/.git/info/exclude"
+    mkdir -p "$(dirname "$EXCLUDE")"
+    touch "$EXCLUDE"
+
+    if grep -qF "# dev-iq" "$EXCLUDE" 2>/dev/null; then
+      warn "Trial mode entries already present in .git/info/exclude."
+    else
+      cat >> "$EXCLUDE" << EOF
 
 # dev-iq — trial install v${PACK_VERSION}
 .github/skills/
@@ -468,28 +522,32 @@ if [[ "$MODE" == "trial" ]]; then
 .dev-iq/
 CLAUDE.md
 EOF
-    [[ "$INCLUDE_HOOKS" == true ]] && printf 'hooks/\n' >> "$EXCLUDE"
-    ok "Dev.IQ paths added to .git/info/exclude (invisible to git)."
+      [[ "$INCLUDE_HOOKS" == true ]] && printf 'hooks/\n' >> "$EXCLUDE"
+      ok "Dev.IQ paths added to .git/info/exclude (invisible to git)."
+    fi
   fi
 fi
 
 # ── Create artifact store ─────────────────────────────────────────
-mkdir -p "$TARGET/.dev-iq/artifacts/adrs"
-mkdir -p "$TARGET/.dev-iq/artifacts/rollback-plans"
-mkdir -p "$TARGET/.dev-iq/artifacts/user-stories"
-mkdir -p "$TARGET/.dev-iq/artifacts/pr-reviews"
-mkdir -p "$TARGET/.dev-iq/artifacts/signals"
+_make_dir "$TARGET/.dev-iq/artifacts/adrs"
+_make_dir "$TARGET/.dev-iq/artifacts/rollback-plans"
+_make_dir "$TARGET/.dev-iq/artifacts/user-stories"
+_make_dir "$TARGET/.dev-iq/artifacts/pr-reviews"
+_make_dir "$TARGET/.dev-iq/artifacts/signals"
 _copy_file "$PACK_ROOT/.dev-iq/artifacts/.gitignore" "$TARGET/.dev-iq/artifacts/.gitignore" false
 _copy_file "$PACK_ROOT/.dev-iq/artifacts/README.md"  "$TARGET/.dev-iq/artifacts/README.md"  false
-ok "Artifact store created : .dev-iq/artifacts/"
+[[ "$DRY_RUN" == false ]] && ok "Artifact store created : .dev-iq/artifacts/"
 
 # ── Write install manifest ────────────────────────────────────────
-mkdir -p "$TARGET/.dev-iq"
-HOOKS_BOOL=$( [[ "$INCLUDE_HOOKS" == true ]] && echo "true" || echo "false" )
-UPGRADE_BOOL=$( [[ "$IS_UPGRADE" == true ]] && echo "true" || echo "false" )
+if [[ "$DRY_RUN" == true ]]; then
+  echo "  [dry-run] would write: .dev-iq/.install-manifest.json"
+else
+  mkdir -p "$TARGET/.dev-iq"
+  HOOKS_BOOL=$( [[ "$INCLUDE_HOOKS" == true ]] && echo "true" || echo "false" )
+  UPGRADE_BOOL=$( [[ "$IS_UPGRADE" == true ]] && echo "true" || echo "false" )
 
-_NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +%s)
-cat > "$MANIFEST" << EOF
+  _NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +%s)
+  cat > "$MANIFEST" << EOF
 {
   "version": "$PACK_VERSION",
   "installed_at": "$_NOW",
@@ -505,24 +563,31 @@ cat > "$MANIFEST" << EOF
   }
 }
 EOF
-ok "Manifest written : .dev-iq/.install-manifest.json"
+  ok "Manifest written : .dev-iq/.install-manifest.json"
+fi
 
 # ── Done ──────────────────────────────────────────────────────────
-echo ""
-echo -e "  ${C_GRN}${C_BLD}Dev.IQ ${PACK_VERSION} is ready.${C_RST}"
-echo ""
-echo -e "  Open Copilot Chat or Claude Code, select ${C_BLD}Dev-IQ${C_RST}, and type:"
-echo ""
-echo -e "    ${C_BLD}/explain-code${C_RST}"
-echo ""
-echo -e "  That's it."
-echo ""
-if [[ -z "$DETECTED_LANG" ]]; then
-  echo -e "  Language not detected — open ${C_BLD}.dev-iq/config.yaml${C_RST} and fill in ${C_BLD}stack.languages${C_RST}."
+if [[ "$DRY_RUN" == true ]]; then
   echo ""
-fi
-if [[ "$MODE" == "trial" ]]; then
-  echo -e "  Share with the team later:"
-  echo -e "    ${C_BLD}bash /path/to/dev-iq/scripts/bootstrap.sh --target=$(pwd) --graduate${C_RST}"
+  log "Dry run complete. Re-run without --dry-run to apply."
   echo ""
+else
+  echo ""
+  echo -e "  ${C_GRN}${C_BLD}Dev.IQ ${PACK_VERSION} is ready.${C_RST}"
+  echo ""
+  echo -e "  Open Copilot Chat or Claude Code, select ${C_BLD}Dev-IQ${C_RST}, and type:"
+  echo ""
+  echo -e "    ${C_BLD}/explain-code${C_RST}"
+  echo ""
+  echo -e "  That's it."
+  echo ""
+  if [[ -z "$DETECTED_LANG" ]]; then
+    echo -e "  Language not detected — open ${C_BLD}.dev-iq/config.yaml${C_RST} and fill in ${C_BLD}stack.languages${C_RST}."
+    echo ""
+  fi
+  if [[ "$MODE" == "trial" ]]; then
+    echo -e "  Share with the team later:"
+    echo -e "    ${C_BLD}bash /path/to/dev-iq/scripts/bootstrap.sh --target=$(pwd) --graduate${C_RST}"
+    echo ""
+  fi
 fi

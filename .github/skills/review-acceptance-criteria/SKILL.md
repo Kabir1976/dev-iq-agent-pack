@@ -28,6 +28,57 @@ during code review — both outcomes are more expensive than fixing the AC now.
 - Any time the user says: "review these ACs", "check this story", "are these
   ACs good enough", "is this sprint-ready", "validate this work item"
 
+## Config Options (read from `.dev-iq/config.yaml`)
+
+Read the `ac_review` section of `.dev-iq/config.yaml` before starting the review.
+Config values are applied on top of the existing DI rubric (Testable / Specific / Complete /
+Consistent) — they add format preferences and gating policy; they do not replace the rubric.
+
+### `ac_review.preferred_format`
+Controls the format used when rewriting gap ACs.
+
+| Value | Format |
+|-------|--------|
+| `gherkin` | Gherkin `Scenario:` / `Given` / `When` / `Then` / `And` / `But` |
+| `given-when-then` | Plain prose Given / When / Then (no Gherkin keywords) |
+| `bullet` | Flat bullet list of observable outcomes (default) |
+| `user-story` | "As a [persona], I want [goal], so that [value]" + acceptance bullets |
+| `custom` | Use the format described in `ac_review.preferred_format_description` |
+
+When this key is absent, default to `bullet`.
+
+### `ac_review.gating_policy`
+Controls how findings affect the sprint-readiness verdict. Print the active policy at the
+top of the output: **"Gating policy: [value]"**
+
+| Value | Behaviour |
+|-------|-----------|
+| `strict` | Any Fail AC or missing error-case AC blocks the sprint-readiness verdict. |
+| `pragmatic` | Fail ACs warn; the team may choose to proceed with documented risk. (default) |
+| `regulated` | Any Fail AC **or** any Weak AC blocks; recommended for safety / compliance contexts. |
+
+When this key is absent, default to `pragmatic`.
+
+### `ac_review.nfr_checklist`
+A list of non-functional requirement categories to check each AC set against.
+Default when absent: `[performance, security, accessibility]`.
+
+Example config:
+```yaml
+ac_review:
+  nfr_checklist:
+    - performance
+    - security
+    - accessibility
+    - privacy
+    - reliability
+    - i18n
+    - observability
+```
+
+For each NFR category in the checklist: after completing the per-AC assessment, check whether
+the AC set as a whole addresses that NFR. If not, flag it as a suggested missing AC.
+
 ## Instructions
 
 ### Step 1: Read the Work Item and ACs

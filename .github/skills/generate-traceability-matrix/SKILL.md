@@ -30,6 +30,46 @@ not that the feature does what it was supposed to do.
 
 ## Instructions
 
+### Step 0: Read Config — Marker Style and Scan Globs
+
+Before searching the codebase, read two sections from `.dev-iq/config.yaml`:
+
+#### A) `traceability.marker_style`
+Determines which pattern to search for when locating traceability comments.
+
+| Value | Pattern | Example |
+|-------|---------|---------|
+| `tracker_id_inline` (default) | `// AB#1234`, `// PROJ-123`, `// #456` | Standard single-line comment |
+| `jsdoc_tag` | `@ticket AB#1234` in a docblock | JSDoc / TSDoc comment |
+| `python_decorator` | `@trace("AB#1234")` on a function | Python decorator |
+| `attribute` | `[WorkItem("AB#1234")]` | .NET / C# attribute |
+| `custom_regex` | Use the pattern in `traceability.marker_regex` | Any team-specific format |
+| `auto` | Try all patterns; use the one with the most matches in the codebase | Polyglot or migrating repos |
+
+When `marker_style` is absent from config, default to `tracker_id_inline`.
+
+When `marker_style: custom_regex`, read `traceability.marker_regex` from config. The first
+capture group must yield the work item ID. If the key is absent, prompt the user for the
+pattern before proceeding.
+
+When `marker_style: auto`, run a lightweight scan for all supported patterns and select the
+one with the highest hit count. Report which style was selected and why.
+
+#### B) `traceability.code_globs` and `traceability.test_globs`
+Controls which files are included in the scan.
+
+- If `traceability.code_globs` is set in config: use those globs for the source code scan.
+  Do **not** prompt the user for file paths.
+- If `traceability.test_globs` is set in config: use those globs for the test file scan.
+  Do **not** prompt the user for test locations.
+- If either key is **absent** from config: prompt the user for the missing value before
+  proceeding. Example prompt: "Which directories or file patterns should I scan for source
+  code? (e.g. `src/`, `**/*.ts`) — or set `traceability.code_globs` in `.dev-iq/config.yaml`
+  to skip this question in future."
+
+Exclusion patterns (generated files, vendor directories, build output) may be set via
+`traceability.code_excludes` in config.
+
 ### Step 1: Read the Work Items and ACs
 **From work item IDs:**
 - Read the title, description, and ACs for each work item
@@ -39,7 +79,7 @@ not that the feature does what it was supposed to do.
 - Accept the work item list and ACs
 - Confirm the tracking system format
 
-Ask for (if not provided):
+Ask for (if not provided and not set in config via `traceability.code_globs` / `traceability.test_globs`):
 - The file paths or directories to scan for traceability comments
 - The test file locations (convention: `tests/`, `spec/`, `__tests__/`, etc.)
 
@@ -97,9 +137,10 @@ At **Mid/Higher maturity**: structured output only.
 | Input | Source | Required |
 |-------|--------|----------|
 | Work item ID(s) and ACs | Work item system or paste | Yes |
-| Codebase file paths to scan | User provides or inferred | Yes |
-| Test file locations | User provides or inferred from codebase conventions | Yes |
-| Traceability comment format | `.dev-iq/config.yaml` or inferred | Auto-detected |
+| Codebase file paths to scan | `traceability.code_globs` in `.dev-iq/config.yaml`; prompt user only if absent | Yes |
+| Test file locations | `traceability.test_globs` in `.dev-iq/config.yaml`; prompt user only if absent | Yes |
+| Traceability marker style | `traceability.marker_style` in `.dev-iq/config.yaml`; defaults to `tracker_id_inline` | Auto-read |
+| Custom marker regex | `traceability.marker_regex` in `.dev-iq/config.yaml`; required only when `marker_style: custom_regex` | Conditional |
 | Maturity tier | `.dev-iq/config.yaml` | Auto-read |
 
 ## Output Format

@@ -28,6 +28,23 @@ the signal gaps are.
 
 ## Instructions
 
+### Pre-Flight: Credential Scan
+Before any other step, scan the diff for hardcoded secrets using the patterns below.
+If any pattern matches: **stop, report as a Critical security finding, and do NOT open the PR.**
+The developer must remove the credential, rotate it (treat it as compromised), and re-run this skill.
+
+| Pattern | Regex |
+|---------|-------|
+| AWS access key | `AKIA[0-9A-Z]{16}` |
+| Azure storage key | `AccountKey=[A-Za-z0-9+/=]{88}` |
+| GCP OAuth token | `ya29\.[A-Za-z0-9_-]{60,}` |
+| GitHub tokens | `(ghp\|gho\|ghs\|ghu\|github_pat)_[A-Za-z0-9_]{36,}` |
+| Slack tokens | `xox[abprs]-[0-9A-Za-z-]{10,}` |
+| GitLab PAT | `glpat-[A-Za-z0-9_-]{20}` |
+| PEM private key | `-----BEGIN (RSA \|EC \|OPENSSH )?PRIVATE KEY-----` |
+
+Additional patterns may be appended via `vcs.credential_patterns_extras` in `.dev-iq/config.yaml` (array of regexes).
+
 ### Step 1: Read the Diff
 **From git diff:**
 - Run `git diff main...HEAD` (or the equivalent base branch) to read all changes
@@ -65,6 +82,25 @@ calls wrapped in error handling? Any hardcoded secrets or credentials visible?
 Flag any WEAK or UNGRADED layer in the PR description so reviewers know where
 to focus.
 
+### Step 3b: PR Template Merge
+Before generating the PR description, check whether the target repository contains a PR template:
+- Auto-detect at: `.github/PULL_REQUEST_TEMPLATE.md`, `.azuredevops/pull_request_template.md`,
+  `.gitlab/merge_request_templates/*.md`, or `docs/pull_request_template.md`.
+- Override the search path via `vcs.pr_template_path` in `.dev-iq/config.yaml`.
+
+**If a template exists:**
+1. Populate every existing template section — do not leave placeholder text unfilled.
+2. For sections that overlap with DI content (Summary, Testing, Checklist, Risk): embed DI
+   content *inside* the template's section rather than duplicating it alongside.
+3. DI-specific sections with no template equivalent (Work Item Coverage, DI Signal Summary,
+   Deployment Notes): append them after the last template section under `<!-- DI additions -->`.
+4. Never remove template checkboxes or required fields. Preserve all checkboxes exactly as
+   written, adding check marks only for items the developer has confirmed.
+5. Insert the DI content — work item reference, signal table, and `@di-review-required` marker
+   — inside the template structure, not appended loosely after it.
+
+**If no template exists:** generate the standalone body defined in Step 4.
+
 ### Step 4: Generate the PR Description
 Produce a complete markdown PR description:
 
@@ -82,6 +118,21 @@ At **Early maturity**: include coaching notes in the DI signal summary for
 any WEAK or UNGRADED finding.
 
 At **Mid/Higher maturity**: structured output only.
+
+### Step 5: Open the PR via the Correct CLI
+Read `vcs.host` from `.dev-iq/config.yaml` to select the appropriate command.
+
+| Host | Detection | CLI command |
+|------|-----------|-------------|
+| GitHub.com / GitHub Enterprise | `vcs.host: github` | `gh pr create` |
+| Azure DevOps | `vcs.host: ado` | `az repos pr create` |
+| GitLab | `vcs.host: gitlab` | `glab mr create` |
+| Bitbucket | `vcs.host: bitbucket` | `bb pr create` (Bitbucket CLI) or POST to the Bitbucket REST API |
+| Other / unset | `vcs.host` not set | Prompt the user for the PR URL and output a paste-ready body |
+
+When the CLI or MCP is unavailable or fails: output the complete PR body as formatted markdown
+and include the exact CLI command the developer should run, substituting the actual values for
+branch, title, and base.
 
 ## Inputs Required
 | Input | Source | Required |
