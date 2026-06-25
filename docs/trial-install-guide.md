@@ -165,7 +165,14 @@ agent — it should autocomplete. Then type:
 /explain-code
 ```
 
-**Pass for either IDE:** Point the skill at any source file. If the response
+**Claude Code:**
+Open the UPS repo in a terminal. Type `/` to see available skills — you should
+see the Dev.IQ skills listed. Then run:
+```
+/explain-code
+```
+
+**Pass for any IDE:** Point the skill at any source file. If the response
 includes a **Purpose** section and an **INTENT signal** verdict — you're live.
 
 **If Dev-IQ does not appear / `@Dev-IQ` does not autocomplete:** this is the
@@ -173,6 +180,29 @@ most important thing to report back. In Visual Studio, also confirm you enabled
 **"Enable repository custom instructions"** in Tools → Options (see prerequisites
 above). Note your IDE version and Copilot extension version (`Help → About`)
 and send that to the person who gave you this guide.
+
+**If skills appear but hooks are silent:** Open `.claude/settings.json` in the
+UPS repo and confirm the `hooks` section is present. If it is missing, re-run
+bootstrap. If present but hooks still don't fire, check that you are on
+Dev.IQ v0.11.0 — earlier versions had incorrect hook event names that caused
+silent failures.
+
+---
+
+## What bootstrap wired (and what it didn't)
+
+Bootstrap installs every file to disk, but a few surfaces only load when they
+are in the right place. If something feels off, check these first:
+
+| Surface | Where it must live | What breaks if missing |
+|---------|-------------------|------------------------|
+| `copilot-instructions.md` | `.github/` in the UPS repo | Dev-IQ behaves like a generic Copilot agent — no DI context |
+| `CLAUDE.md` | UPS repo root | Dev-IQ in Claude Code has no DI reasoning layer |
+| `.dev-iq/` | UPS repo root | Skills can't read your stack config or maturity tier |
+| `.claude/settings.json` | UPS repo root | Hindsight Hooks don't fire at session start/end |
+
+Bootstrap creates all of these during install. If one is missing, re-run
+bootstrap with `-Preset solo` — it is safe to run multiple times.
 
 ---
 
@@ -198,6 +228,29 @@ a Go / Hold / Discuss recommendation. This is the core of what Dev.IQ does.
 | Reviewing someone else's code | `/code-review` |
 | Something breaks | `/debug-issue` |
 | Starting a new feature | `/generate-user-stories` |
+
+---
+
+## Removing the pack
+
+If you want to uninstall, run bootstrap with the uninstall flag from the
+Dev.IQ folder:
+
+```powershell
+powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" -Target "C:\path\to\your-ups-repo" -Uninstall
+```
+
+```bash
+# macOS / Linux
+bash /path/to/dev-iq/scripts/bootstrap.sh --target /path/to/your-ups-repo --uninstall
+```
+
+Uninstall reads the install manifest and restores any files that existed before
+the pack was installed. Files you edited post-install (config.yaml, governance.md)
+are saved as `<file>.di.uninstall-saved` so nothing is silently lost.
+
+For trial mode: the `.git/info/exclude` block is also removed so the files
+become visible to git again (useful if you decide to commit them later).
 
 ---
 
