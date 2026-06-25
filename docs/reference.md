@@ -4,7 +4,7 @@
 > instructions, agents, and tools that turn GitHub Copilot Chat **and**
 > Claude Code into a delivery-aware engineering partner inside the IDE.
 
-**Version**: v0.10.0
+**Version**: v0.11.0
 
 ---
 
@@ -27,7 +27,7 @@ Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and
 | VS Code | 1.99 | Host for Copilot Chat and MCP servers |
 | GitHub Copilot Chat extension | v0.22 | Agent mode, skill invocation, custom agents. Check: `Help → About` |
 | Git | Any recent | Branch detection, diff context for skills |
-| dev-iq pack | v0.10.0 | Provided as a zip by your engagement lead |
+| dev-iq pack | v0.11.0 | Provided as a zip by your engagement lead |
 
 > **Claude Code alternative:** Claude Code CLI works instead of or alongside Copilot Chat. Skills and agents behave identically. See `.claude/claude-readme.md` for Claude-specific setup.
 
@@ -67,7 +67,7 @@ Enables directory symlinks without an admin shell. Without it, bootstrap falls b
 
 ---
 
-## What's Disabled in v0.10.0
+## What's Disabled in v0.11.0
 
 These features are built and wired but explicitly turned off. The flag is in `.dev-iq/config.yaml` unless noted otherwise.
 
@@ -77,7 +77,7 @@ These features are built and wired but explicitly turned off. The flag is in `.d
 | **Decision Confidence signal** | `signals.confidence.enabled: false` | Phase 2 — not built | Do not enable. Referenced in skill output format but not computed. Ships in a future release. |
 | **Blast Radius full mode** | `blast_radius.enabled: false` | Disabled at Early maturity | The `/blast-radius-estimator` skill still runs in advisory mode. Full dependency-graph traversal requires `blast_radius.dependency_map_path` and Mid+ maturity. |
 | **Auto-assign reviewer on Yellow** | `pr.auto_assign_on_yellow: false` | Off | Requires ADO/GitHub PAT with write access and Mid+ maturity. |
-| **Signal emission to `.dev-iq/signals/`** | — | Planned for 0.10.0 | Skills don't yet write structured JSONL signal records. The directory doesn't exist yet. |
+| **Signal emission to `.dev-iq/signals/`** | — | Planned for 0.11.0 | Skills don't yet write structured JSONL signal records. The directory doesn't exist yet. |
 | **Webhook telemetry sink** | `hooks.telemetry_sink: local` | Local only | Signals written to local logs only. Set `telemetry_sink: webhook` and add a URL in `hooks.telemetry_webhook_url` to push externally. |
 
 ### MCP servers: what's active vs. disabled
@@ -304,7 +304,7 @@ bash ~/dev-iq/scripts/bootstrap.sh --preset=portable
 
 ### Pinning to a version
 
-v0.10.0 is a pre-release — no git tags have been cut yet. Use the zip provided
+v0.11.0 is a pre-release — no git tags have been cut yet. Use the zip provided
 by your engagement lead, which is pinned to a specific commit. Once the repo
 moves to tagged releases (v1.0.0+), bootstrap CLI flags, manifest schema, skill
 names, and workspace surface layout will not change incompatibly without a
@@ -322,7 +322,7 @@ Create a clean zip from the pack and share via Teams, email, or SharePoint:
 
 ```bash
 cd /path/to/dev-iq
-git archive --format=zip --output=~/Desktop/dev-iq-v0.10.0.zip HEAD
+git archive --format=zip --output=~/Desktop/dev-iq-v0.11.0.zip HEAD
 ```
 
 `git archive` includes only committed files — no `.git` folder, no machine-specific files (`.claude/settings.local.json`, `hooks/hooks.json`, `.DS_Store`) are included. The result is exactly what a colleague needs to run bootstrap.
@@ -837,9 +837,9 @@ matches your actual tools and file paths.
 
 | Version | Notes |
 |---------|-------|
-| 0.10.0 | Pre-release. 22 skills complete. Bootstrap with `--preset` and `--uninstall`. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired. |
+| 0.11.0 | Pre-release. 22 skills complete. Bootstrap with `--preset` and `--uninstall`. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired. |
 
-See [CHANGELOG.md](../CHANGELOG.md) for the full release history including post-0.10.0 maintenance.
+See [CHANGELOG.md](../CHANGELOG.md) for the full release history including post-0.11.0 maintenance.
 
 ---
 

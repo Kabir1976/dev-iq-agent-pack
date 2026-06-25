@@ -50,7 +50,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$PackVersion  = "0.10.0"
+$PackVersion  = "0.11.0"
 $PackRoot     = (Resolve-Path "$PSScriptRoot\..").Path
 $MarkerStart  = "<!-- dev-iq:start -->"
 $MarkerEnd    = "<!-- dev-iq:end -->"

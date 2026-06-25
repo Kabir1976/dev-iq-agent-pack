@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Dev.IQ Agent Pack — Bootstrap Installer
-# Version : 0.10.0
+# Version : 0.11.0
 # Usage   : bash scripts/bootstrap.sh [--target=<path>] [--mode=trial|committed]
 #           [--preset=pod|solo|portable] [--graduate] [--uninstall] [--hooks]
 set -euo pipefail
 
-PACK_VERSION="0.10.0"
+PACK_VERSION="0.11.0"
 PACK_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MARKER_START="<!-- dev-iq:start -->"
 MARKER_END="<!-- dev-iq:end -->"

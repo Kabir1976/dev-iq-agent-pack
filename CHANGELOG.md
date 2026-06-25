@@ -7,6 +7,30 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.11.0] — 2026-06-25
+
+### Added
+
+- **`MANIFEST.md`** — complete file inventory with hidden-file browser warning for macOS Finder and Windows Explorer.
+- **`handoffs:` frontmatter on `Dev-IQ-PLAN.agent.md`** — wires the clickable "Start Implementation" button in VS Code Copilot Chat, routing directly to Dev-IQ.
+- **`argument-hint` and handoff buttons on `dev-iq-plan.md`** (Claude Code) — Start Implementation and Open in Editor buttons; argument-hint surfaces as a placeholder in the subagent UI.
+- **`hooks/hooks.template.json`** — Windows PowerShell variants (`osx`/`linux`/`windows` keys per hook entry).
+- **`config.yaml`** — `traceability.marker_style` (6 options + config-driven code/test globs), `pr.risk_thresholds` (`lines_amber`, `lines_red`, `sensitive_paths`), `code_review` block (`disabled_categories`, `severity_floor`, `default_output_format`, depth thresholds), `mcp.servers` (per-skill server allowlist).
+
+### Changed
+
+- **`hooks/hooks.template.json`** — fixed incorrect Claude Code event names: `session.start` → `SessionStart`, `tool.use` → `PostToolUse`, `session.end` → `Stop`. This was a silent failure — hooks were not firing.
+- **`hooks/config/skill-improve.config.json`** — expanded from 6 fields to full schema: weighted correction signatures (20 patterns, strong/weak), proactive insights detection, tool behavioral signals, thresholds, retention policy, full customization roots (`.github/instructions`, `.github/skills`, `.github/agents`, `.claude/skills`, `.claude/agents`, `.dev-iq`).
+- **`.dev-iq/governance.md`** — rewritten as a fillable client template: compliance posture table (HIPAA/PCI-DSS/SOX/GDPR/CCPA/FedRAMP/ISO 27001), human review gates, escalation paths, AI tool boundary, approval signatures. Existing Data Boundary and AI Output Controls content preserved.
+- **`.dev-iq/maturity-profile.md`** — expanded with 15-indicator checklist (Foundation/Signals/Quality/Governance), 7 re-evaluation triggers, approval table.
+- **`code-review` skill** — added PR Context Gathering Protocol (diff + thread fetch + iteration timeline + reconciliation), Recurring Anti-Patterns Pre-flight (6 checks), review depth calibration (<20/20-200/>200 lines), Post-Review Follow-Up section, PR Comment Reconciliation table in output.
+- **`new-pull-request` skill** — added credential pre-flight scan (7 patterns: AWS, Azure, GCP, GitHub, Slack, GitLab, PEM), PR template merge logic, per-host CLI routing table (GitHub/ADO/GitLab/Bitbucket).
+- **`review-acceptance-criteria` skill** — config-backed `ac_review.preferred_format`, `ac_review.gating_policy`, `ac_review.nfr_checklist`.
+- **`generate-traceability-matrix` skill** — 6 marker styles from `traceability.marker_style` in config; reads `code_globs`/`test_globs` from config instead of always prompting the user.
+- **`scripts/bootstrap.sh` + `bootstrap.ps1`** — `--dry-run` flag (shows what would change without applying), `--yes` / `-y` flag (skips interactive confirmation), uninstall snapshot/restore (saves `.di.pre-install` before overwriting, restores on `--uninstall`).
+
+---
+
 ## [0.10.0] — 2026-06-22
 
 ### Added

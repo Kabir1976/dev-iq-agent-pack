@@ -1,6 +1,6 @@
 # Dev.IQ — Governance Posture (client template)
 
-**Pack version:** 0.10.0
+**Pack version:** 0.11.0
 **Review cadence:** Quarterly or after a major delivery milestone
 
 <!-- =========================================================================
