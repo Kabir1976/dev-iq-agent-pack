@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dev.IQ Agent Pack — Full Reference</title>
+<style>
+  :root {
+    --bg: #18191a;
+    --bg-elev: #242526;
+    --bg-card: #2a2b2d;
+    --border: #3a3b3c;
+    --text: #f5f5f5;
+    --text-dim: #aab0b8;
+    --accent: #2563eb;
+    --accent-2: #0ea5e9;
+    --accent-3: #60a5fa;
+    --warn: #ffb347;
+    --code-bg: #111213;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+  }
+
+  /* Sidebar nav */
+  .sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg-elev);
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    padding: 32px 0;
+    flex-shrink: 0;
+  }
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .sidebar-logo a {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-logo .logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .sidebar-section-label {
+    padding: 8px 20px 4px;
+    font-size: 0.72em;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #555;
+    font-weight: 600;
+  }
+  .sidebar a {
+    display: block;
+    padding: 7px 20px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.9em;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .sidebar a:hover {
+    color: var(--text);
+    border-left-color: var(--accent-2);
+    background: rgba(14, 165, 233, 0.06);
+  }
+
+  /* Main content */
+  .content {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+  }
+  .content-inner {
+    max-width: 860px;
+    padding: 60px 48px;
+  }
+
+  a { color: var(--accent-2); text-decoration: none; transition: color 0.15s; }
+  a:hover { color: var(--accent-3); }
+
+  code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    color: #c8d3ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.86em;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; padding: 0; color: #c8d3ff; }
+  .comment { color: #6b7280; }
+  p { color: var(--text-dim); }
+
+  h1 {
+    font-size: 2.4rem;
+    margin: 0 0 12px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 60%, var(--accent-3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .version-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(37, 99, 235, 0.4);
+    border-radius: 999px;
+    font-size: 0.8em;
+    color: var(--accent-2);
+    font-weight: 500;
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-size: 1.7rem;
+    margin: 56px 0 16px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  h2:first-of-type { border-top: none; margin-top: 32px; }
+  h2 .accent { color: var(--accent-2); }
+  h3 { font-size: 1.15rem; margin: 32px 0 12px; color: var(--text); }
+  h4 { font-size: 1rem; margin: 24px 0 8px; color: var(--accent-2); }
+
+  .lead {
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    max-width: 700px;
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    font-size: 0.9em;
+  }
+  thead { background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(14, 165, 233, 0.12)); }
+  th {
+    text-align: left;
+    padding: 11px 14px;
+    color: var(--text);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+  td:first-child { color: var(--text); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(37, 99, 235, 0.04); }
+
+  .callout {
+    background: rgba(14, 165, 233, 0.06);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-left: 3px solid var(--accent-2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 20px 0;
+  }
+  .callout strong { color: var(--text); }
+  .callout p { margin: 6px 0 0; }
+
+  .warn-callout {
+    background: rgba(255, 179, 71, 0.06);
+    border: 1px solid rgba(255, 179, 71, 0.3);
+    border-left: 3px solid var(--warn);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 20px 0;
+  }
+  .warn-callout strong { color: var(--warn); }
+
+  .signal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .signal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .signal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-3));
+  }
+  .signal-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72em;
+    color: var(--accent-2);
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .signal-card p { margin: 0; font-size: 0.88em; color: var(--text-dim); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px;
+    color: var(--text-dim);
+    font-size: 0.88em;
+    background: var(--bg-elev);
+  }
+  footer a { margin-right: 16px; }
+
+  @media (max-width: 900px) {
+    body { display: block; }
+    .sidebar { display: none; }
+    .content-inner { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="README.html">
+      <div class="logo-icon">⚙️</div>
+      Dev.IQ Agent Pack
+    </a>
+  </div>
+
+  <div class="sidebar-section-label">Overview</div>
+  <a href="#at-a-glance">At a Glance</a>
+  <a href="#prerequisites">Prerequisites</a>
+  <a href="#di-signal-model">DI Signal Model</a>
+  <a href="#agent-autonomy">Agent Autonomy</a>
+
+  <div class="sidebar-section-label">Installation</div>
+  <a href="#installation">Install Paths</a>
+  <a href="#presets">Presets</a>
+  <a href="#bootstrap-surfaces">Bootstrap Surfaces</a>
+  <a href="#trial-vs-committed">Trial vs Committed</a>
+  <a href="#distributing">Distributing</a>
+  <a href="#upgrading">Upgrading</a>
+
+  <div class="sidebar-section-label">Skills</div>
+  <a href="#skill-registry">Skill Registry</a>
+  <a href="#requirements">Requirements</a>
+  <a href="#design">Design</a>
+  <a href="#development">Development</a>
+  <a href="#code-review-pr">Code Review / PR</a>
+  <a href="#deployment">Deployment</a>
+  <a href="#cross-cutting">Cross-Cutting</a>
+
+  <div class="sidebar-section-label">Configuration</div>
+  <a href="#maturity">Maturity Tiers</a>
+  <a href="#mcp-servers">MCP Servers</a>
+  <a href="#dual-target">Dual-IDE Architecture</a>
+  <a href="#customization">Customization</a>
+  <a href="#governance">Governance</a>
+
+  <div class="sidebar-section-label">Reference</div>
+  <a href="#disabled">Disabled Features</a>
+  <a href="#pack-structure">Pack Structure</a>
+  <a href="#troubleshooting">Troubleshooting</a>
+  <a href="#what-deviq-is-not">What Dev.IQ Is Not</a>
+  <a href="#versioning">Versioning</a>
+
+  <div class="sidebar-section-label" style="margin-top:16px;">Pages</div>
+  <a href="README.html">← Landing Page</a>
+  <a href="vscode-readme.html">VS Code Guide</a>
+  <a href="claude-readme.html">Claude Code Guide</a>
+</nav>
+
+<div class="content">
+<div class="content-inner">
+
+  <div class="version-badge">v0.11.0 · Internal Sparq asset</div>
+  <h1>Dev.IQ — Full Reference</h1>
+  <p class="lead">The complete reference for the Dev.IQ Agent Pack — install options, DI signal model, full skill registry, maturity tiers, MCP wiring, governance, and troubleshooting.</p>
+
+  <h2 id="at-a-glance">At a Glance</h2>
+  <p>Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and give GitHub Copilot Chat and Claude Code a Developer Intelligence reasoning layer — 22 skills, two agents, and MCP wiring for ADO and GitHub — without deploying any runtime or service.</p>
+
+  <p><strong>Fastest path to first value:</strong> extract the zip → run <code>bootstrap.sh --preset=solo</code> against your repo → open Copilot Chat → select Dev-IQ → run <code>/review-pr-readiness</code> on a branch with changes. Under 20 minutes, requires nothing beyond VS Code and Git.</p>
+
+  <div class="callout">
+    <strong>Skills work without MCP.</strong>
+    <p>If Node.js isn't installed or credentials aren't configured, every skill that needs external data falls back to asking you to paste the content inline. Nothing is blocking.</p>
+  </div>
+
+  <h2 id="prerequisites">Prerequisites</h2>
+  <h3>Required</h3>
+  <table>
+    <thead><tr><th>Dependency</th><th>Minimum version</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>VS Code</td><td>1.99</td><td>Host for Copilot Chat and MCP servers</td></tr>
+      <tr><td>GitHub Copilot Chat extension</td><td>v0.22</td><td>Agent mode, skill invocation, custom agents. Check: Help → About</td></tr>
+      <tr><td>Git</td><td>Any recent</td><td>Branch detection, diff context for skills</td></tr>
+      <tr><td>dev-iq pack</td><td>v0.11.0</td><td>Provided as a zip by your engagement lead</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Optional — needed for live data pull</h3>
+  <table>
+    <thead><tr><th>Dependency</th><th>What it unlocks</th><th>Without it</th></tr></thead>
+    <tbody>
+      <tr><td>Node.js 18+</td><td>All MCP servers (ADO, GitHub, filesystem)</td><td>Skills ask you to paste work item text and PR details manually</td></tr>
+      <tr><td>ADO Personal Access Token</td><td>Live work item + PR fetch for <code>/review-pr-readiness</code>, <code>/generate-user-stories</code>, <code>/review-acceptance-criteria</code>, <code>/generate-traceability-matrix</code></td><td>You paste the work item when prompted</td></tr>
+      <tr><td>GitHub PAT</td><td>Live PR diff and repo context when <code>vcs.type: github</code></td><td>Skills use the diff visible in your editor</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Credentials are never written to files.</strong>
+    <p>VS Code stores them in your OS keychain on first prompt. The <code>${input:ADO_PAT}</code> syntax in <code>mcp.json</code> triggers this — nothing is committed.</p>
+  </div>
+
+  <h2 id="di-signal-model">The DI Signal Model</h2>
+  <p>Every skill in this pack reasons through four DI signal layers in order, then synthesizes them into Decision Confidence:</p>
+
+  <div class="signal-grid">
+    <div class="signal-card">
+      <span class="signal-label">INTENT</span>
+      <p>What are we building? Does the code match the requirement and acceptance criteria?</p>
+    </div>
+    <div class="signal-card">
+      <span class="signal-label">DESIGN</span>
+      <p>Is it built the right way? Patterns, architecture, naming, abstractions in check?</p>
+    </div>
+    <div class="signal-card">
+      <span class="signal-label">QUALITY</span>
+      <p>Is it production-ready? Error handling, security, test coverage, performance?</p>
+    </div>
+    <div class="signal-card">
+      <span class="signal-label">RISK</span>
+      <p>What could break? Dependencies, schema changes, blast radius, breaking contracts?</p>
+    </div>
+  </div>
+
+  <p>Each signal is assessed as <strong>STRONG</strong> (positive evidence), <strong>WEAK</strong> (gap or risk identified), or <strong>UNGRADED</strong> (data unavailable). UNGRADED is never treated as safety — it blocks a confident verdict.</p>
+
+  <h3>Layer threshold actions by maturity tier</h3>
+  <table>
+    <thead><tr><th>Tier</th><th>Green</th><th>Yellow</th><th>Red</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Early</strong></td><td>Proceed with AI guidance</td><td>Human review + coaching note</td><td>Block + coaching report</td></tr>
+      <tr><td><strong>Mid</strong></td><td>Auto-proceed</td><td>Human review required</td><td>Block + diagnostic report</td></tr>
+      <tr><td><strong>Higher</strong></td><td>Fully autonomous</td><td>Auto-assign senior reviewer</td><td>Block + auto-rollback suggestion</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="agent-autonomy">Enterprise Governance: Agent Autonomy Classification</h2>
+  <p>Dev.IQ operates at the <strong>Advise</strong> and <strong>Act with Approval</strong> tiers of the Gartner AI agent autonomy model. No skill operates at Act Autonomously.</p>
+
+  <table>
+    <thead><tr><th>Gartner Tier</th><th>What the agent does</th><th>Dev.IQ skills at this tier</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Observe</strong></td><td>Reads and surfaces information. No recommendations.</td><td><code>/explain-code</code>, <code>/identify-dependencies</code>, <code>/generate-traceability-matrix</code></td></tr>
+      <tr><td><strong>Advise</strong></td><td>Makes recommendations. Human decides and acts.</td><td><code>/code-review</code>, <code>/review-security</code>, <code>/review-pr-readiness</code>, <code>/review-architecture</code>, <code>/review-acceptance-criteria</code>, <code>/refactor-code</code> (plan phase), <code>/blast-radius-estimator</code></td></tr>
+      <tr><td><strong>Act with Approval</strong></td><td>Produces a complete artifact. Developer reviews and applies manually.</td><td><code>/scaffold-feature</code>, <code>/generate-user-stories</code>, <code>/generate-adr</code>, <code>/design-data-model</code>, <code>/generate-rollback-plan</code>, <code>/generate-release-notes</code>, <code>/debug-issue</code>, <code>/review-deployment-readiness</code>, <code>/refactor-code</code> (apply phase)</td></tr>
+      <tr><td><strong>Act Autonomously</strong></td><td>Takes action without human review.</td><td><em>None — prohibited by <code>governance.md</code></em></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>The <code>@di-review-required</code> marker is mandatory.</strong>
+    <p>Every skill output carries this marker. It is a formal signal that AI-generated content has not been human-reviewed yet — the audit trail for the Act-with-Approval tier. Not optional.</p>
+  </div>
+
+  <h2 id="installation">Installation</h2>
+  <p>The pack supports two install paths. Pick based on whether you're evaluating Dev.IQ or deploying it into a team's repo.</p>
+
+  <h3>Path A — Try it on the pack folder itself</h3>
+  <p>Best when you want to explore Dev.IQ without touching your team's repository. Extract the pack zip, then run bootstrap from inside the pack folder.</p>
+<pre><code><span class="comment"># macOS / Linux</span>
+cd path/to/dev-iq
+bash scripts/bootstrap.sh --preset=solo
+
+<span class="comment"># Windows PowerShell</span>
+cd C:\Tools\dev-iq
+powershell -File scripts\bootstrap.ps1 -Preset solo</code></pre>
+  <p>Idempotent on every platform — safe to re-run. Reverse with <code>--uninstall</code>.</p>
+
+  <h3>Path B — Install into your codebase</h3>
+  <p>This is the real deployment path. Run from a terminal in your target repo — no editor required:</p>
+<pre><code><span class="comment"># 1. Extract the pack zip somewhere on your machine (one time, anywhere)</span>
+<span class="comment">#    e.g. ~/tools/dev-iq  or  C:\Tools\dev-iq on Windows</span>
+
+<span class="comment"># 2. cd into YOUR repo</span>
+cd ~/code/my-app
+
+<span class="comment"># 3. Run bootstrap pointing at the extracted pack</span>
+bash ~/tools/dev-iq/scripts/bootstrap.sh --mode=trial
+
+<span class="comment"># Windows PowerShell</span>
+powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
+
+  <p>Already have the pack loaded in your editor? Run <code>/dev-iq-bootstrap</code> from Copilot Chat or Claude Code — same outcome, chat-driven prompts.</p>
+
+  <h2 id="presets">Presets</h2>
+  <table>
+    <thead><tr><th>Preset</th><th>What it configures</th><th>Best for</th></tr></thead>
+    <tbody>
+      <tr><td><code>pod</code></td><td>Committed + hooks</td><td>Cross-functional teams adopting DI together</td></tr>
+      <tr><td><code>solo</code></td><td>Trial, no hooks, instructions user-global</td><td>Individual contributor evaluating solo</td></tr>
+      <tr><td><code>portable</code></td><td>Committed mode, no hooks — minimal footprint</td><td>Client handoff or read-only install</td></tr>
+    </tbody>
+  </table>
+<pre><code>bash ~/dev-iq/scripts/bootstrap.sh --preset=portable
+<span class="comment"># Reverse with: --uninstall</span></code></pre>
+
+  <h2 id="bootstrap-surfaces">Bootstrap Surfaces</h2>
+  <p>Bootstrap copies the complete workspace surface into the target repo. Copilot and Claude Code can't auto-discover skills or agents that aren't physically present in the workspace.</p>
+
+  <table>
+    <thead><tr><th>Surface</th><th>Why it's per-repo</th></tr></thead>
+    <tbody>
+      <tr><td><code>.dev-iq/config.yaml</code></td><td>Maturity tier, tracker, language, signal sink — varies by repo.</td></tr>
+      <tr><td><code>.dev-iq/governance.md</code></td><td>Compliance posture — varies by client / regulatory regime.</td></tr>
+      <tr><td><code>.dev-iq/maturity-profile.md</code></td><td>Tier rationale — team-specific.</td></tr>
+      <tr><td><code>.github/copilot-instructions.md</code> + instructions</td><td>Copilot reads these only from the workspace; <code>applyTo</code> globs scope to repo files.</td></tr>
+      <tr><td><code>.github/skills/</code></td><td>All 22 DI skills — Copilot Chat reads them from this workspace path.</td></tr>
+      <tr><td><code>.github/agents/</code></td><td><code>Dev-IQ.agent.md</code> and <code>Dev-IQ-PLAN.agent.md</code> custom chat modes.</td></tr>
+      <tr><td><code>.claude/agents/</code></td><td>Claude Code subagent counterparts (<code>dev-iq.md</code>, <code>dev-iq-plan.md</code>).</td></tr>
+      <tr><td><code>.claude/skills</code></td><td>Symlink to <code>../.github/skills</code> — one canonical copy for both tools.</td></tr>
+      <tr><td><code>CLAUDE.md</code> / <code>AGENTS.md</code></td><td>Claude and other agent runners read these from the repo root.</td></tr>
+      <tr><td><code>.vscode/settings.json</code> + <code>mcp.json</code></td><td>Wires VS Code Copilot; declares MCP servers. Deep-merged — your values win on conflicts.</td></tr>
+      <tr><td><code>hooks/</code></td><td>Hook scripts that fire on session events. Rendered at bootstrap time so paths resolve correctly.</td></tr>
+      <tr><td><code>.claude/settings.json</code></td><td>Claude Code reads the hooks block from here. Bootstrap merges only the hooks key.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="trial-vs-committed">Trial vs Committed</h2>
+  <table>
+    <thead><tr><th>Mode</th><th>What happens</th><th>Reverse with</th></tr></thead>
+    <tbody>
+      <tr><td><code>--mode=trial</code></td><td>Files land in workspace; paths added to <code>.git/info/exclude</code> (local-only). <code>.gitignore</code> untouched.</td><td><code>--graduate</code> (promote) or <code>--uninstall</code> (remove)</td></tr>
+      <tr><td><code>--mode=committed</code></td><td>Files land in workspace and are visible to git.</td><td><code>--uninstall</code></td></tr>
+      <tr><td><code>--mode=ask</code> (default in TTY)</td><td>Prompts interactively. Non-TTY falls back to <code>committed</code>.</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+<pre><code><span class="comment"># Graduating from trial → committed:</span>
+scripts/bootstrap.sh --graduate
+git add .dev-iq .claude .github CLAUDE.md AGENTS.md
+git commit -m "chore: adopt Dev.IQ agent pack"
+
+<span class="comment"># Removing the pack from a workspace:</span>
+scripts/bootstrap.sh --uninstall
+scripts/bootstrap.sh --uninstall --dry-run  <span class="comment"># preview without changing anything</span></code></pre>
+
+  <h2 id="distributing">Distributing to Colleagues</h2>
+  <h3>Option 1 — Zip file (no internet required)</h3>
+<pre><code>cd /path/to/dev-iq
+git archive --format=zip --output=~/Desktop/dev-iq-v0.11.0.zip HEAD</code></pre>
+  <p><code>git archive</code> includes only committed files — no <code>.git</code> folder, no machine-specific files. The result is exactly what a colleague needs to run bootstrap. Colleagues follow the trial install guide.</p>
+
+  <h3>Option 2 — GitHub collaborator</h3>
+  <p>Invite them to the GitHub repo: <strong>Settings → Collaborators → Add people</strong>. They clone once, then run bootstrap against their own repos.</p>
+
+  <h3>Option 3 — Internal Git server (enterprise long-term)</h3>
+<pre><code>git remote add internal https://your-internal-git/dev-iq.git
+git push internal main</code></pre>
+
+  <h2 id="upgrading">Upgrading</h2>
+  <ol style="color:var(--text-dim);line-height:2;">
+    <li>Read the release notes for what changed and any migration notes.</li>
+    <li>Uninstall the current path: <code>bash scripts/bootstrap.sh --uninstall</code> in each installed location.</li>
+    <li><code>git pull</code> (or re-extract the zip) to the new version.</li>
+    <li>Re-run the same install path to refresh all surfaces.</li>
+  </ol>
+
+  <h2 id="skill-registry">The Skill Registry</h2>
+  <p>Skills are organized by developer lifecycle phase. All skills are invoked with <code>/skill-name</code> in Copilot Chat or Claude Code. Maturity gating is enforced by each skill that requires it.</p>
+
+  <h3 id="requirements">Requirements</h3>
+  <table>
+    <thead><tr><th>Skill</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-user-stories</code></td><td>INTENT</td><td>Convert requirements to stories with acceptance criteria</td></tr>
+      <tr><td><code>/review-acceptance-criteria</code></td><td>INTENT</td><td>Review ACs for completeness and clarity</td></tr>
+      <tr><td><code>/identify-dependencies</code></td><td>RISK</td><td>Surface blockers and cross-team dependencies</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="design">Design</h3>
+  <table>
+    <thead><tr><th>Skill</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/design-api</code></td><td>DESIGN</td><td>RESTful API design from requirements</td></tr>
+      <tr><td><code>/design-data-model</code></td><td>DESIGN</td><td>Entity/database design from stories</td></tr>
+      <tr><td><code>/generate-adr</code></td><td>DESIGN</td><td>Architecture Decision Record generation</td></tr>
+      <tr><td><code>/review-architecture</code></td><td>DESIGN + RISK</td><td>Architecture review through DI lens</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="development">Development</h3>
+  <table>
+    <thead><tr><th>Skill</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/scaffold-feature</code></td><td>INTENT + DESIGN</td><td>Generate boilerplate from AC + story</td></tr>
+      <tr><td><code>/code-review</code></td><td>DESIGN + QUALITY</td><td>Four-layer code review with DI reasoning</td></tr>
+      <tr><td><code>/debug-issue</code></td><td>RISK + QUALITY</td><td>Structured bug diagnosis + fix suggestion</td></tr>
+      <tr><td><code>/refactor-code</code></td><td>DESIGN + QUALITY</td><td>Refactoring suggestions with rationale</td></tr>
+      <tr><td><code>/review-security</code></td><td>QUALITY + RISK</td><td>Security-focused code review (OWASP Top 10 + LLM Top 10)</td></tr>
+      <tr><td><code>/explain-code</code></td><td>INTENT</td><td>Plain-language code explanation</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="code-review-pr">Code Review / PR</h3>
+  <table>
+    <thead><tr><th>Skill</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/review-pr-readiness</code></td><td>RISK + QUALITY</td><td>Go / Hold / Discuss verdict before merge</td></tr>
+      <tr><td><code>/blast-radius-estimator</code></td><td>RISK</td><td>Map downstream impact of a change</td></tr>
+      <tr><td><code>/review-dependencies</code></td><td>RISK</td><td>Dependency change risk analysis</td></tr>
+      <tr><td><code>/new-pull-request</code></td><td>INTENT + RISK</td><td>PR body with DI risk band + traceability</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="deployment">Deployment</h3>
+  <table>
+    <thead><tr><th>Skill</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-release-notes</code></td><td>INTENT</td><td>Release notes from commits / PRs</td></tr>
+      <tr><td><code>/review-deployment-readiness</code></td><td>QUALITY + RISK</td><td>Go / No-Go deployment checklist</td></tr>
+      <tr><td><code>/generate-rollback-plan</code></td><td>RISK</td><td>Rollback steps from deployment context</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="cross-cutting">Cross-Cutting</h3>
+  <table>
+    <thead><tr><th>Skill</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-traceability-matrix</code></td><td>INTENT + DESIGN</td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
+      <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Testing skills are covered by Assert.IQ.</strong>
+    <p>Dev.IQ produces test stubs only. Full test generation, test planning, flaky test analysis, and release confidence belong to Assert.IQ. Install both packs for full SDLC + QE coverage.</p>
+  </div>
+
+  <h2 id="maturity">Maturity Awareness</h2>
+  <p>The pack reads <code>.dev-iq/maturity-profile.md</code> and adjusts behavior. Set during the DI Diagnostic and re-evaluated quarterly.</p>
+
+  <table>
+    <thead><tr><th>Tier</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Early</strong></td><td>Foundation + intent + design review only. Risk assessment in advisory mode. All outputs are drafts with coaching notes. Human review required for every output.</td></tr>
+      <tr><td><strong>Mid</strong></td><td>Add quality signals, automated code review, PR readiness in suggest-only mode. DI routing operates as designed. Risk assessment provides structured reports.</td></tr>
+      <tr><td><strong>Higher</strong></td><td>Full pack including blast radius estimation, autonomous PR readiness verdict, and predictive deployment risk. Decision Confidence signal available in Phase 2.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="mcp-servers">MCP Servers</h2>
+  <h3>Active by default (3 servers)</h3>
+  <table>
+    <thead><tr><th>Server</th><th>What it provides</th><th>Credential needed</th></tr></thead>
+    <tbody>
+      <tr><td><code>azure-devops</code></td><td>Live ADO work items, ACs, PR context</td><td>ADO PAT via <code>${input:ADO_PAT}</code></td></tr>
+      <tr><td><code>github</code></td><td>PR diff, branch, repo context</td><td>GitHub PAT via <code>${input:GITHUB_PAT}</code></td></tr>
+      <tr><td><code>filesystem</code></td><td>Workspace file tree read access (scoped to <code>${workspaceFolder}</code>)</td><td>None</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Disabled — pre-configured in <code>_disabled_servers</code></h3>
+  <table>
+    <thead><tr><th>Server</th><th>What it provides</th><th>Enable when</th></tr></thead>
+    <tbody>
+      <tr><td><code>jira</code></td><td>Live Jira issues and sprints</td><td><code>tracker.type: jira</code> in config.yaml — replaces <code>azure-devops</code></td></tr>
+      <tr><td><code>git</code></td><td>Git log, blame, structured diff</td><td>Useful for <code>/blast-radius-estimator</code> and <code>/generate-release-notes</code> on complex histories</td></tr>
+      <tr><td><code>sentry</code></td><td>Error tracking and issue context</td><td>Useful for <code>/debug-issue</code> on production incidents</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="dual-target">Dual-IDE Architecture</h2>
+  <p>The pack ships one canonical copy of every asset and exposes it through both tools' native config surfaces. No duplicated content — only thin entry-point files plus the installer that wires everything.</p>
+
+  <table>
+    <thead><tr><th>Asset</th><th>Canonical location</th><th>Copilot reads</th><th>Claude reads</th></tr></thead>
+    <tbody>
+      <tr><td>Always-on guidance</td><td><code>.github/copilot-instructions.md</code></td><td><code>copilot-instructions.md</code></td><td><code>CLAUDE.md</code></td></tr>
+      <tr><td>Scoped instructions</td><td><code>.github/instructions/*.instructions.md</code></td><td>same (via <code>applyTo</code>)</td><td>same (via <code>@</code>-imports in <code>CLAUDE.md</code>)</td></tr>
+      <tr><td>Skills (22)</td><td><code>.github/skills/*/SKILL.md</code></td><td><code>.github/skills/</code> directly</td><td><code>.claude/skills/</code> (symlink)</td></tr>
+      <tr><td>Agents</td><td><code>.github/agents/</code> (Copilot) + <code>.claude/agents/</code> (Claude)</td><td>agent files</td><td>subagent files</td></tr>
+      <tr><td>Hooks</td><td><code>hooks/hooks.json</code></td><td>via <code>chat.hookFilesLocations</code></td><td><code>.claude/settings.json</code></td></tr>
+      <tr><td>MCP wiring</td><td><code>.vscode/mcp.json</code></td><td>yes</td><td>yes (VS Code MCP is tool-agnostic)</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="customization">Customization</h2>
+  <table>
+    <thead><tr><th>Need</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td>Change language/framework</td><td><code>.dev-iq/config.yaml</code> → <code>language</code></td></tr>
+      <tr><td>Switch tracker (ADO &harr; Jira)</td><td><code>.dev-iq/config.yaml</code> + <code>.vscode/mcp.json</code></td></tr>
+      <tr><td>Adjust maturity tier</td><td><code>.dev-iq/config.yaml</code> + <code>.dev-iq/maturity-profile.md</code></td></tr>
+      <tr><td>Add client telemetry</td><td><code>.dev-iq/telemetry-overlay.md</code></td></tr>
+      <tr><td>Add a domain skill</td><td>New folder under <code>.github/skills/&lt;name&gt;/</code> with <code>SKILL.md</code></td></tr>
+      <tr><td>Adjust code standards</td><td><code>.github/instructions/di-code-standards.instructions.md</code></td></tr>
+      <tr><td>Adjust security rules</td><td><code>.github/instructions/di-security.instructions.md</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Adding a New Skill</h3>
+  <ol style="color:var(--text-dim);line-height:1.9;">
+    <li>Create <code>.github/skills/your-skill/SKILL.md</code> with YAML frontmatter: <code>name</code>, <code>description</code>, <code>di_signal</code>, <code>maturity_required</code>.</li>
+    <li>Add sections: <strong>Overview</strong>, <strong>When to Use</strong>, <strong>Instructions</strong>, <strong>Inputs Required</strong>, <strong>Output Format</strong>, <strong>Governance</strong>.</li>
+    <li>Update the skill registry in <code>docs/reference.md</code>.</li>
+    <li>Claude Code picks up the skill automatically via the <code>.claude/skills/</code> symlink — no second copy needed.</li>
+  </ol>
+
+  <h2 id="governance">Governance &amp; Guardrails</h2>
+  <table>
+    <thead><tr><th>Concern</th><th>Control</th></tr></thead>
+    <tbody>
+      <tr><td>AI-generated code merged without review</td><td><code>@di-review-required</code> header on every skill output</td></tr>
+      <tr><td>Skills applied at wrong maturity</td><td>Maturity tier gate in every applicable skill</td></tr>
+      <tr><td>Client-specific data in generic prompts</td><td>Telemetry overlay separates generic from client-specific</td></tr>
+      <tr><td>Vendor lock-in</td><td>Markdown / YAML / JSON only — portable across LLM IDE tools</td></tr>
+      <tr><td>Secrets in prompts</td><td>Mask rule in foundation instructions</td></tr>
+      <tr><td>Hallucinated traceability</td><td>Trace must reference a real work item resolvable via MCP</td></tr>
+      <tr><td>Compliance violations</td><td><code>governance.md</code> defines client compliance posture</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Governance configuration for security teams</h3>
+<pre><code><span class="comment"># .dev-iq/governance.md</span>
+allow_ai_merge_without_review: false   <span class="comment"># PR verdicts are advisory only</span>
+allow_new_dependencies: false          <span class="comment"># No new packages without developer confirmation</span>
+mask_secrets_in_prompts: true          <span class="comment"># Secrets never appear in skill I/O</span>
+compliance_posture: enterprise         <span class="comment"># Skills refuse requests that violate this posture</span></code></pre>
+
+  <h2 id="disabled">Disabled Features in v0.11.0</h2>
+  <p>These features are built and wired but explicitly turned off. The flag is in <code>.dev-iq/config.yaml</code> unless noted.</p>
+
+  <table>
+    <thead><tr><th>Feature</th><th>Config flag</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Hindsight Hooks</td><td><code>hooks.hindsight_enabled: false</code></td><td>Off by default</td><td>Enable after verifying the pack is stable in your repo.</td></tr>
+      <tr><td>Decision Confidence signal</td><td><code>signals.confidence.enabled: false</code></td><td>Phase 2 — not built</td><td>Do not enable. Ships in a future release.</td></tr>
+      <tr><td>Blast Radius full mode</td><td><code>blast_radius.enabled: false</code></td><td>Disabled at Early maturity</td><td>The skill still runs in advisory mode. Full mode requires Mid+ maturity.</td></tr>
+      <tr><td>Auto-assign reviewer on Yellow</td><td><code>pr.auto_assign_on_yellow: false</code></td><td>Off</td><td>Requires ADO/GitHub PAT with write access and Mid+ maturity.</td></tr>
+      <tr><td>Webhook telemetry sink</td><td><code>hooks.telemetry_sink: local</code></td><td>Local only</td><td>Set <code>telemetry_sink: webhook</code> and add a URL to push externally.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="pack-structure">Pack Structure</h2>
+<pre><code>dev-iq/
+├── CLAUDE.md                              <span class="comment"># Always-on guidance for Claude Code</span>
+├── AGENTS.md                              <span class="comment"># Always-on for Codex CLI / Cursor / Aider</span>
+│
+├── .github/
+│   ├── copilot-instructions.md            <span class="comment"># Always-on guidance for Copilot</span>
+│   ├── instructions/
+│   │   ├── di-foundation.instructions.md
+│   │   ├── di-code-standards.instructions.md
+│   │   ├── di-security.instructions.md
+│   │   ├── di-signal-emission.instructions.md
+│   │   └── di-traceability.instructions.md
+│   ├── skills/                            <span class="comment"># 22 DI skills, one subfolder each</span>
+│   └── agents/
+│       ├── Dev-IQ.agent.md                <span class="comment"># Action agent</span>
+│       └── Dev-IQ-PLAN.agent.md           <span class="comment"># Plan-first agent</span>
+│
+├── .claude/
+│   ├── agents/
+│   │   ├── dev-iq.md                      <span class="comment"># Claude Code subagent</span>
+│   │   └── dev-iq-plan.md                 <span class="comment"># Claude Code plan-first subagent</span>
+│   ├── settings.json                      <span class="comment"># Hooks wiring for Claude Code</span>
+│   └── skills/                            <span class="comment"># Symlink → ../.github/skills/</span>
+│
+├── .vscode/
+│   ├── MCP.md                             <span class="comment"># Per-server setup guide</span>
+│   ├── mcp.json                           <span class="comment"># MCP server wiring</span>
+│   └── settings.json                      <span class="comment"># VS Code settings</span>
+│
+├── hooks/
+│   ├── scripts/                           <span class="comment"># session-start/end, apply, reflect</span>
+│   └── hooks.template.json
+│
+├── scripts/
+│   ├── bootstrap.sh                       <span class="comment"># Workspace bootstrapper (macOS/Linux)</span>
+│   └── bootstrap.ps1                      <span class="comment"># Workspace bootstrapper (Windows)</span>
+│
+└── .dev-iq/                               <span class="comment"># Per-client config (created by bootstrap)</span>
+    ├── config.yaml
+    ├── maturity-profile.md
+    ├── governance.md
+    └── telemetry-overlay.md</code></pre>
+
+  <h2 id="troubleshooting">Troubleshooting</h2>
+
+  <h3>Skill can't find the work item</h3>
+  <p>Confirm MCP is wired (<code>.vscode/mcp.json</code>) and the PAT has read access to Work Items. Test with a minimal MCP query directly. If Node.js is not installed, skills will prompt you to paste the work item content manually — that is the expected fallback.</p>
+
+  <h3>Generated code doesn't match our conventions</h3>
+  <p>Update <code>.github/instructions/di-code-standards.instructions.md</code> with explicit examples of your project's patterns. The agent reads instructions before generating code.</p>
+
+  <h3>Dev-IQ does not appear in the agent dropdown</h3>
+  <p>Confirm <code>.github/agents/Dev-IQ.agent.md</code> exists in the workspace root. In Visual Studio 2022, also confirm you enabled <strong>"Enable repository custom instructions"</strong> in <strong>Tools → Options → GitHub → Copilot → (General)</strong>.</p>
+
+  <h3>Skill outputs feel generic</h3>
+  <p>The pack relies on instruction files for project-specific context. Update <code>di-code-standards.instructions.md</code> and <code>di-traceability.instructions.md</code> with real examples from your codebase, and fill in <code>.dev-iq/telemetry-overlay.md</code> so the agent knows your actual tool stack.</p>
+
+  <h3>Hooks are silent</h3>
+  <p>Open <code>.claude/settings.json</code> in the workspace and confirm the <code>hooks</code> section is present. If missing, re-run bootstrap. If present but hooks still don't fire, confirm you are on v0.11.0 — earlier versions had incorrect hook event names that caused silent failures.</p>
+
+  <h3>Risk assessment feels off</h3>
+  <p>Adjust signal weighting in <code>.github/skills/review-pr-readiness/SKILL.md</code>. Each DI layer is independently tunable. Also verify <code>.dev-iq/telemetry-overlay.md</code> maps to your actual data sources.</p>
+
+  <h2 id="what-deviq-is-not">What Dev.IQ Is Not</h2>
+  <ul style="color:var(--text-dim);line-height:2;">
+    <li>It is not a runtime. There is no service to deploy.</li>
+    <li>It is not a SaaS. The client owns the files — if the consulting team rotates off, the pack stays.</li>
+    <li>It is not a replacement for engineering judgment. Every output is a draft; human review is required.</li>
+    <li>It is not a replacement for Assert.IQ. Use both packs together for full SDLC + QE coverage.</li>
+    <li>It is not a tooling pitch. Use it where the maturity supports it. Lead with DI thinking, not with this pack.</li>
+  </ul>
+
+  <h2 id="versioning">Versioning</h2>
+  <table>
+    <thead><tr><th>Version</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>0.11.0</td><td>Pre-release. 22 skills complete. Bootstrap with <code>--preset</code> and <code>--uninstall</code>. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired.</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<footer>
+  <div>Dev.IQ Agent Pack &middot; v0.11.0 &middot; Sparq Intelligence Studio</div>
+  <div style="margin-top:10px;">
+    <a href="README.html">Landing Page</a>
+    <a href="vscode-readme.html">VS Code Guide</a>
+    <a href="claude-readme.html">Claude Code Guide</a>
+  </div>
+</footer>
+</div>
+
+</body>
+</html>

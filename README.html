@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dev.IQ Agent Pack — Developer Intelligence in your IDE</title>
+<style>
+  :root {
+    --bg: #18191a;
+    --bg-elev: #242526;
+    --bg-card: #2a2b2d;
+    --border: #3a3b3c;
+    --text: #f5f5f5;
+    --text-dim: #aab0b8;
+    --accent: #2563eb;
+    --accent-2: #0ea5e9;
+    --accent-3: #60a5fa;
+    --warn: #ffb347;
+    --code-bg: #111213;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent-2); text-decoration: none; transition: color 0.15s; }
+  a:hover { color: var(--accent-3); }
+  code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    color: #c8d3ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.86em;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; padding: 0; color: #c8d3ff; }
+  .comment { color: #6b7280; }
+  p { color: var(--text-dim); }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 100px 24px 80px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at top, rgba(37, 99, 235, 0.15), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(14, 165, 233, 0.12), transparent 60%),
+      var(--bg);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  .hero-content { position: relative; max-width: 880px; margin: 0 auto; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(37, 99, 235, 0.4);
+    border-radius: 999px;
+    font-size: 0.82em;
+    color: var(--accent-2);
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    margin-bottom: 24px;
+  }
+  .badge-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 12px var(--accent-2);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  h1 {
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    margin: 0 0 16px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 60%, var(--accent-3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tagline {
+    font-size: 1.25rem;
+    color: var(--text-dim);
+    margin: 0 0 36px;
+    font-weight: 300;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    color: white;
+    box-shadow: 0 4px 24px rgba(37, 99, 235, 0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); color: white; box-shadow: 0 6px 30px rgba(37, 99, 235, 0.5); }
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--accent-2); color: var(--accent-2); }
+
+  /* Layout */
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+  section { margin-bottom: 80px; }
+  h2 {
+    font-size: 2rem;
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  h2 .accent { color: var(--accent-2); }
+  h3 { font-size: 1.25rem; margin: 32px 0 12px; }
+  .lead {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    max-width: 720px;
+    margin-bottom: 40px;
+  }
+
+  /* Four-layer cards */
+  .layers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .layer-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .layer-card:hover { transform: translateY(-4px); border-color: var(--accent-2); }
+  .layer-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-3));
+  }
+  .layer-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75em;
+    color: var(--accent-2);
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .layer-card h4 { margin: 0 0 8px; font-size: 1.05rem; }
+  .layer-card p { margin: 0; color: var(--text-dim); font-size: 0.92em; }
+
+  /* Bullets impact list */
+  .impact { list-style: none; padding: 0; }
+  .impact li {
+    position: relative;
+    padding: 10px 0 10px 32px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .impact li:last-child { border-bottom: none; }
+  .impact li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent-2);
+    font-weight: bold;
+  }
+
+  /* Feature grid */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 32px;
+  }
+  .feature {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .feature:hover { border-color: var(--accent-2); }
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+  .feature h4 { margin: 0 0 8px; }
+  .feature p { margin: 0; color: var(--text-dim); font-size: 0.92em; }
+
+  /* Steps */
+  .steps { counter-reset: step; }
+  .step {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px 28px 88px;
+    margin-bottom: 20px;
+    position: relative;
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    left: 24px;
+    top: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+  }
+  .step h3 { margin-top: 0; }
+  .step h4 { margin: 24px 0 8px; color: var(--accent-2); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    font-size: 0.92em;
+  }
+  thead { background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(14, 165, 233, 0.12)); }
+  th {
+    text-align: left;
+    padding: 12px 16px;
+    color: var(--text);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+  td:first-child { color: var(--text); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(37, 99, 235, 0.04); }
+
+  /* Tree / file structure */
+  .tree {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+    line-height: 1.85;
+    color: var(--text-dim);
+    overflow-x: auto;
+  }
+  .tree .dir { color: var(--accent-2); }
+  .tree .comment { color: #6b7280; font-style: italic; }
+  .tree .file { color: var(--text); }
+
+  /* Path comparison */
+  .paths {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 32px 0;
+  }
+  .path-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    position: relative;
+    min-width: 0;
+  }
+  .path-card.featured { border-color: var(--accent); }
+  .path-card.featured::after {
+    content: 'RECOMMENDED';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 0.65em;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 700;
+  }
+  .path-card h3 { margin-top: 0; color: var(--accent-2); }
+  .path-card.featured h3 { color: var(--accent-2); }
+
+  /* Callout */
+  .callout {
+    background: rgba(14, 165, 233, 0.06);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-left: 3px solid var(--accent-2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+  }
+  .callout strong { color: var(--text); }
+  .callout p { margin: 6px 0 0; }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9em;
+    background: var(--bg-elev);
+  }
+  footer a { margin: 0 12px; }
+
+  @media (max-width: 720px) {
+    .paths { grid-template-columns: 1fr; }
+    .step { padding-left: 28px; padding-top: 80px; }
+    .step::before { top: 24px; left: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="badge"><span class="badge-dot"></span>v0.11.0 · Internal Sparq asset</div>
+    <h1>Dev.IQ Agent Pack</h1>
+    <p class="tagline">Developer Intelligence, built into your IDE.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#get-started">Get Started →</a>
+      <a class="btn btn-ghost" href="README.dev-iq.html">Full Documentation</a>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+
+<section id="di">
+  <h2>The shift from <span class="accent">development</span> to <span class="accent">Developer Intelligence</span></h2>
+  <p class="lead">Traditional development asks one question: <em>does this work?</em> Developer Intelligence asks four — and synthesizes them into <strong>Decision Confidence</strong> no single linter pass or green build can give you.</p>
+
+  <div class="layers">
+    <div class="layer-card">
+      <span class="layer-num">LAYER 01</span>
+      <h4>INTENT</h4>
+      <p>Are we building the right thing? Does the code match the requirement and acceptance criteria?</p>
+    </div>
+    <div class="layer-card">
+      <span class="layer-num">LAYER 02</span>
+      <h4>DESIGN</h4>
+      <p>Is it built the right way? Patterns, architecture, naming, and abstractions in check?</p>
+    </div>
+    <div class="layer-card">
+      <span class="layer-num">LAYER 03</span>
+      <h4>QUALITY</h4>
+      <p>Is it production-ready? Error handling, security, test coverage, and performance validated?</p>
+    </div>
+    <div class="layer-card">
+      <span class="layer-num">LAYER 04</span>
+      <h4>RISK</h4>
+      <p>What could break? Dependencies, schema changes, blast radius, and breaking-change exposure mapped.</p>
+    </div>
+  </div>
+
+  <h3>The immediate impact</h3>
+  <ul class="impact">
+    <li>Developers stop asking "does it compile?" and start asking "does this solve the right problem the right way?"</li>
+    <li>PR conversations shift from gut-feel to evidence.</li>
+    <li>Design decisions get documented and traceable — not just implied.</li>
+    <li>Architecture guardrails enforce themselves through every code review, every PR, every deployment check.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Dev.IQ — <span class="accent">DI inside your IDE</span></h2>
+  <p class="lead">Dev.IQ is the accelerator. It drops a DI reasoning layer directly into <strong>GitHub Copilot Chat</strong> and <strong>Claude Code</strong> so developers don't have to learn a new tool or change their workflow. The IDE they already use becomes delivery-intelligent.</p>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon" aria-hidden="true">⚡</div>
+      <h4>22 Skills</h4>
+      <p>User story review, API design, feature scaffolding, code review, security analysis, PR readiness, blast radius estimation, deployment checks, and more — covering the full developer lifecycle.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" aria-hidden="true">🤖</div>
+      <h4>Two Agents</h4>
+      <p><code>Dev-IQ</code> for full execution and <code>Dev-IQ-PLAN</code> for plan-first workflows, with a built-in Start Implementation handoff button between them.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" aria-hidden="true">📊</div>
+      <h4>Maturity-Aware</h4>
+      <p>A one-file config scales the pack from <em>early / advisory only</em> to <em>higher / autonomous PR verdicts</em>, meeting teams where they are.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" aria-hidden="true">🔌</div>
+      <h4>MCP Wiring</h4>
+      <p>GitHub, ADO, Jira, Sentry, Grafana, and more — 20 pre-configured MCP servers, credentials kept in your OS keychain, nothing committed.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" aria-hidden="true">🪝</div>
+      <h4>Hindsight Hooks</h4>
+      <p>Learn from corrections across sessions and progressively tighten agent behavior for your specific codebase.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon" aria-hidden="true">🎯</div>
+      <h4>Dual-IDE</h4>
+      <p>One canonical copy of every asset — skills, agents, instructions — exposed through both Copilot Chat and Claude Code's native config surfaces. No duplicated content.</p>
+    </div>
+  </div>
+</section>
+
+<section id="get-started">
+  <h2>Get started in <span class="accent">three steps</span></h2>
+
+  <div class="steps">
+
+    <div class="step">
+      <h3>Install the pack</h3>
+      <p>Two install paths. Pick the one that matches how comfortable you are dropping the pack into your team's codebase.</p>
+
+      <div class="paths">
+        <div class="path-card">
+          <h3>Path A &middot; Try it on the pack</h3>
+          <p style="font-size:0.92em;">Best if you want to explore Dev.IQ before touching your team's repository. Extract the zip, run bootstrap from inside the pack folder.</p>
+<pre><code><span class="comment"># macOS / Linux</span>
+cd path/to/dev-iq
+bash scripts/bootstrap.sh --preset=solo
+
+<span class="comment"># Windows PowerShell</span>
+cd C:\Tools\dev-iq
+powershell -File scripts\bootstrap.ps1 -Preset solo</code></pre>
+          <p style="font-size:0.88em;">Reverse with <code>--uninstall</code>.</p>
+        </div>
+
+        <div class="path-card featured">
+          <h3>Path B &middot; Install into your codebase</h3>
+          <p style="font-size:0.92em;">The real deployment path. <strong>Run bootstrap from a terminal in your target repo</strong> — no editor required:</p>
+<pre><code><span class="comment"># 1. Extract the pack zip somewhere (one time, anywhere)</span>
+<span class="comment">#    e.g. ~/tools/dev-iq  or  C:\Tools\dev-iq on Windows</span>
+
+<span class="comment"># 2. cd into YOUR repo</span>
+cd ~/code/my-app
+
+<span class="comment"># 3. Run bootstrap pointing at the extracted pack</span>
+bash ~/tools/dev-iq/scripts/bootstrap.sh --mode=trial
+
+<span class="comment"># Windows PowerShell</span>
+powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
+          <p style="font-size:0.88em;">The script is fully standalone — accepts <code>--preset=solo|pod</code>, prompts interactively, and writes everything Copilot and Claude need. <strong>No chicken-and-egg.</strong> You do not need to open VS Code or Claude Code first.</p>
+
+          <div class="callout" style="margin-top:16px;margin-bottom:16px;">
+            <strong>What does <code>--mode=trial</code> do?</strong>
+            <p style="margin:6px 0 0 0;">Trial hides pack files from git via <code>.git/info/exclude</code> — only you see them; your codebase <code>.gitignore</code> is <strong>never</strong> touched. Graduate to committed any time with <code>--graduate</code>.</p>
+          </div>
+          <p style="font-size:0.85em;color:var(--text-dim);"><em>Already have the pack loaded in your editor?</em> Run <code>/dev-iq-bootstrap</code> from Copilot Chat or Claude Code — same outcome, chat-driven prompts.</p>
+        </div>
+      </div>
+
+      <h4>Compare the presets</h4>
+      <table>
+        <thead>
+          <tr><th>Preset</th><th>Git visibility</th><th>Hooks</th><th>Best for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>--preset=pod</code></td><td>Committed</td><td>Yes</td><td>Cross-functional teams adopting DI together</td></tr>
+          <tr><td><code>--preset=solo</code></td><td>Trial (hidden)</td><td>No</td><td>Individual contributor evaluating solo</td></tr>
+          <tr><td><code>--preset=portable</code></td><td>Committed, minimal footprint</td><td>No</td><td>Client handoff or read-only install</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:16px;">
+        <strong>Bootstrap surface overview</strong>
+        <p style="margin:6px 0 0 0;">Bootstrap writes <strong>twelve surfaces</strong>: <code>.dev-iq/</code>, <code>.github/instructions/</code>, <code>.github/copilot-instructions.md</code>, <code>.github/skills/</code>, <code>.github/agents/</code>, <code>.claude/agents/</code>, <code>.claude/skills</code> (symlink), <code>.claude/settings.json</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.vscode/settings.json</code> + <code>.vscode/mcp.json</code>, and <code>hooks/</code>. SHA256-compares before writing — pre-existing files are preserved, never silently overwritten.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <h3>Configure for your codebase</h3>
+      <p>Bootstrap places the pack; configuration tailors it to your project.</p>
+
+      <ul style="font-size:0.92em;color:var(--text-dim);padding-left:20px;">
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/maturity-profile.md</code></strong> — Set your maturity tier: Early, Mid, or Higher. Agents read this on every code and delivery question and scale behavior accordingly.</li>
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/governance.md</code></strong> — Set your compliance posture: constraints the agents must respect and never override.</li>
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/config.yaml</code></strong> — Set <code>client.name</code>, <code>tracker.type</code> (ado or jira), <code>vcs.type</code>, and <code>language</code>. Every skill reads this.</li>
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/telemetry-overlay.md</code></strong> — Map each DI signal to your actual data sources: ADO/Jira for intent, SonarQube/Codecov for quality, your dependency manifest for risk. Or attach it to chat and say: <em>"Customize this overlay for my stack."</em></li>
+        <li><strong><code>.vscode/mcp.json</code></strong> — Credentials are entered when VS Code prompts (stored in OS keychain, never committed). See <code>.vscode/MCP.md</code> for per-server setup.</li>
+      </ul>
+
+      <h4>Workspace topology</h4>
+      <table>
+        <thead>
+          <tr><th>Topology</th><th><code>workspace.role</code></th><th>Setup</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tests + prod in one repo</td><td><code>monorepo</code> (default)</td><td>Nothing else to configure</td></tr>
+          <tr><td>This repo = prod; tests elsewhere</td><td><code>prod</code></td><td>Set <code>workspace.companion_repo</code> to tests repo</td></tr>
+          <tr><td>This repo = tests; prod elsewhere</td><td><code>tests</code></td><td>Set <code>workspace.companion_repo</code> to prod repo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="step">
+      <h3>Run a skill</h3>
+      <p>With the pack configured, put it to work. In Copilot Chat, select the <code>Dev-IQ</code> agent and try:</p>
+<pre><code>/review-pr-readiness</code></pre>
+      <p>The agent pulls context from your connected tools and reasons through all four DI signal layers — INTENT, DESIGN, QUALITY, RISK — returning a Go / Hold / Discuss verdict with evidence.</p>
+
+      <h4>Recommended starter skills</h4>
+      <table>
+        <thead>
+          <tr><th>When</th><th>Skill</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Looking at an unfamiliar file</td><td><code>/explain-code</code></td></tr>
+          <tr><td>Before opening a PR</td><td><code>/review-pr-readiness</code></td></tr>
+          <tr><td>Reviewing someone else's code</td><td><code>/code-review</code></td></tr>
+          <tr><td>Something breaks in production</td><td><code>/debug-issue</code></td></tr>
+          <tr><td>Starting a new feature</td><td><code>/generate-user-stories</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Skills <span class="accent">quick reference</span></h2>
+  <p class="lead">22 skills covering the full developer lifecycle. Invoke any skill with <code>/skill-name</code> in Copilot Chat or Claude Code.</p>
+
+  <h3>Requirements</h3>
+  <table>
+    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-user-stories</code></td><td>INTENT</td><td>Convert requirements to stories with acceptance criteria</td></tr>
+      <tr><td><code>/review-acceptance-criteria</code></td><td>INTENT</td><td>Review ACs for completeness and clarity</td></tr>
+      <tr><td><code>/identify-dependencies</code></td><td>RISK</td><td>Surface blockers and cross-team dependencies</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Design</h3>
+  <table>
+    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/design-api</code></td><td>DESIGN</td><td>RESTful API design from requirements</td></tr>
+      <tr><td><code>/design-data-model</code></td><td>DESIGN</td><td>Entity/database design from stories</td></tr>
+      <tr><td><code>/generate-adr</code></td><td>DESIGN</td><td>Architecture Decision Record generation</td></tr>
+      <tr><td><code>/review-architecture</code></td><td>DESIGN + RISK</td><td>Architecture review through DI lens</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Development</h3>
+  <table>
+    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/scaffold-feature</code></td><td>INTENT + DESIGN</td><td>Generate boilerplate from AC + story</td></tr>
+      <tr><td><code>/code-review</code></td><td>DESIGN + QUALITY</td><td>Code review through DI four-layer lens</td></tr>
+      <tr><td><code>/debug-issue</code></td><td>RISK + QUALITY</td><td>Structured bug diagnosis + fix suggestion</td></tr>
+      <tr><td><code>/refactor-code</code></td><td>DESIGN + QUALITY</td><td>Refactoring suggestions with rationale</td></tr>
+      <tr><td><code>/review-security</code></td><td>QUALITY + RISK</td><td>Security-focused code review (OWASP)</td></tr>
+      <tr><td><code>/explain-code</code></td><td>INTENT</td><td>Plain-language code explanation</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Code Review / PR</h3>
+  <table>
+    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/review-pr-readiness</code></td><td>RISK + QUALITY</td><td>Go / Hold / Discuss verdict before merge</td></tr>
+      <tr><td><code>/blast-radius-estimator</code></td><td>RISK</td><td>Map downstream impact of a change</td></tr>
+      <tr><td><code>/review-dependencies</code></td><td>RISK</td><td>Dependency change risk analysis</td></tr>
+      <tr><td><code>/new-pull-request</code></td><td>INTENT + RISK</td><td>PR body with DI risk band + traceability</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Deployment</h3>
+  <table>
+    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-release-notes</code></td><td>INTENT</td><td>Release notes from commits / PRs</td></tr>
+      <tr><td><code>/review-deployment-readiness</code></td><td>QUALITY + RISK</td><td>Go / No-Go deployment checklist</td></tr>
+      <tr><td><code>/generate-rollback-plan</code></td><td>RISK</td><td>Rollback steps from deployment context</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Cross-Cutting</h3>
+  <table>
+    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-traceability-matrix</code></td><td>INTENT + DESIGN</td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
+      <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper (run once per repo)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>What's <span class="accent">inside</span></h2>
+  <pre class="tree"><span class="dir">.github/</span>
+  <span class="file">copilot-instructions.md</span>     <span class="comment">← always-on DI reasoning rules for Copilot</span>
+  <span class="dir">instructions/</span>               <span class="comment">← scoped rule sheets (code standards, security, etc.)</span>
+  <span class="dir">skills/</span>                     <span class="comment">← 22 DI skills, one subfolder each</span>
+  <span class="dir">agents/</span>                     <span class="comment">← Dev-IQ &amp; Dev-IQ-PLAN agent definitions</span>
+<span class="dir">.claude/</span>
+  <span class="dir">agents/</span>                     <span class="comment">← Claude Code subagent counterparts</span>
+  <span class="dir">skills</span> → ../.github/skills    <span class="comment">← symlink (copy on Windows w/o Dev Mode)</span>
+<span class="dir">.vscode/</span>
+  <span class="file">mcp.json</span>                    <span class="comment">← 20 MCP server definitions</span>
+  <span class="file">MCP.md</span>                      <span class="comment">← per-server credential and setup guide</span>
+<span class="dir">hooks/</span>
+  <span class="file">hooks.json</span>                  <span class="comment">← Hindsight Hooks wiring</span>
+  <span class="dir">scripts/</span>                    <span class="comment">← session-start, apply, reflect, session-end</span>
+<span class="dir">.dev-iq/</span>                      <span class="comment">← per-repo config (created by bootstrap)</span>
+  <span class="file">config.yaml</span>                 <span class="comment">← maturity tier, tracker, language, signal sink</span>
+  <span class="file">governance.md</span>               <span class="comment">← compliance posture — varies by client</span>
+  <span class="file">maturity-profile.md</span>         <span class="comment">← tier rationale — team-specific</span>
+  <span class="file">telemetry-overlay.md</span>        <span class="comment">← DI signal → data source mapping</span>
+<span class="dir">scripts/</span>
+  <span class="file">bootstrap.sh / .ps1</span>         <span class="comment">← workspace installer, cross-platform</span></pre>
+</section>
+
+<section>
+  <h2>Upgrade</h2>
+  <p class="lead">Upgrades are explicit and intentional.</p>
+  <ol style="color:var(--text-dim);font-size:1.02em;line-height:2;">
+    <li>Read the Releases page for what changed and any migration notes.</li>
+    <li>Uninstall the current path you used:
+      <ul>
+        <li><strong>Path A</strong> (pack-as-workspace): <code>bash scripts/bootstrap.sh --uninstall</code></li>
+        <li><strong>Path B</strong> (codebase install): <code>bash scripts/bootstrap.sh --uninstall</code> in each target repo</li>
+      </ul>
+    </li>
+    <li><code>git pull</code> (or re-extract the zip) to the new version, then re-run the same path to refresh.</li>
+    <li>Re-run <code>/dev-iq-bootstrap</code> to refresh workspace surfaces.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Go <span class="accent">deeper</span></h2>
+  <p class="lead">The three steps above are the fast path. When you're ready for the full picture:</p>
+  <p><a class="btn btn-primary" href="README.dev-iq.html">Full Documentation →</a></p>
+  <p style="margin-top:32px;">Tool-specific references:</p>
+  <ul style="color:var(--text-dim);">
+    <li>VS Code / Copilot Chat — <a href="vscode-readme.html"><code>vscode-readme.html</code></a></li>
+    <li>Claude Code — <a href="claude-readme.html"><code>claude-readme.html</code></a></li>
+  </ul>
+
+  <div class="callout" style="margin-top:40px;max-width:680px;">
+    <strong>Dev.IQ + Assert.IQ — full SDLC coverage</strong>
+    <p>Dev.IQ covers the developer lifecycle: requirements, design, code, and deployment. <strong>Assert.IQ</strong> covers the QE lifecycle: test planning, defect analysis, and release confidence. Install both for end-to-end SDLC coverage under one unified Intelligence Studio operating model.</p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div>Dev.IQ Agent Pack &middot; v0.11.0 &middot; Sparq Intelligence Studio</div>
+  <div style="margin-top:12px;">
+    <a href="README.md">Markdown README</a>
+    <a href="README.dev-iq.html">Full Docs</a>
+    <a href="vscode-readme.html">VS Code Guide</a>
+    <a href="claude-readme.html">Claude Code Guide</a>
+  </div>
+</footer>
+
+</body>
+</html>

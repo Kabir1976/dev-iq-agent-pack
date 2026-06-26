@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dev.IQ Agent Pack — Claude Code Install Guide</title>
+<style>
+  :root {
+    --bg: #18191a;
+    --bg-elev: #242526;
+    --bg-card: #2a2b2d;
+    --border: #3a3b3c;
+    --text: #f5f5f5;
+    --text-dim: #aab0b8;
+    --accent: #2563eb;
+    --accent-2: #0ea5e9;
+    --accent-3: #60a5fa;
+    --warn: #ffb347;
+    --code-bg: #111213;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent-2); text-decoration: none; transition: color 0.15s; }
+  a:hover { color: var(--accent-3); }
+  code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    color: #c8d3ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.86em;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; padding: 0; color: #c8d3ff; }
+  .comment { color: #6b7280; }
+  p { color: var(--text-dim); }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 80px 24px 60px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at top, rgba(37, 99, 235, 0.15), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(14, 165, 233, 0.12), transparent 60%),
+      var(--bg);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  .hero-content { position: relative; max-width: 800px; margin: 0 auto; }
+  .breadcrumb {
+    font-size: 0.85em;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+  .breadcrumb a { color: var(--accent-2); }
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0 0 14px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 60%, var(--accent-3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tagline {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    margin: 0 0 28px;
+    font-weight: 300;
+  }
+
+  /* Layout */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  section { margin-bottom: 64px; }
+  h2 {
+    font-size: 1.65rem;
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  h2 .accent { color: var(--accent-2); }
+  h3 { font-size: 1.15rem; margin: 28px 0 10px; color: var(--text); }
+  h4 { font-size: 1rem; margin: 20px 0 8px; color: var(--accent-2); }
+
+  /* Steps */
+  .steps { counter-reset: step; }
+  .step {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px 28px 88px;
+    margin-bottom: 20px;
+    position: relative;
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    left: 24px;
+    top: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+  }
+  .step h3 { margin-top: 0; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    font-size: 0.91em;
+  }
+  thead { background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(14, 165, 233, 0.12)); }
+  th {
+    text-align: left;
+    padding: 11px 14px;
+    color: var(--text);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+  td:first-child { color: var(--text); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(37, 99, 235, 0.04); }
+
+  /* Callouts */
+  .callout {
+    background: rgba(14, 165, 233, 0.06);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-left: 3px solid var(--accent-2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 16px 0;
+  }
+  .callout strong { color: var(--text); }
+  .callout p { margin: 6px 0 0; }
+
+  .success-callout {
+    background: rgba(34, 197, 94, 0.06);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-left: 3px solid #22c55e;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 16px 0;
+  }
+  .success-callout strong { color: #22c55e; }
+
+  .warn-callout {
+    background: rgba(255, 179, 71, 0.06);
+    border: 1px solid rgba(255, 179, 71, 0.3);
+    border-left: 3px solid var(--warn);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 16px 0;
+  }
+  .warn-callout strong { color: var(--warn); }
+
+  /* Skill table */
+  .skill-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+  .tag-intent { background: rgba(37, 99, 235, 0.15); color: var(--accent-2); }
+  .tag-design { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+  .tag-quality { background: rgba(34, 197, 94, 0.12); color: #4ade80; }
+  .tag-risk { background: rgba(239, 68, 68, 0.12); color: #f87171; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9em;
+    background: var(--bg-elev);
+  }
+  footer a { margin: 0 12px; }
+
+  @media (max-width: 640px) {
+    .step { padding-left: 28px; padding-top: 80px; }
+    .step::before { top: 24px; left: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="breadcrumb"><a href="README.html">Dev.IQ Agent Pack</a> / Claude Code Guide</div>
+    <h1>Claude Code Install Guide</h1>
+    <p class="tagline">Get Dev.IQ running in Claude Code in under 20 minutes — personal trial, invisible to your team until you're ready.</p>
+  </div>
+</section>
+
+<div class="container">
+
+<section>
+  <h2>What you need</h2>
+  <table>
+    <thead><tr><th>Requirement</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Claude Code CLI</td><td>Installed and authenticated (<code>claude --version</code> should work)</td></tr>
+      <tr><td>Git</td><td><code>git --version</code> in a terminal should return a result</td></tr>
+      <tr><td>The dev-iq zip</td><td>Provided by your engagement lead</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Node.js 18+ is optional</strong> — it's needed for live MCP data pull from ADO/GitHub. Skills fall back gracefully to paste-mode without it. You can wire MCP later.</p>
+</section>
+
+<section>
+  <h2>Install in <span class="accent">five steps</span></h2>
+
+  <div class="steps">
+
+    <div class="step">
+      <h3>Extract the zip</h3>
+      <p>Unzip to a permanent location on your machine. This is the pack source — it stays here and you bootstrap from it into your repos.</p>
+<pre><code><span class="comment"># macOS / Linux — example locations</span>
+~/tools/dev-iq/
+/opt/dev-iq/
+
+<span class="comment"># Windows — example locations</span>
+C:\Tools\dev-iq\</code></pre>
+      <div class="callout">
+        <strong>Windows only — unblock extracted files</strong>
+        <p>Files from a downloaded zip are flagged by Windows and may be blocked from running. Run this once after extracting:</p>
+        <pre style="margin:8px 0 0;"><code>Get-ChildItem "C:\Tools\dev-iq" -Recurse | Unblock-File</code></pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <h3>Run bootstrap in trial mode</h3>
+      <p>Navigate to your target repo (the codebase you want Dev.IQ to analyse) and run bootstrap from the extracted pack:</p>
+<pre><code><span class="comment"># macOS / Linux</span>
+cd ~/code/my-repo
+bash ~/tools/dev-iq/scripts/bootstrap.sh --mode=trial --preset=solo
+
+<span class="comment"># Windows PowerShell</span>
+cd C:\code\my-repo
+powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" -Mode trial -Preset solo</code></pre>
+      <p>When prompted "Just you, or the whole team?" — answer <strong>[1] Just me (solo)</strong>. Trial mode means all pack files are hidden from git via <code>.git/info/exclude</code>. Your <code>.gitignore</code> is never touched, nothing is committed, nothing reaches your teammates.</p>
+
+      <h4>What bootstrap writes to your repo</h4>
+      <table>
+        <thead><tr><th>Surface</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>CLAUDE.md</code></td><td>Always-on DI reasoning rules for Claude Code</td></tr>
+          <tr><td><code>.claude/agents/dev-iq.md</code></td><td>Dev-IQ subagent definition</td></tr>
+          <tr><td><code>.claude/agents/dev-iq-plan.md</code></td><td>Dev-IQ-PLAN plan-first subagent</td></tr>
+          <tr><td><code>.claude/skills/</code></td><td>Symlink to 22 DI skills (or copy on Windows without Dev Mode)</td></tr>
+          <tr><td><code>.claude/settings.json</code></td><td>Hooks wiring — session-start/end events</td></tr>
+          <tr><td><code>.dev-iq/config.yaml</code></td><td>Per-repo config — maturity tier, tracker, language</td></tr>
+          <tr><td><code>.dev-iq/governance.md</code></td><td>Compliance posture for this repo</td></tr>
+          <tr><td><code>.dev-iq/maturity-profile.md</code></td><td>Maturity tier rationale</td></tr>
+          <tr><td><code>.github/instructions/</code></td><td>Scoped DI instruction files (code standards, security, traceability)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="step">
+      <h3>Fill in the config</h3>
+      <p>Open <code>.dev-iq/config.yaml</code> in the repo and fill in what you know:</p>
+<pre><code>client:
+  name: "[your client or project name]"
+
+tracker:
+  type: "ado"   <span class="comment"># or "jira"</span>
+  ado:
+    org_url: ""    <span class="comment"># e.g. https://dev.azure.com/your-org</span>
+    project: ""    <span class="comment"># e.g. YourProjectName</span>
+
+vcs:
+  type: "github"  <span class="comment"># or "ado-repos", "gitlab", "bitbucket"</span>
+
+stack:
+  languages:
+    - ""           <span class="comment"># e.g. typescript, csharp, python</span></code></pre>
+      <p>Leave anything you're unsure of blank — skills still work, they'll ask you for details inline when needed.</p>
+    </div>
+
+    <div class="step">
+      <h3>Verify it's working</h3>
+      <p>Open the repo in a terminal. Type <code>/</code> to see available skills — you should see the Dev.IQ skills listed. Then run:</p>
+<pre><code>/explain-code</code></pre>
+      <p>Point the skill at any source file. If the response includes a <strong>Purpose</strong> section and an <strong>INTENT signal</strong> verdict — you're live.</p>
+
+      <div class="success-callout">
+        <strong>Expected pass criteria</strong>
+        <p>Response contains: a Purpose summary, one or more DI signal assessments (INTENT / DESIGN / QUALITY / RISK), and a recommendation. If you see all three — Dev.IQ is running correctly.</p>
+      </div>
+
+      <div class="warn-callout">
+        <strong>Skills appear but hooks are silent?</strong>
+        <p>Open <code>.claude/settings.json</code> in the repo and confirm the <code>hooks</code> section is present. If it's missing, re-run bootstrap. If present but hooks still don't fire, confirm you are on Dev.IQ v0.11.0 — earlier versions had incorrect hook event names.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <h3>Try a real skill on your work</h3>
+      <p>Open a branch with recent changes and run:</p>
+<pre><code>/review-pr-readiness</code></pre>
+      <p>You should get a four-layer DI assessment — INTENT, DESIGN, QUALITY, RISK — with a Go / Hold / Discuss recommendation. This is the core of what Dev.IQ does.</p>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Using the <span class="accent">Dev-IQ agents</span></h2>
+  <p>Dev.IQ ships two Claude Code subagents. Both are discovered automatically from <code>.claude/agents/</code>.</p>
+
+  <table>
+    <thead><tr><th>Agent</th><th>When to use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>dev-iq</strong></td><td>Default. Full tools, full execution. Pick this for code review, PR readiness, security review, debugging, scaffolding — anything where you want results.</td></tr>
+      <tr><td><strong>dev-iq-plan</strong></td><td>Read-only planning mode. Produces a structured DI four-layer plan for complex or risky changes. Ends with a <strong>Start Implementation</strong> handoff to dev-iq. Use when you want to think through a change before touching any files.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Both agents are maturity-aware: they adjust recommendations based on <code>maturity.tier</code> in <code>.dev-iq/config.yaml</code> and proactively raise traceability gaps, design issues, and governance concerns.</p>
+</section>
+
+<section>
+  <h2>Skills <span class="accent">quick reference</span></h2>
+  <p>Type <code>/</code> in Claude Code to see all available skills. Here is the full list by developer lifecycle phase:</p>
+
+  <table>
+    <thead><tr><th>/skill-name</th><th>Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-user-stories</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Convert requirements to stories with ACs</td></tr>
+      <tr><td><code>/review-acceptance-criteria</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Review ACs for completeness and clarity</td></tr>
+      <tr><td><code>/identify-dependencies</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Surface blockers and cross-team dependencies</td></tr>
+      <tr><td><code>/design-api</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>RESTful API design from requirements</td></tr>
+      <tr><td><code>/design-data-model</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>Entity/database design from stories</td></tr>
+      <tr><td><code>/generate-adr</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>Architecture Decision Record generation</td></tr>
+      <tr><td><code>/review-architecture</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-risk">RISK</span></td><td>Architecture review through DI lens</td></tr>
+      <tr><td><code>/scaffold-feature</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Generate boilerplate from AC + story</td></tr>
+      <tr><td><code>/code-review</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Four-layer code review with DI reasoning</td></tr>
+      <tr><td><code>/debug-issue</code></td><td><span class="skill-tag tag-risk">RISK</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Structured bug diagnosis + fix suggestion</td></tr>
+      <tr><td><code>/refactor-code</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Refactoring suggestions with rationale</td></tr>
+      <tr><td><code>/review-security</code></td><td><span class="skill-tag tag-quality">QUALITY</span> <span class="skill-tag tag-risk">RISK</span></td><td>Security review (OWASP Top 10 + LLM Top 10)</td></tr>
+      <tr><td><code>/explain-code</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Plain-language code explanation</td></tr>
+      <tr><td><code>/review-pr-readiness</code></td><td><span class="skill-tag tag-risk">RISK</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Go / Hold / Discuss verdict before merge</td></tr>
+      <tr><td><code>/blast-radius-estimator</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Map downstream impact of a change</td></tr>
+      <tr><td><code>/review-dependencies</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Dependency change risk analysis</td></tr>
+      <tr><td><code>/new-pull-request</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-risk">RISK</span></td><td>PR body with DI risk band + traceability</td></tr>
+      <tr><td><code>/generate-release-notes</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Release notes from commits / PRs</td></tr>
+      <tr><td><code>/review-deployment-readiness</code></td><td><span class="skill-tag tag-quality">QUALITY</span> <span class="skill-tag tag-risk">RISK</span></td><td>Go / No-Go deployment checklist</td></tr>
+      <tr><td><code>/generate-rollback-plan</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Rollback steps from deployment context</td></tr>
+      <tr><td><code>/generate-traceability-matrix</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
+      <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Typical <span class="accent">workflows</span></h2>
+
+  <h3>PR-time workflow</h3>
+<pre><code>/generate-user-stories          <span class="comment">→ define what we're building</span>
+/design-api                     <span class="comment">→ design the interface</span>
+/scaffold-feature               <span class="comment">→ generate boilerplate</span>
+/code-review                    <span class="comment">→ four-layer DI review</span>
+/review-pr-readiness            <span class="comment">→ Go/Hold verdict before opening PR</span>
+/new-pull-request               <span class="comment">→ PR body with DI risk band + traceability</span></code></pre>
+
+  <h3>Incident-driven workflow</h3>
+<pre><code>/debug-issue                    <span class="comment">→ structured diagnosis + fix suggestion</span>
+/review-security                <span class="comment">→ confirm fix doesn't introduce new exposure</span>
+/blast-radius-estimator         <span class="comment">→ map what else could be affected</span>
+/review-deployment-readiness    <span class="comment">→ Go/No-Go before pushing the fix</span>
+/generate-rollback-plan         <span class="comment">→ have a plan before you deploy</span></code></pre>
+
+  <h3>Skills worth trying over the first 2–3 days</h3>
+  <table>
+    <thead><tr><th>When</th><th>Skill to try</th></tr></thead>
+    <tbody>
+      <tr><td>Looking at an unfamiliar file</td><td><code>/explain-code</code></td></tr>
+      <tr><td>Before opening a PR</td><td><code>/review-pr-readiness</code></td></tr>
+      <tr><td>Reviewing someone else's code</td><td><code>/code-review</code></td></tr>
+      <tr><td>Something breaks</td><td><code>/debug-issue</code></td></tr>
+      <tr><td>Starting a new feature</td><td><code>/generate-user-stories</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>What bootstrap <span class="accent">wired</span> (and what it didn't)</h2>
+  <p>Bootstrap installs every file to disk, but a few surfaces only load when they are in the right place. If something feels off, check these first:</p>
+
+  <table>
+    <thead><tr><th>Surface</th><th>Where it must live</th><th>What breaks if missing</th></tr></thead>
+    <tbody>
+      <tr><td><code>CLAUDE.md</code></td><td>Repo root</td><td>Dev-IQ has no DI reasoning layer — behaves like generic Claude</td></tr>
+      <tr><td><code>.claude/agents/dev-iq.md</code></td><td><code>.claude/agents/</code></td><td>Dev-IQ subagent not available</td></tr>
+      <tr><td><code>.claude/skills/</code></td><td><code>.claude/</code></td><td>Skill invocations (<code>/code-review</code> etc.) fail to load</td></tr>
+      <tr><td><code>.dev-iq/config.yaml</code></td><td>Repo root</td><td>Skills can't read your stack config or maturity tier</td></tr>
+      <tr><td><code>.claude/settings.json</code></td><td>Repo root</td><td>Hindsight Hooks don't fire at session start/end</td></tr>
+    </tbody>
+  </table>
+
+  <p>Bootstrap creates all of these during install. If one is missing, re-run bootstrap with <code>--preset=solo</code> — it is safe to run multiple times.</p>
+</section>
+
+<section>
+  <h2>Graduate to team <span class="accent">adoption</span></h2>
+  <p>When you're ready to share Dev.IQ with the rest of the team, graduate from trial mode to committed:</p>
+
+<pre><code><span class="comment"># macOS / Linux</span>
+bash ~/tools/dev-iq/scripts/bootstrap.sh --graduate
+
+<span class="comment"># Windows</span>
+powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Graduate
+
+<span class="comment"># Commit the pack files</span>
+git add .dev-iq .claude .github CLAUDE.md AGENTS.md
+git commit -m "chore: adopt Dev.IQ agent pack"</code></pre>
+
+  <p>Graduating removes the <code>.git/info/exclude</code> block and makes the files visible to git. From here, teammates clone the repo and get Dev.IQ automatically.</p>
+</section>
+
+<section>
+  <h2>Removing the pack</h2>
+<pre><code><span class="comment"># macOS / Linux</span>
+bash ~/tools/dev-iq/scripts/bootstrap.sh \
+  --target ~/code/my-repo \
+  --uninstall
+
+<span class="comment"># Windows</span>
+powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 \
+  -Target C:\code\my-repo \
+  -Uninstall</code></pre>
+  <p>Uninstall reads the install manifest and restores any files that existed before. Files you edited post-install (<code>config.yaml</code>, <code>governance.md</code>) are saved as <code>&lt;file&gt;.di.uninstall-saved</code> so nothing is silently lost.</p>
+</section>
+
+<section>
+  <h2>Security — what stays on your machine</h2>
+  <ul style="color:var(--text-dim);line-height:2;">
+    <li>No source code or repository content is sent anywhere beyond what Claude Code already sends to Anthropic when you use it normally.</li>
+    <li>ADO/GitHub credentials are stored in your OS keychain by VS Code — never written to any file, never committed.</li>
+    <li>The filesystem MCP server only reads files inside the repo folder you have open. It cannot access anything outside that folder.</li>
+    <li>Trial mode files are local-only. Nothing is committed to the shared repo.</li>
+    <li>See <code>.dev-iq/governance.md</code> for the full data boundary statement.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Sending feedback</h2>
+  <p>After 2–3 days with the pack, send a short report back using these prompts:</p>
+
+  <h3>Install experience</h3>
+  <ul style="color:var(--text-dim);">
+    <li>Did bootstrap run without errors on the first try? If not, what error appeared and at which step?</li>
+    <li>Did the Dev.IQ skills appear when you typed <code>/</code> in Claude Code?</li>
+  </ul>
+
+  <h3>Skill quality</h3>
+  <ul style="color:var(--text-dim);">
+    <li>Which skills did you try? Did the output feel useful and specific to your code, or generic?</li>
+    <li>Did any skill produce output that was wrong, confusing, or unhelpful?</li>
+  </ul>
+
+  <h3>One overall rating (optional but useful)</h3>
+  <blockquote style="border-left:3px solid var(--accent-2);margin:0;padding:12px 16px;color:var(--text-dim);font-style:italic;">"I would / would not recommend this to a teammate because _______"</blockquote>
+
+  <p>Reply directly to the person who sent you this guide. No formal write-up needed — bullet points are fine.</p>
+</section>
+
+</div>
+
+<footer>
+  <div>Dev.IQ Agent Pack &middot; v0.11.0 &middot; Claude Code Guide &middot; Sparq Intelligence Studio</div>
+  <div style="margin-top:12px;">
+    <a href="README.html">Landing Page</a>
+    <a href="README.dev-iq.html">Full Docs</a>
+    <a href="vscode-readme.html">VS Code Guide</a>
+  </div>
+</footer>
+
+</body>
+</html>

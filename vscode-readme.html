@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dev.IQ Agent Pack — VS Code + Copilot Chat Install Guide</title>
+<style>
+  :root {
+    --bg: #18191a;
+    --bg-elev: #242526;
+    --bg-card: #2a2b2d;
+    --border: #3a3b3c;
+    --text: #f5f5f5;
+    --text-dim: #aab0b8;
+    --accent: #2563eb;
+    --accent-2: #0ea5e9;
+    --accent-3: #60a5fa;
+    --warn: #ffb347;
+    --code-bg: #111213;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent-2); text-decoration: none; transition: color 0.15s; }
+  a:hover { color: var(--accent-3); }
+  code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    color: #c8d3ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.86em;
+    line-height: 1.55;
+  }
+  pre code { background: none; border: none; padding: 0; color: #c8d3ff; }
+  .comment { color: #6b7280; }
+  p { color: var(--text-dim); }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    padding: 80px 24px 60px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse at top, rgba(37, 99, 235, 0.15), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(14, 165, 233, 0.12), transparent 60%),
+      var(--bg);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  .hero-content { position: relative; max-width: 800px; margin: 0 auto; }
+  .breadcrumb {
+    font-size: 0.85em;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+  .breadcrumb a { color: var(--accent-2); }
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0 0 14px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 60%, var(--accent-3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.tagline {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    margin: 0 0 28px;
+    font-weight: 300;
+  }
+
+  /* Layout */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+  section { margin-bottom: 64px; }
+  h2 {
+    font-size: 1.65rem;
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  h2 .accent { color: var(--accent-2); }
+  h3 { font-size: 1.15rem; margin: 28px 0 10px; color: var(--text); }
+  h4 { font-size: 1rem; margin: 20px 0 8px; color: var(--accent-2); }
+
+  /* Steps */
+  .steps { counter-reset: step; }
+  .step {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px 28px 88px;
+    margin-bottom: 20px;
+    position: relative;
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    left: 24px;
+    top: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+  }
+  .step h3 { margin-top: 0; }
+
+  /* IDE selector tabs */
+  .ide-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .ide-tab {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: var(--bg-card);
+  }
+  .ide-tab.active {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+    background: rgba(14, 165, 233, 0.08);
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    font-size: 0.91em;
+  }
+  thead { background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(14, 165, 233, 0.12)); }
+  th {
+    text-align: left;
+    padding: 11px 14px;
+    color: var(--text);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+  td:first-child { color: var(--text); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(37, 99, 235, 0.04); }
+
+  /* Callouts */
+  .callout {
+    background: rgba(14, 165, 233, 0.06);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    border-left: 3px solid var(--accent-2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 16px 0;
+  }
+  .callout strong { color: var(--text); }
+  .callout p { margin: 6px 0 0; }
+
+  .success-callout {
+    background: rgba(34, 197, 94, 0.06);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-left: 3px solid #22c55e;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 16px 0;
+  }
+  .success-callout strong { color: #22c55e; }
+
+  .warn-callout {
+    background: rgba(255, 179, 71, 0.06);
+    border: 1px solid rgba(255, 179, 71, 0.3);
+    border-left: 3px solid var(--warn);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 0.92em;
+    margin: 16px 0;
+  }
+  .warn-callout strong { color: var(--warn); }
+
+  /* Skill tags */
+  .skill-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.78em;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+  .tag-intent { background: rgba(37, 99, 235, 0.15); color: var(--accent-2); }
+  .tag-design { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+  .tag-quality { background: rgba(34, 197, 94, 0.12); color: #4ade80; }
+  .tag-risk { background: rgba(239, 68, 68, 0.12); color: #f87171; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9em;
+    background: var(--bg-elev);
+  }
+  footer a { margin: 0 12px; }
+
+  @media (max-width: 640px) {
+    .step { padding-left: 28px; padding-top: 80px; }
+    .step::before { top: 24px; left: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="breadcrumb"><a href="README.html">Dev.IQ Agent Pack</a> / VS Code + Copilot Chat Guide</div>
+    <h1>VS Code + Copilot Chat Guide</h1>
+    <p class="tagline">Get Dev.IQ running in GitHub Copilot Chat in under 20 minutes — personal trial, invisible to your team until you're ready.</p>
+  </div>
+</section>
+
+<div class="container">
+
+<section>
+  <h2>Prerequisites</h2>
+
+  <h3>Required</h3>
+  <table>
+    <thead><tr><th>Dependency</th><th>Minimum version</th><th>How to check</th></tr></thead>
+    <tbody>
+      <tr><td>VS Code</td><td>1.99+</td><td><strong>Help → About</strong></td></tr>
+      <tr><td>GitHub Copilot Chat extension</td><td>v0.22+</td><td><strong>Help → About</strong> — agent mode and skill invocation required</td></tr>
+      <tr><td>Git</td><td>Any recent</td><td><code>git --version</code> in a terminal</td></tr>
+      <tr><td>The dev-iq zip</td><td>v0.11.0</td><td>Provided by your engagement lead</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Optional — Visual Studio 2022</h3>
+  <p>Dev.IQ also works in <strong>Visual Studio 2022 v17.14+</strong> with the GitHub Copilot extension. One extra step is required after install — see Step 5 below.</p>
+
+  <h3>Optional — needed for live data pull</h3>
+  <table>
+    <thead><tr><th>Dependency</th><th>What it unlocks</th><th>Without it</th></tr></thead>
+    <tbody>
+      <tr><td>Node.js 18+</td><td>All MCP servers (ADO, GitHub, filesystem)</td><td>Skills ask you to paste work item / PR details manually</td></tr>
+      <tr><td>ADO Personal Access Token</td><td>Live work item + PR fetch</td><td>You paste the work item when prompted</td></tr>
+      <tr><td>GitHub PAT</td><td>Live PR diff and repo context</td><td>Skills use the diff visible in your editor</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Windows checklist — run this <span class="accent">before anything else</span></h2>
+  <p>These are the most common blockers on corporate Windows machines. Run through these first.</p>
+
+  <h3>1. PowerShell execution policy</h3>
+<pre><code>Get-ExecutionPolicy -Scope CurrentUser
+<span class="comment"># If Restricted or AllSigned:</span>
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></pre>
+  <p>If you get "Access denied", your machine is managed by Group Policy — speak to your IT contact before proceeding.</p>
+
+  <h3>2. Unblock zip contents</h3>
+<pre><code>Get-ChildItem "C:\Tools\dev-iq" -Recurse | Unblock-File</code></pre>
+
+  <h3>3. Developer Mode (recommended, not required)</h3>
+  <p><strong>Settings → Privacy &amp; security → For developers → Developer Mode On.</strong> Enables directory symlinks without an admin shell. Without it, bootstrap falls back to copying skill files — safe but requires re-running after edits.</p>
+
+  <h3>4. Check your IDE version</h3>
+  <p>VS Code: <strong>Help → About</strong> — requires 1.99 or later + Copilot Chat v0.22+. Visual Studio 2022: <strong>Help → About</strong> — requires v17.14 or later. Update before continuing if behind.</p>
+</section>
+
+<section>
+  <h2>Install in <span class="accent">five steps</span></h2>
+
+  <div class="steps">
+
+    <div class="step">
+      <h3>Extract the zip</h3>
+      <p>Unzip to a permanent location. This is the pack source — it stays here and you bootstrap from it into your repos.</p>
+<pre><code><span class="comment"># Recommended locations</span>
+C:\Tools\dev-iq\       <span class="comment"># Windows</span>
+~/tools/dev-iq/        <span class="comment"># macOS / Linux</span></code></pre>
+      <p>Then run the Unblock-File command above if on Windows.</p>
+    </div>
+
+    <div class="step">
+      <h3>Run bootstrap in trial mode</h3>
+      <p>Open PowerShell (Windows) or Terminal (macOS/Linux) and run bootstrap, pointing it at your target repo:</p>
+
+      <div class="ide-tabs">
+        <div class="ide-tab active">Windows</div>
+        <div class="ide-tab" style="opacity:0.5;">macOS / Linux</div>
+      </div>
+
+<pre><code><span class="comment"># Windows PowerShell</span>
+powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" `
+  -Target "C:\code\my-repo" `
+  -Preset solo</code></pre>
+<pre><code><span class="comment"># macOS / Linux</span>
+bash ~/tools/dev-iq/scripts/bootstrap.sh \
+  --target ~/code/my-repo \
+  --preset=solo \
+  --mode=trial</code></pre>
+
+      <p>When prompted "Just you, or the whole team?" — answer <strong>[1] Just me (solo)</strong>.</p>
+
+      <div class="callout">
+        <strong>Trial mode = invisible to git.</strong>
+        <p>All pack files land in your workspace but are hidden from git via <code>.git/info/exclude</code>. Your <code>.gitignore</code> is never touched, nothing is committed, nothing reaches your teammates until you graduate to committed mode.</p>
+      </div>
+
+      <h4>What bootstrap writes</h4>
+      <table>
+        <thead><tr><th>Surface</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>.github/copilot-instructions.md</code></td><td>Always-on DI reasoning rules — Copilot loads this automatically</td></tr>
+          <tr><td><code>.github/instructions/di-*.md</code></td><td>Scoped instruction files (code standards, security, traceability)</td></tr>
+          <tr><td><code>.github/skills/</code></td><td>22 DI skills — Copilot Chat discovers these for <code>/skill-name</code> invocation</td></tr>
+          <tr><td><code>.github/agents/Dev-IQ.agent.md</code></td><td>Dev-IQ custom chat agent (action mode)</td></tr>
+          <tr><td><code>.github/agents/Dev-IQ-PLAN.agent.md</code></td><td>Dev-IQ-PLAN custom chat agent (plan-first mode)</td></tr>
+          <tr><td><code>.vscode/mcp.json</code></td><td>20 pre-configured MCP server definitions</td></tr>
+          <tr><td><code>.vscode/settings.json</code></td><td>VS Code settings — hooks wiring, chat config</td></tr>
+          <tr><td><code>.dev-iq/config.yaml</code></td><td>Per-repo config — maturity tier, tracker, language</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="step">
+      <h3>Fill in the config</h3>
+      <p>Open <code>.dev-iq/config.yaml</code> in VS Code and fill in what you know:</p>
+<pre><code>client:
+  name: "[your client or project name]"
+
+tracker:
+  type: "ado"   <span class="comment"># or "jira"</span>
+  ado:
+    org_url: ""    <span class="comment"># e.g. https://dev.azure.com/your-org</span>
+    project: ""    <span class="comment"># e.g. YourProjectName</span>
+
+vcs:
+  type: "ado-repos"  <span class="comment"># or "github", "gitlab", "bitbucket"</span>
+
+stack:
+  languages:
+    - ""           <span class="comment"># e.g. csharp, typescript, java</span></code></pre>
+      <p>Leave anything you're unsure of blank — skills still work, they'll ask you for details inline.</p>
+    </div>
+
+    <div class="step">
+      <h3>Wire your ADO credentials (optional but recommended)</h3>
+      <p>This lets skills pull live work item and PR data from ADO without you having to paste it.</p>
+
+      <h4>Create a Personal Access Token in ADO</h4>
+      <p>ADO → top-right avatar → <strong>Personal access tokens</strong> → <strong>New Token</strong></p>
+      <p>Scopes needed: <strong>Work Items (Read)</strong>, <strong>Code (Read)</strong>, <strong>Pull Request Threads (Read &amp; Write)</strong></p>
+
+      <h4>Connect in VS Code</h4>
+      <p>Open Copilot Chat. VS Code will prompt for <code>ADO_ORG_URL</code> and <code>ADO_PAT</code> the first time a skill needs them. Enter your org URL and the token. VS Code stores both in your OS keychain — you won't be asked again.</p>
+
+      <div class="callout">
+        <strong>Node.js required for MCP.</strong>
+        <p>MCP servers require Node.js 18+. If you don't have it, skip this step — skills fall back to paste mode automatically. You can wire MCP later once Node.js is available.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <h3>Verify it's working</h3>
+      <p>Open the target repo in VS Code. Open Copilot Chat (<code>Ctrl+Alt+I</code>). Look for <strong>Dev-IQ</strong> in the agent dropdown at the top of the chat panel. Select it, then run:</p>
+<pre><code>/explain-code</code></pre>
+      <p>Point the skill at any source file. If the response includes a <strong>Purpose</strong> section and an <strong>INTENT signal</strong> verdict — you're live.</p>
+
+      <div class="success-callout">
+        <strong>Expected pass criteria</strong>
+        <p>Response contains: a Purpose summary, one or more DI signal assessments (INTENT / DESIGN / QUALITY / RISK), and a recommendation. If you see all three — Dev.IQ is running correctly.</p>
+      </div>
+
+      <div class="warn-callout">
+        <strong>Dev-IQ does not appear in the agent dropdown?</strong>
+        <p>This is the most important thing to report back if it happens. Check that <code>.github/agents/Dev-IQ.agent.md</code> exists in the workspace. If you are using Visual Studio 2022, also see the next section. Note your IDE version and Copilot extension version (<strong>Help → About</strong>) and send that to the person who gave you this guide.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Visual Studio 2022 — <span class="accent">one-time setup</span></h2>
+  <p>This step is easy to miss and blocks everything if skipped.</p>
+
+  <p>In Visual Studio: <strong>Tools → Options → GitHub → Copilot → (General)</strong></p>
+  <p>Turn on <strong>"Enable repository custom instructions"</strong> and click OK.</p>
+
+  <div class="warn-callout">
+    <strong>Without this, the DI reasoning layer never loads.</strong>
+    <p><code>copilot-instructions.md</code> is the always-on file that gives Dev-IQ its DI reasoning. Without this VS option enabled, the file is ignored and Dev-IQ responds like a generic Copilot agent with no DI context.</p>
+  </div>
+
+  <p>To invoke the Dev-IQ agent in Visual Studio, type <code>@Dev-IQ</code> in Copilot Chat — it should autocomplete. Then type <code>/explain-code</code> to verify.</p>
+</section>
+
+<section>
+  <h2>Using the <span class="accent">Dev-IQ agents</span></h2>
+  <p>Dev.IQ ships two custom Copilot Chat agents. Select them from the agent dropdown at the top of the chat panel.</p>
+
+  <table>
+    <thead><tr><th>Agent</th><th>When to use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Dev-IQ</strong></td><td>Default. Full tools, full execution. Pick this for code review, PR readiness, security review, debugging, scaffolding — anything where you want results.</td></tr>
+      <tr><td><strong>Dev-IQ-PLAN</strong></td><td>Read-only planning mode. Produces a structured DI four-layer plan for complex or risky changes. Ends with a <strong>Start Implementation</strong> handoff button to Dev-IQ for execution. Use when you want to think through a change before touching files.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Both agents are maturity-aware: they adjust recommendations based on <code>maturity.tier</code> in <code>.dev-iq/config.yaml</code> and proactively raise traceability gaps, design issues, and governance concerns.</p>
+</section>
+
+<section>
+  <h2>Skills <span class="accent">quick reference</span></h2>
+  <p>Type <code>/</code> in Copilot Chat (with Dev-IQ selected) to see all available skills. Here is the full list by developer lifecycle phase:</p>
+
+  <table>
+    <thead><tr><th>/skill-name</th><th>Signal</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/generate-user-stories</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Convert requirements to stories with ACs</td></tr>
+      <tr><td><code>/review-acceptance-criteria</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Review ACs for completeness and clarity</td></tr>
+      <tr><td><code>/identify-dependencies</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Surface blockers and cross-team dependencies</td></tr>
+      <tr><td><code>/design-api</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>RESTful API design from requirements</td></tr>
+      <tr><td><code>/design-data-model</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>Entity/database design from stories</td></tr>
+      <tr><td><code>/generate-adr</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>Architecture Decision Record generation</td></tr>
+      <tr><td><code>/review-architecture</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-risk">RISK</span></td><td>Architecture review through DI lens</td></tr>
+      <tr><td><code>/scaffold-feature</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Generate boilerplate from AC + story</td></tr>
+      <tr><td><code>/code-review</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Four-layer code review with DI reasoning</td></tr>
+      <tr><td><code>/debug-issue</code></td><td><span class="skill-tag tag-risk">RISK</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Structured bug diagnosis + fix suggestion</td></tr>
+      <tr><td><code>/refactor-code</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Refactoring suggestions with rationale</td></tr>
+      <tr><td><code>/review-security</code></td><td><span class="skill-tag tag-quality">QUALITY</span> <span class="skill-tag tag-risk">RISK</span></td><td>Security review (OWASP Top 10 + LLM Top 10)</td></tr>
+      <tr><td><code>/explain-code</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Plain-language code explanation</td></tr>
+      <tr><td><code>/review-pr-readiness</code></td><td><span class="skill-tag tag-risk">RISK</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Go / Hold / Discuss verdict before merge</td></tr>
+      <tr><td><code>/blast-radius-estimator</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Map downstream impact of a change</td></tr>
+      <tr><td><code>/review-dependencies</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Dependency change risk analysis</td></tr>
+      <tr><td><code>/new-pull-request</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-risk">RISK</span></td><td>PR body with DI risk band + traceability</td></tr>
+      <tr><td><code>/generate-release-notes</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Release notes from commits / PRs</td></tr>
+      <tr><td><code>/review-deployment-readiness</code></td><td><span class="skill-tag tag-quality">QUALITY</span> <span class="skill-tag tag-risk">RISK</span></td><td>Go / No-Go deployment checklist</td></tr>
+      <tr><td><code>/generate-rollback-plan</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Rollback steps from deployment context</td></tr>
+      <tr><td><code>/generate-traceability-matrix</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
+      <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Try a real skill — <span class="accent">Step 6</span></h2>
+  <p>Open a branch with recent changes and run:</p>
+<pre><code>/review-pr-readiness</code></pre>
+  <p>You should get a four-layer assessment — INTENT, DESIGN, QUALITY, RISK — with a Go / Hold / Discuss recommendation. This is the core of what Dev.IQ does.</p>
+
+  <h3>Skills worth trying over the first 2–3 days</h3>
+  <table>
+    <thead><tr><th>When</th><th>Skill to try</th></tr></thead>
+    <tbody>
+      <tr><td>Looking at an unfamiliar file</td><td><code>/explain-code</code></td></tr>
+      <tr><td>Before opening a PR</td><td><code>/review-pr-readiness</code></td></tr>
+      <tr><td>Reviewing someone else's code</td><td><code>/code-review</code></td></tr>
+      <tr><td>Something breaks</td><td><code>/debug-issue</code></td></tr>
+      <tr><td>Starting a new feature</td><td><code>/generate-user-stories</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>What bootstrap wired (and what it didn't)</h2>
+  <table>
+    <thead><tr><th>Surface</th><th>Where it must live</th><th>What breaks if missing</th></tr></thead>
+    <tbody>
+      <tr><td><code>copilot-instructions.md</code></td><td><code>.github/</code> in the repo</td><td>Dev-IQ behaves like a generic Copilot agent — no DI context</td></tr>
+      <tr><td><code>Dev-IQ.agent.md</code></td><td><code>.github/agents/</code></td><td>Dev-IQ not available in the agent dropdown</td></tr>
+      <tr><td><code>.github/skills/</code></td><td>Repo root</td><td>Skill invocations don't load the DI skill content</td></tr>
+      <tr><td><code>.dev-iq/config.yaml</code></td><td>Repo root</td><td>Skills can't read your stack config or maturity tier</td></tr>
+      <tr><td><code>.vscode/mcp.json</code></td><td><code>.vscode/</code></td><td>MCP servers not registered — live data pull unavailable</td></tr>
+    </tbody>
+  </table>
+  <p>Bootstrap creates all of these during install. If one is missing, re-run bootstrap with <code>--preset=solo</code> — it is safe to run multiple times.</p>
+</section>
+
+<section>
+  <h2>Graduate to team adoption</h2>
+  <p>When you're ready to share Dev.IQ with the rest of the team:</p>
+<pre><code><span class="comment"># macOS / Linux</span>
+bash ~/tools/dev-iq/scripts/bootstrap.sh --graduate
+
+<span class="comment"># Windows</span>
+powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Graduate
+
+<span class="comment"># Commit the pack files</span>
+git add .dev-iq .claude .github CLAUDE.md AGENTS.md
+git commit -m "chore: adopt Dev.IQ agent pack"</code></pre>
+  <p>Teammates who clone the repo will automatically get Dev.IQ instructions and skills loaded into their Copilot Chat and Claude Code sessions.</p>
+</section>
+
+<section>
+  <h2>Removing the pack</h2>
+<pre><code><span class="comment"># Windows</span>
+powershell -File "C:\Tools\dev-iq\scripts\bootstrap.ps1" `
+  -Target "C:\code\my-repo" `
+  -Uninstall
+
+<span class="comment"># macOS / Linux</span>
+bash ~/tools/dev-iq/scripts/bootstrap.sh \
+  --target ~/code/my-repo \
+  --uninstall</code></pre>
+  <p>Uninstall reads the install manifest and restores any files that existed before the pack was installed. Files you edited post-install (<code>config.yaml</code>, <code>governance.md</code>) are saved as <code>&lt;file&gt;.di.uninstall-saved</code> so nothing is silently lost.</p>
+</section>
+
+<section>
+  <h2>Security — what stays on your machine</h2>
+  <ul style="color:var(--text-dim);line-height:2;">
+    <li>No source code or repository content is sent anywhere beyond what GitHub Copilot already sends when you use Copilot Chat normally.</li>
+    <li>ADO/GitHub credentials are stored in the Windows Credential Manager or macOS Keychain — never written to any file, never committed.</li>
+    <li>The filesystem MCP server only reads files inside the repo folder open in VS Code. It cannot access anything outside that folder.</li>
+    <li>Trial mode files are local-only. Nothing is committed to the shared repo.</li>
+    <li>See <code>.dev-iq/governance.md</code> for the full data boundary statement.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Sending feedback</h2>
+  <p>After 2–3 days with the pack, send a short report back.</p>
+
+  <h3>Install experience</h3>
+  <ul style="color:var(--text-dim);">
+    <li>Did bootstrap run without errors on the first try? If not, what error and at which step?</li>
+    <li>Did the Dev-IQ agent appear in the Copilot Chat dropdown?</li>
+    <li>Did you need to change your PowerShell execution policy?</li>
+  </ul>
+
+  <h3>Skill quality</h3>
+  <ul style="color:var(--text-dim);">
+    <li>Which skills did you try? Did the output feel useful and specific to your code, or generic?</li>
+    <li>Did any skill produce output that was wrong, confusing, or unhelpful?</li>
+  </ul>
+
+  <h3>MCP / live data</h3>
+  <ul style="color:var(--text-dim);">
+    <li>Did you wire the ADO credentials? If yes, did work item pull work?</li>
+    <li>If you skipped MCP, did the paste-mode fallback feel usable?</li>
+  </ul>
+
+  <blockquote style="border-left:3px solid var(--accent-2);margin:16px 0 0;padding:12px 16px;color:var(--text-dim);font-style:italic;">"I would / would not recommend this to a teammate on this project because _______"</blockquote>
+  <p>Reply directly to the person who sent you this guide. No formal write-up needed — bullet points are fine.</p>
+</section>
+
+</div>
+
+<footer>
+  <div>Dev.IQ Agent Pack &middot; v0.11.0 &middot; VS Code + Copilot Chat Guide &middot; Sparq Intelligence Studio</div>
+  <div style="margin-top:12px;">
+    <a href="README.html">Landing Page</a>
+    <a href="README.dev-iq.html">Full Docs</a>
+    <a href="claude-readme.html">Claude Code Guide</a>
+  </div>
+</footer>
+
+</body>
+</html>
