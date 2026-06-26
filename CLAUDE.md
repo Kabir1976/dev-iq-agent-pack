@@ -11,7 +11,8 @@ Assert.IQ boundaries — read it before acting on any code or delivery question.
 - @.github/instructions/di-code-standards.instructions.md — code generation, review, refactoring
 - @.github/instructions/di-security.instructions.md — security review, auth, data handling, OWASP
 - @.github/instructions/di-traceability.instructions.md — work item linking, artifact tracing
-- @.github/instructions/di-signal-emission.instructions.md — CI/CD configuration changes
+
+> Load `.github/instructions/di-signal-emission.instructions.md` when editing CI/CD configuration (GitHub Actions workflows, Azure Pipelines, Jenkinsfiles, Terraform). It is scoped and not always-on.
 
 ## Claude Code capabilities
 

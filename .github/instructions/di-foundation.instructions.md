@@ -57,15 +57,7 @@ When the maturity file is missing from both locations: proceed at Early tier, re
 
 ## Workspace Topology
 
-Read `.dev-iq/config.yaml` → `workspace.role` before reasoning about cross-file or cross-service signals.
-
-| Role | Meaning | Behavior |
-|------|---------|----------|
-| `monorepo` (default) | Production code and tests in one workspace | All four layers assessable from this workspace |
-| `prod` | This repo holds production code; tests live in a separate repo | QUALITY layer may be UNGRADED for test coverage — note `companion_repo` |
-| `tests` | This repo holds tests; production code is elsewhere | INTENT and DESIGN layers assessed via companion — note if unset |
-
-When `companion_repo` is unset or unreachable, the affected layer is **UNGRADED** with an explicit reason. Never fabricate coverage or test data from the wrong repo.
+Most repos are monorepos — production code and tests in the same workspace, all four DI layers assessable here. Proceed on that assumption unless `.dev-iq/config.yaml` sets `workspace.role` to `prod` or `tests`. For split-repo teams, read `.dev-iq/workspace-topology.md` for UNGRADED handling and companion repo fetch rules.
 
 ## Governance Rules (Always Enforce)
 

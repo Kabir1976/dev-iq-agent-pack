@@ -7,8 +7,11 @@ set -euo pipefail
 
 PACK_VERSION="0.11.0"
 PACK_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MARKER_START="<!-- dev-iq:start -->"
+MARKER_START="<!-- dev-iq:begin v=${PACK_VERSION} -->"
 MARKER_END="<!-- dev-iq:end -->"
+# CONFLICT_BULK_CHOICE: K = keep all existing files, O = overwrite all files.
+# Set via environment variable to control non-interactive installs.
+CONFLICT_BULK_CHOICE="${CONFLICT_BULK_CHOICE:-}"
 
 # ── Terminal colours (only when writing to a real TTY) ────────────
 if [[ -t 1 ]]; then
@@ -211,6 +214,7 @@ if [[ "$GRADUATE" == true ]]; then
       | grep -v "^\.dev-iq" \
       | grep -v "^hooks/" \
       | grep -v "^CLAUDE\.md" \
+      | grep -v "^AGENTS\.md" \
       > "$EXCLUDE.tmp" && mv "$EXCLUDE.tmp" "$EXCLUDE"
     ok "Removed trial entries from .git/info/exclude."
   fi
@@ -272,13 +276,24 @@ if [[ "$UNINSTALL" == true ]]; then
     fi
   done
 
+  # Remove dev-iq marker block from CLAUDE.md (handles both begin/start marker formats).
   CLAUDE_DST="$TARGET/CLAUDE.md"
-  if [[ -f "$CLAUDE_DST" ]] && grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
-    sed -i.bak "/${MARKER_START//\//\\/}/,/${MARKER_END//\//\\/}/d" "$CLAUDE_DST" 2>/dev/null \
+  if [[ -f "$CLAUDE_DST" ]] && grep -qE '<!-- dev-iq:(begin|start)' "$CLAUDE_DST" 2>/dev/null; then
+    sed -i.bak '/<!-- dev-iq:/,/<!-- dev-iq:end -->/d' "$CLAUDE_DST" 2>/dev/null \
       && rm -f "${CLAUDE_DST}.bak" \
-      || warn "Could not remove Dev.IQ block from CLAUDE.md — delete the block between $MARKER_START and $MARKER_END manually."
+      || warn "Could not remove Dev.IQ block from CLAUDE.md — delete the block between <!-- dev-iq:begin --> and <!-- dev-iq:end --> manually."
     ok "Removed Dev.IQ block from CLAUDE.md."
     [[ -s "$CLAUDE_DST" ]] || { rm -f "$CLAUDE_DST"; ok "Removed empty CLAUDE.md."; }
+  fi
+
+  # Remove dev-iq marker block from AGENTS.md.
+  AGENTS_DST="$TARGET/AGENTS.md"
+  if [[ -f "$AGENTS_DST" ]] && grep -qE '<!-- dev-iq:(begin|start)' "$AGENTS_DST" 2>/dev/null; then
+    sed -i.bak '/<!-- dev-iq:/,/<!-- dev-iq:end -->/d' "$AGENTS_DST" 2>/dev/null \
+      && rm -f "${AGENTS_DST}.bak" \
+      || warn "Could not remove Dev.IQ block from AGENTS.md — delete the block between <!-- dev-iq:begin --> and <!-- dev-iq:end --> manually."
+    ok "Removed Dev.IQ block from AGENTS.md."
+    [[ -s "$AGENTS_DST" ]] || { rm -f "$AGENTS_DST"; ok "Removed empty AGENTS.md."; }
   fi
 
   EXCLUDE="$TARGET/.git/info/exclude"
@@ -292,6 +307,7 @@ if [[ "$UNINSTALL" == true ]]; then
       | grep -v "^\.dev-iq" \
       | grep -v "^hooks/" \
       | grep -v "^CLAUDE\.md" \
+      | grep -v "^AGENTS\.md" \
       > "$EXCLUDE.tmp" && mv "$EXCLUDE.tmp" "$EXCLUDE"
     ok "Removed trial entries from .git/info/exclude."
   fi
@@ -348,7 +364,11 @@ _copy_file() {
     return
   fi
   mkdir -p "$(dirname "$dst")"
-  if [[ "$preserve" == "true" && -f "$dst" ]]; then
+  # CONFLICT_BULK_CHOICE=K forces keep; =O forces overwrite regardless of preserve flag.
+  local effective_preserve="$preserve"
+  if [[ "$CONFLICT_BULK_CHOICE" == "K" && -f "$dst" ]]; then effective_preserve="true"; fi
+  if [[ "$CONFLICT_BULK_CHOICE" == "O" ]]; then effective_preserve="false"; fi
+  if [[ "$effective_preserve" == "true" && -f "$dst" ]]; then
     warn "Preserved existing : ${dst#"$TARGET/"}"
     return
   fi
@@ -457,46 +477,51 @@ if [[ "$INCLUDE_HOOKS" == true ]]; then
   ok "Hooks installed."
 fi
 
-# ── CLAUDE.md injection ───────────────────────────────────────────
-CLAUDE_SRC="$PACK_ROOT/CLAUDE.md"
-CLAUDE_DST="$TARGET/CLAUDE.md"
+# ── Markdown file injection (idempotent merge-marker) ─────────────
+# Wraps pack content in <!-- dev-iq:begin / dev-iq:end --> markers.
+# Re-runs replace only the marker block, leaving user content outside
+# the markers untouched. Handles both old (dev-iq:start) and new
+# (dev-iq:begin v=X) marker formats for safe upgrades.
 
-_inject_claude_md() {
-  if [[ ! -f "$CLAUDE_DST" ]]; then
+_inject_md() {
+  local src="$1" dst="$2" label="$3"
+  if [[ ! -f "$dst" ]]; then
     {
       printf '%s\n' "$MARKER_START"
-      cat "$CLAUDE_SRC"
+      cat "$src"
       printf '%s\n' "$MARKER_END"
-    } > "$CLAUDE_DST"
-    ok "Created CLAUDE.md with Dev.IQ instructions."
+    } > "$dst"
+    ok "Created ${label} with Dev.IQ instructions."
     return
   fi
 
-  if grep -qF "$MARKER_START" "$CLAUDE_DST" 2>/dev/null; then
-    # Remove old block, re-append updated content at end.
-    sed -i.bak "/${MARKER_START//\//\\/}/,/${MARKER_END//\//\\/}/d" "$CLAUDE_DST" \
-      && rm -f "${CLAUDE_DST}.bak"
+  if grep -qE '<!-- dev-iq:(begin|start)' "$dst" 2>/dev/null; then
+    # Remove old block (any marker version), re-append updated content.
+    sed -i.bak '/<!-- dev-iq:/,/<!-- dev-iq:end -->/d' "$dst" \
+      && rm -f "${dst}.bak"
     {
       printf '\n\n%s\n' "$MARKER_START"
-      cat "$CLAUDE_SRC"
+      cat "$src"
       printf '%s\n' "$MARKER_END"
-    } >> "$CLAUDE_DST"
-    ok "Updated Dev.IQ block in existing CLAUDE.md."
+    } >> "$dst"
+    ok "Updated Dev.IQ block in existing ${label}."
   else
     {
       printf '\n\n'
       printf '%s\n' "$MARKER_START"
-      cat "$CLAUDE_SRC"
+      cat "$src"
       printf '%s\n' "$MARKER_END"
-    } >> "$CLAUDE_DST"
-    ok "Appended Dev.IQ instructions to existing CLAUDE.md."
+    } >> "$dst"
+    ok "Appended Dev.IQ instructions to existing ${label}."
   fi
 }
 
 if [[ "$DRY_RUN" == true ]]; then
-  echo "  [dry-run] would copy: $CLAUDE_SRC -> CLAUDE.md"
+  echo "  [dry-run] would inject: CLAUDE.md"
+  echo "  [dry-run] would inject: AGENTS.md"
 else
-  _inject_claude_md
+  _inject_md "$PACK_ROOT/CLAUDE.md"  "$TARGET/CLAUDE.md"  "CLAUDE.md"
+  _inject_md "$PACK_ROOT/AGENTS.md"  "$TARGET/AGENTS.md"  "AGENTS.md"
 fi
 
 # ── Trial mode: add paths to .git/info/exclude ───────────────────
@@ -521,6 +546,7 @@ if [[ "$MODE" == "trial" ]]; then
 .claude/skills.md
 .dev-iq/
 CLAUDE.md
+AGENTS.md
 EOF
       [[ "$INCLUDE_HOOKS" == true ]] && printf 'hooks/\n' >> "$EXCLUDE"
       ok "Dev.IQ paths added to .git/info/exclude (invisible to git)."

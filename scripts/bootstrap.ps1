@@ -52,8 +52,10 @@ $ErrorActionPreference = "Stop"
 
 $PackVersion  = "0.11.0"
 $PackRoot     = (Resolve-Path "$PSScriptRoot\..").Path
-$MarkerStart  = "<!-- dev-iq:start -->"
+$MarkerStart  = "<!-- dev-iq:begin v=$PackVersion -->"
 $MarkerEnd    = "<!-- dev-iq:end -->"
+# CONFLICT_BULK_CHOICE: K = keep all existing files, O = overwrite all files.
+$ConflictBulkChoice = $env:CONFLICT_BULK_CHOICE
 
 # ── Console helpers ───────────────────────────────────────────────
 function Write-Log   { param($Msg) Write-Host "[dev-iq] $Msg" -ForegroundColor White }
@@ -218,22 +220,23 @@ if ($Uninstall) {
         Write-Ok "Processed : .claude\skills.md"
     }
 
-    # Remove dev-iq marker block from CLAUDE.md
-    $ClaudeDst = "$Target\CLAUDE.md"
-    if ((Test-Path $ClaudeDst) -and ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart))) {
-        $Lines   = Get-Content $ClaudeDst -Encoding UTF8
-        $Inside  = $false
-        $Kept    = foreach ($Line in $Lines) {
-            if ($Line -match [regex]::Escape($MarkerStart)) { $Inside = $true; continue }
-            if ($Line -match [regex]::Escape($MarkerEnd))   { $Inside = $false; continue }
-            if (-not $Inside) { $Line }
-        }
-        ($Kept -join "`n").Trim() | Set-Content $ClaudeDst -Encoding UTF8
-        Write-Ok "Removed Dev.IQ block from CLAUDE.md."
-        if (-not (Get-Content $ClaudeDst -Raw -ErrorAction SilentlyContinue).Trim()) {
-            Remove-Item -Force $ClaudeDst; Write-Ok "Removed empty CLAUDE.md."
+    # Helper: remove dev-iq marker block from a Markdown file (handles begin/start formats).
+    function Remove-DiMarkerBlock {
+        param([string]$FilePath, [string]$Label)
+        if (-not (Test-Path $FilePath)) { return }
+        $Raw = Get-Content $FilePath -Raw -Encoding UTF8
+        if ($Raw -notmatch '<!-- dev-iq:(begin|start)') { return }
+        $Pattern = '<!-- dev-iq:[\s\S]*?<!-- dev-iq:end -->'
+        $Cleaned = [regex]::Replace($Raw, $Pattern, '').Trim()
+        $Cleaned | Set-Content $FilePath -Encoding UTF8
+        Write-Ok "Removed Dev.IQ block from $Label."
+        if (-not (Get-Content $FilePath -Raw -ErrorAction SilentlyContinue).Trim()) {
+            Remove-Item -Force $FilePath; Write-Ok "Removed empty $Label."
         }
     }
+
+    Remove-DiMarkerBlock "$Target\CLAUDE.md"  "CLAUDE.md"
+    Remove-DiMarkerBlock "$Target\AGENTS.md"  "AGENTS.md"
 
     # Remove trial entries from .git\info\exclude
     $ExcludePath = "$Target\.git\info\exclude"
@@ -247,7 +250,8 @@ if ($Uninstall) {
             Where-Object { $_ -notmatch "^\.claude/skills" } |
             Where-Object { $_ -notmatch "^\.dev-iq" } |
             Where-Object { $_ -notmatch "^hooks/" } |
-            Where-Object { $_ -notmatch "^CLAUDE\.md" }
+            Where-Object { $_ -notmatch "^CLAUDE\.md" } |
+            Where-Object { $_ -notmatch "^AGENTS\.md" }
         $Lines | Set-Content $ExcludePath -Encoding UTF8
         Write-Ok "Removed trial entries from .git\info\exclude."
     }
@@ -281,7 +285,8 @@ if ($Graduate) {
             Where-Object { $_ -notmatch "^\.claude/skills" } |
             Where-Object { $_ -notmatch "^\.dev-iq" } |
             Where-Object { $_ -notmatch "^hooks/" } |
-            Where-Object { $_ -notmatch "^CLAUDE\.md" }
+            Where-Object { $_ -notmatch "^CLAUDE\.md" } |
+            Where-Object { $_ -notmatch "^AGENTS\.md" }
         $Lines | Set-Content $ExcludePath -Encoding UTF8
         Write-Ok "Removed trial entries from .git\info\exclude."
     }
@@ -327,7 +332,11 @@ function Copy-PackFile {
     }
     $DstDir = Split-Path $Dst -Parent
     if (-not (Test-Path $DstDir)) { New-Item -ItemType Directory -Path $DstDir -Force | Out-Null }
-    if ($Preserve -and (Test-Path $Dst)) {
+    # CONFLICT_BULK_CHOICE=K forces keep; =O forces overwrite regardless of Preserve flag.
+    $EffectivePreserve = $Preserve
+    if ($ConflictBulkChoice -eq "K" -and (Test-Path $Dst)) { $EffectivePreserve = $true }
+    if ($ConflictBulkChoice -eq "O") { $EffectivePreserve = $false }
+    if ($EffectivePreserve -and (Test-Path $Dst)) {
         Write-Warn "Preserved existing : $($Dst.Replace($Target + '\', ''))"
         return
     }
@@ -410,29 +419,39 @@ if ($Hooks) {
     Write-Ok "Hooks installed."
 }
 
-# ── CLAUDE.md injection ───────────────────────────────────────────
-$ClaudeSrc     = "$PackRoot\CLAUDE.md"
-$ClaudeDst     = "$Target\CLAUDE.md"
+# ── Markdown file injection (idempotent merge-marker) ─────────────
+# Wraps pack content in <!-- dev-iq:begin / dev-iq:end --> markers.
+# Re-runs replace only the marker block, leaving user content outside
+# the markers untouched. Handles both old (dev-iq:start) and new
+# (dev-iq:begin v=X) marker formats for safe upgrades.
+
+function Invoke-InjectMd {
+    param([string]$Src, [string]$Dst, [string]$Label)
+    $SrcContent = Get-Content $Src -Raw -Encoding UTF8
+    if (-not (Test-Path $Dst)) {
+        "$MarkerStart`n$SrcContent`n$MarkerEnd" | Set-Content $Dst -Encoding UTF8
+        Write-Ok "Created $Label with Dev.IQ instructions."
+        return
+    }
+    $Existing = Get-Content $Dst -Raw -Encoding UTF8
+    if ($Existing -match '<!-- dev-iq:(begin|start)') {
+        # Remove old block (any marker version), re-append updated content.
+        $Pattern = '<!-- dev-iq:[\s\S]*?<!-- dev-iq:end -->'
+        $Cleaned = [regex]::Replace($Existing, $Pattern, '').Trim()
+        "$Cleaned`n`n$MarkerStart`n$SrcContent`n$MarkerEnd" | Set-Content $Dst -Encoding UTF8
+        Write-Ok "Updated Dev.IQ block in existing $Label."
+    } else {
+        "$Existing`n`n$MarkerStart`n$SrcContent`n$MarkerEnd" | Set-Content $Dst -Encoding UTF8
+        Write-Ok "Appended Dev.IQ instructions to existing $Label."
+    }
+}
 
 if ($DryRun) {
-    Write-Host "  [dry-run] would copy: $ClaudeSrc -> CLAUDE.md"
+    Write-Host "  [dry-run] would inject: CLAUDE.md"
+    Write-Host "  [dry-run] would inject: AGENTS.md"
 } else {
-    $ClaudeContent = Get-Content $ClaudeSrc -Raw -Encoding UTF8
-    if (-not (Test-Path $ClaudeDst)) {
-        "$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
-        Write-Ok "Created CLAUDE.md with Dev.IQ instructions."
-    } elseif ((Get-Content $ClaudeDst -Raw) -match [regex]::Escape($MarkerStart)) {
-        # Remove old block, re-append updated content at end.
-        $Pattern  = [regex]::Escape($MarkerStart) + '[\s\S]*?' + [regex]::Escape($MarkerEnd)
-        $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
-        $Cleaned  = [regex]::Replace($Existing, $Pattern, '').Trim()
-        "$Cleaned`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
-        Write-Ok "Updated Dev.IQ block in existing CLAUDE.md."
-    } else {
-        $Existing = Get-Content $ClaudeDst -Raw -Encoding UTF8
-        "$Existing`n`n$MarkerStart`n$ClaudeContent`n$MarkerEnd" | Set-Content $ClaudeDst -Encoding UTF8
-        Write-Ok "Appended Dev.IQ instructions to existing CLAUDE.md."
-    }
+    Invoke-InjectMd "$PackRoot\CLAUDE.md"  "$Target\CLAUDE.md"  "CLAUDE.md"
+    Invoke-InjectMd "$PackRoot\AGENTS.md"  "$Target\AGENTS.md"  "AGENTS.md"
 }
 
 # ── Trial mode: add paths to .git\info\exclude ───────────────────
@@ -449,7 +468,7 @@ if ($Mode -eq "trial") {
         if ($ExcludeContent -match "# dev-iq") {
             Write-Warn "Trial mode entries already present in .git\info\exclude."
         } else {
-            $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.claude/agents/`n.claude/skills.md`n.dev-iq/`nCLAUDE.md"
+            $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.claude/agents/`n.claude/skills.md`n.dev-iq/`nCLAUDE.md`nAGENTS.md"
             if ($Hooks) { $Block += "`nhooks/" }
             Add-Content $ExcludePath $Block -Encoding UTF8
             Write-Ok "Dev.IQ paths added to .git\info\exclude (invisible to git)."
