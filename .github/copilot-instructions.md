@@ -16,14 +16,13 @@ Assert.IQ boundaries — Copilot loads it automatically via `applyTo: "**"`.
 ## Copilot capabilities
 
 - **Agents** — `Dev-IQ` (default, full tools) and `Dev-IQ-PLAN` (read-only planning → Start Implementation handoff to Dev-IQ)
-- **Skills** — 23 DI skills invoked with `/skill-name` in Copilot Chat. Type `/` to see all available skills.
+- **Skills** — 27 DI skills invoked with `/skill-name` in Copilot Chat. Type `/` to see all available skills.
 - **Per-client config** — `.dev-iq/config.yaml`, `.dev-iq/governance.md`, `.dev-iq/maturity-profile.md`
 
 ## Skills quick reference
 
 | /skill-name | DI Signal | Purpose |
 |-------------|-----------|---------|
-| `/generate-user-stories` | INTENT | Convert requirements to stories with AC |
 | `/review-acceptance-criteria` | INTENT | Review ACs for completeness and clarity |
 | `/identify-dependencies` | RISK | Surface blockers and cross-team dependencies |
 | `/design-api` | DESIGN | RESTful API design from requirements |
@@ -45,6 +44,11 @@ Assert.IQ boundaries — Copilot loads it automatically via `applyTo: "**"`.
 | `/generate-rollback-plan` | RISK | Rollback steps from deployment context |
 | `/generate-traceability-matrix` | INTENT + DESIGN | Req ↔ Code ↔ Test matrix |
 | `/dev-iq-tailor` | DESIGN | Tailor pack config to this codebase (run after bootstrap) |
+| `/estimate-effort` | INTENT + DESIGN | Story point / t-shirt estimate with rationale |
+| `/review-observability` | QUALITY | Logging, metrics, tracing, and alerting coverage review |
+| `/generate-openapi` | DESIGN | Generate OpenAPI 3.x spec from controller/router code |
+| `/onboard-codebase` | INTENT | New developer guide — architecture, flows, local setup |
+| `/review-ai-integration` | QUALITY + RISK | OWASP LLM Top 10 review for LLM/agentic code |
 
 ## Companion files
 
