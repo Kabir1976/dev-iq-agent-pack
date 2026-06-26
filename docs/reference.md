@@ -10,7 +10,7 @@
 
 ## At a Glance
 
-Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and give GitHub Copilot Chat and Claude Code a Developer Intelligence reasoning layer — 22 skills, two agents, and MCP wiring for ADO and GitHub — without deploying any runtime or service.
+Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and give GitHub Copilot Chat and Claude Code a Developer Intelligence reasoning layer — 27 skills, two agents, and MCP wiring for ADO and GitHub — without deploying any runtime or service.
 
 **Fastest path to first value:** extract the zip → run `bootstrap.sh --preset=solo` against your repo → open Copilot Chat → select Dev-IQ → run `/review-pr-readiness` on a branch with changes. Under 20 minutes, requires nothing beyond VS Code and Git.
 
@@ -117,8 +117,8 @@ The pack operationalizes the **Developer Intelligence (DI)** framework:
 
 - The four-layer signal model (Intent → Design → Quality → Risk → Decision Confidence)
   is loaded as the AI's reasoning lens on every interaction.
-- 22 skills cover the developer lifecycle: requirements, design, development,
-  code review, and deployment readiness.
+- 27 skills cover the developer lifecycle: requirements, design, development,
+  code review, observability, AI integration, and deployment readiness.
 - A Dev.IQ agent provides delivery-aware coaching and execution.
 - MCP wiring connects to ADO or Jira and to GitHub for first-class
   bidirectional context.
@@ -362,7 +362,7 @@ physically present in the workspace, so all of them ship in.
 | `.dev-iq/governance.md` | Compliance posture — varies by client / regulatory regime. |
 | `.dev-iq/maturity-profile.md` | Tier rationale — team-specific. |
 | `.github/copilot-instructions.md` + `.github/instructions/di-*.instructions.md` | Copilot reads these only from the workspace; their `applyTo` globs scope to repo files. |
-| `.github/skills/` | All 22 DI skills — Copilot Chat reads them from this workspace path. |
+| `.github/skills/` | All 27 DI skills — Copilot Chat reads them from this workspace path. |
 | `.github/agents/` | `Dev-IQ.agent.md` and `Dev-IQ-PLAN.agent.md` custom chat modes. |
 | `.claude/agents/` | Claude Code subagent counterparts (`dev-iq.md`, `dev-iq-plan.md`). |
 | `.claude/skills` | Symlink to `../.github/skills` (copy fallback on Windows without Developer Mode). |
@@ -427,7 +427,7 @@ Upgrades are explicit and intentional:
 
 The installer creates `.claude/skills` as a directory symlink to
 `../.github/skills/`, so Copilot and Claude share one canonical copy of the
-22 skills. Behavior varies by platform:
+27 skills. Behavior varies by platform:
 
 | Platform | What happens | What you need to do |
 |----------|-------------|---------------------|
@@ -841,7 +841,7 @@ matches your actual tools and file paths.
 
 | Version | Notes |
 |---------|-------|
-| 0.11.0 | Pre-release. 22 skills complete. Bootstrap with `--preset` and `--uninstall`. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired. |
+| 0.11.0 | Pre-release. 27 skills complete. Bootstrap with `--preset` and `--uninstall`. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired. |
 
 See [CHANGELOG.md](../CHANGELOG.md) for the full release history including post-0.11.0 maintenance.
 

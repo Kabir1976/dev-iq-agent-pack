@@ -32,7 +32,7 @@ The immediate impact:
 
 Dev.IQ is the accelerator. It drops a DI reasoning layer directly into **GitHub Copilot Chat** and **Claude Code** so developers don't have to learn a new tool or change their workflow. The IDE they already use becomes delivery-intelligent.
 
-- **22 skills** covering the full developer lifecycle — user story review, API design, feature scaffolding, code review, security analysis, PR readiness, blast radius estimation, deployment checks, and more.
+- **27 skills** covering the full developer lifecycle — API design, feature scaffolding, code review, security analysis, observability review, AI integration review, PR readiness, blast radius estimation, deployment checks, and more.
 - **Two agents** (`Dev-IQ` for full execution, `Dev-IQ-PLAN` for plan-first workflows) with a built-in handoff button between them.
 - **Maturity-aware behavior** — a one-file config scales the pack from "early / advisory only" to "higher / autonomous PR verdicts," meeting teams where they are.
 - **MCP wiring** to GitHub, ADO, Jira, Sentry, Grafana, Playwright, Slack, and 13 more tool surfaces — configured in one file, credentials kept in your OS keychain.
@@ -78,7 +78,7 @@ Dev.IQ addresses all three: the trust gap with explicit signal grounding (UNGRAD
 /plugin install [your-org]/dev-iq@v0.11.0
 ```
 
-This installs the 22 skills and both agents globally. Nothing is written to your codebase yet — that's the next step.
+This installs the 27 skills and both agents globally. Nothing is written to your codebase yet — that's the next step.
 
 ---
 
@@ -130,7 +130,7 @@ Bootstrap copies instruction files, `.dev-iq/` config, `.vscode/settings.json`, 
 .github/
   copilot-instructions.md     ← always-on DI reasoning rules for Copilot
   instructions/               ← scoped rule sheets (code standards, security, etc.)
-  skills/                     ← 22 DI skills, one subfolder each
+  skills/                     ← 27 DI skills, one subfolder each
   agents/                     ← Dev-IQ and Dev-IQ-PLAN agent definitions
 .claude/
   agents/                     ← Claude Code subagent counterparts

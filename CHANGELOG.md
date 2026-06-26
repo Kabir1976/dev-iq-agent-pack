@@ -29,6 +29,25 @@ Versions follow [Semantic Versioning](https://semver.org/).
 - **`generate-traceability` skill** — 6 marker styles from `traceability.marker_style` in config; reads `code_globs`/`test_globs` from config instead of always prompting the user.
 - **`scripts/bootstrap.sh` + `bootstrap.ps1`** — `--dry-run` flag (shows what would change without applying), `--yes` / `-y` flag (skips interactive confirmation), uninstall snapshot/restore (saves `.di.pre-install` before overwriting, restores on `--uninstall`).
 
+### Added (skills)
+
+- **`estimate-effort`** — INTENT + DESIGN signal. Calibrated story-point and t-shirt sizing with rationale, uncertainty band, and scope-risk flags.
+- **`review-observability`** — QUALITY signal. Logging, metrics, distributed tracing, health endpoints, and alerting coverage review with severity-rated anti-patterns.
+- **`generate-openapi`** — DESIGN signal. Generates OpenAPI 3.x YAML from controller/router code across Express, NestJS, FastAPI, Spring, ASP.NET, Rails, and Go — with gap report.
+- **`onboard-codebase`** — INTENT signal. New developer guide generated from repo structure: architecture map, one key data flow, local dev setup, and 10 conventions to know before touching code.
+- **`review-ai-integration`** — QUALITY + RISK signal. Full OWASP LLM Top 10 review for LLM/agentic code with blast radius summary.
+
+### Changed (skill renames — resolves Assert.IQ name collision, aligns with `review-*` convention)
+
+- `code-review` → **`review-code`** — fixes naming convention (only skill not following `review-*` pattern).
+- `new-pull-request` → **`create-pull-request`** — clearer verb.
+- `review-acceptance-criteria` → **`validate-acceptance-criteria`** — stronger verb, avoids exact Assert.IQ collision.
+- `generate-traceability-matrix` → **`generate-traceability`** — shorter name, avoids exact Assert.IQ collision.
+
+### Removed (skills)
+
+- **`generate-user-stories`** — BA/PO territory, not developer territory. Replaced in starter recommendations by `/onboard-codebase` ("Joining a new codebase") and `/estimate-effort` ("Starting a new feature").
+
 ---
 
 ## [0.10.0] — 2026-06-22

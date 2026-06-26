@@ -93,7 +93,7 @@ difference is how you invoke the Dev-IQ agent.
 
 ## Step 4 — Skills reference
 
-22 skills are available. This is the full list with the most practical starting
+27 skills are available. This is the full list with the most practical starting
 points highlighted.
 
 ### Start here (Day 1)
@@ -125,12 +125,17 @@ points highlighted.
 | `/design-api` | New or changed API surface | API contract review, naming, consistency |
 | `/design-data-model` | Schema or data model work | Data model assessment with migration risk |
 | `/generate-adr` | Architecture decision to record | Architecture Decision Record (ADR) document |
+| `/generate-openapi` | Document an API | OpenAPI 3.x YAML generated from controller/router code |
 | `/identify-dependencies` | Before a major change | Upstream/downstream dependency map |
 | `/blast-radius-estimator` | Before a breaking change | Blast radius estimate — who and what is affected |
 | `/generate-traceability` | Audit or compliance | Requirements → code → tests traceability table |
 | `/generate-release-notes` | After a sprint | Release notes from the diff |
 | `/create-pull-request` | Creating a PR | PR description with DI context |
 | `/review-dependencies` | After adding packages | Dependency risk review (CVEs, licensing) |
+| `/review-observability` | Before merging instrumented code | Logging, metrics, tracing, alerting coverage review |
+| `/review-ai-integration` | Any LLM/agentic code | OWASP LLM Top 10 review with blast radius summary |
+| `/onboard-codebase` | Joining a new codebase | New developer guide — architecture, setup, conventions |
+| `/dev-iq-tailor` | Customizing pack config | Config.yaml tuned to the codebase's stack and conventions |
 
 ---
 

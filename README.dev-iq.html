@@ -472,7 +472,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
       <tr><td><code>.dev-iq/governance.md</code></td><td>Compliance posture — varies by client / regulatory regime.</td></tr>
       <tr><td><code>.dev-iq/maturity-profile.md</code></td><td>Tier rationale — team-specific.</td></tr>
       <tr><td><code>.github/copilot-instructions.md</code> + instructions</td><td>Copilot reads these only from the workspace; <code>applyTo</code> globs scope to repo files.</td></tr>
-      <tr><td><code>.github/skills/</code></td><td>All 22 DI skills — Copilot Chat reads them from this workspace path.</td></tr>
+      <tr><td><code>.github/skills/</code></td><td>All 27 DI skills — Copilot Chat reads them from this workspace path.</td></tr>
       <tr><td><code>.github/agents/</code></td><td><code>Dev-IQ.agent.md</code> and <code>Dev-IQ-PLAN.agent.md</code> custom chat modes.</td></tr>
       <tr><td><code>.claude/agents/</code></td><td>Claude Code subagent counterparts (<code>dev-iq.md</code>, <code>dev-iq-plan.md</code>).</td></tr>
       <tr><td><code>.claude/skills</code></td><td>Symlink to <code>../.github/skills</code> — one canonical copy for both tools.</td></tr>
@@ -718,7 +718,7 @@ compliance_posture: enterprise         <span class="comment"># Skills refuse req
 │   │   ├── di-security.instructions.md
 │   │   ├── di-signal-emission.instructions.md
 │   │   └── di-traceability.instructions.md
-│   ├── skills/                            <span class="comment"># 22 DI skills, one subfolder each</span>
+│   ├── skills/                            <span class="comment"># 27 DI skills, one subfolder each</span>
 │   └── agents/
 │       ├── Dev-IQ.agent.md                <span class="comment"># Action agent</span>
 │       └── Dev-IQ-PLAN.agent.md           <span class="comment"># Plan-first agent</span>
@@ -782,7 +782,7 @@ compliance_posture: enterprise         <span class="comment"># Skills refuse req
   <table>
     <thead><tr><th>Version</th><th>Notes</th></tr></thead>
     <tbody>
-      <tr><td>0.11.0</td><td>Pre-release. 22 skills complete. Bootstrap with <code>--preset</code> and <code>--uninstall</code>. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired.</td></tr>
+      <tr><td>0.11.0</td><td>Pre-release. 27 skills complete. Bootstrap with <code>--preset</code> and <code>--uninstall</code>. No git tags cut yet — distributed as a zip. All Copilot and Claude Code surfaces wired.</td></tr>
     </tbody>
   </table>
 
