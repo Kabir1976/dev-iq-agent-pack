@@ -44,7 +44,7 @@
 | Skill | DI Signal | What it does |
 |-------|-----------|-------------|
 | `blast-radius-estimator` | RISK | Maps the downstream impact of a proposed change — consumers, services, schemas, teams — and produces a deployment sequencing recommendation. |
-| `code-review` | DESIGN + QUALITY | Reviews a code change through all four DI signal layers and produces a severity-rated findings report with a merge verdict. |
+| `review-code` | DESIGN + QUALITY | Reviews a code change through all four DI signal layers and produces a severity-rated findings report with a merge verdict. |
 | `debug-issue` | QUALITY + RISK | Diagnoses the root cause of a bug or unexpected behavior, distinguishing root causes from symptoms and assessing fix risk. |
 | `design-api` | DESIGN | Designs a REST or GraphQL API from requirements, producing endpoint definitions, request/response schemas, and an error contract. |
 | `design-data-model` | DESIGN | Designs a relational or document data model from requirements, producing entity definitions, relationships, index recommendations, and migration impact notes. |
@@ -53,15 +53,15 @@
 | `generate-adr` | DESIGN | Generates a MADR-style Architecture Decision Record capturing context, the decision made, alternatives considered, and consequences. |
 | `generate-release-notes` | INTENT | Generates structured release notes from git history, merged PRs, and linked work items, flagging untracked scope as INTENT UNGRADED. |
 | `generate-rollback-plan` | RISK | Generates a rollback plan for a deployment — trigger criteria, step-by-step reversal procedure, and explicit documentation of what cannot be rolled back. |
-| `generate-traceability-matrix` | INTENT | Generates a traceability matrix mapping work items to acceptance criteria to code to tests, surfacing gaps at each link in the chain. |
+| `generate-traceability` | INTENT | Generates a traceability matrix mapping work items to acceptance criteria to code to tests, surfacing gaps at each link in the chain. |
 | `dev-iq-tailor` | DESIGN | Tailors the pack configuration to the specific stack, deployment targets, and observability tools of the workspace — sets defaults for signal thresholds, stack languages, and framework patterns. |
 | `estimate-effort` | INTENT + DESIGN | Produces a calibrated story-point or t-shirt size estimate for a user story, feature request, or diff, with rationale, uncertainty band, and scope-risk flags. |
 | `generate-openapi` | DESIGN | Generates an OpenAPI 3.x YAML specification by reading controller, router, or handler code — extracts endpoints, parameters, request/response shapes, auth schemes, and produces a gap report. |
 | `identify-dependencies` | INTENT + RISK | Surfaces blockers, external dependencies, and delivery risks for a work item before work begins, rated by severity with a resolution order. |
 | `onboard-codebase` | INTENT | Generates a structured new-developer guide from repo structure — entry points, architecture overview, one end-to-end data flow trace, local setup, established conventions, and the top 10 things to know before touching code. |
-| `new-pull-request` | DESIGN + QUALITY + RISK | Generates a complete, ready-to-paste PR description from the current diff and linked work item, including a DI signal summary. |
+| `create-pull-request` | DESIGN + QUALITY + RISK | Generates a complete, ready-to-paste PR description from the current diff and linked work item, including a DI signal summary. |
 | `refactor-code` | DESIGN + QUALITY | Analyzes code through DESIGN and QUALITY lenses, proposes a plan for developer approval, then delivers refactored code with per-change rationale. |
-| `review-acceptance-criteria` | INTENT | Evaluates acceptance criteria on a work item for testability, specificity, completeness, and consistency — returns an AC-by-AC assessment with gaps. |
+| `validate-acceptance-criteria` | INTENT | Evaluates acceptance criteria on a work item for testability, specificity, completeness, and consistency — returns an AC-by-AC assessment with gaps. |
 | `review-ai-integration` | QUALITY + RISK | Reviews LLM API calls, prompt construction, agentic workflows, and RAG pipelines against the OWASP LLM Top 10 plus DI security and quality standards. |
 | `review-observability` | QUALITY | Reviews code for adequate logging, metrics instrumentation, distributed tracing, alerting hooks, and health endpoints — flags PII in logs, silent catches, and missing business-operation coverage. |
 | `review-architecture` | DESIGN + RISK | Reviews an architecture or design proposal for layer separation, coupling, scalability, and single points of failure — issues a Go / Go with recommendations / Hold verdict. |

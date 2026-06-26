@@ -170,7 +170,7 @@ bootstrap:
   version: "0.11.0"
 
 # ── Code Review ────────────────────────────────────────────────────
-# Tunes the code-review skill output, severity filtering, and thread
+# Tunes the review-code skill output, severity filtering, and thread
 # reconciliation behaviour. Mirrors the Assert.IQ code_review block.
 code_review:
   # disabled_categories: skip these review categories.
@@ -207,19 +207,19 @@ mcp:
     - key: "azure-devops"
       purpose: "Work item lookup, AC retrieval, PR creation, and release note delivery via ADO"
       allowed_skills:
-        - "review-acceptance-criteria"
-        - "new-pull-request"
+        - "validate-acceptance-criteria"
+        - "create-pull-request"
         - "review-pr-readiness"
-        - "generate-traceability-matrix"
+        - "generate-traceability"
         - "generate-release-notes"
     - key: "github"
       purpose: "PR creation, diff retrieval, issue linking, and release note delivery via GitHub"
       allowed_skills:
-        - "new-pull-request"
+        - "create-pull-request"
         - "review-pr-readiness"
-        - "generate-traceability-matrix"
+        - "generate-traceability"
         - "generate-release-notes"
-        - "code-review"
+        - "review-code"
     - key: "filesystem"
       purpose: "Read and write local workspace artifacts (ADRs, rollback plans, user stories)"
       allowed_skills:

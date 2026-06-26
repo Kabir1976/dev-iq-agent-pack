@@ -1,5 +1,5 @@
 ---
-name: generate-traceability-matrix
+name: generate-traceability
 description: Generate a traceability matrix mapping work items to acceptance criteria to code to tests. Use when asked to "generate a traceability matrix", "trace requirements to code", "verify AC coverage", or "show me what's tested".
 di_signal: INTENT
 maturity_required: early
@@ -203,7 +203,7 @@ Insufficient data to assess:
 
 ### Example 1: Fully Covered Story
 
-**User says:** `/generate-traceability-matrix` for AB#2202 (wishlist sharing)
+**User says:** `/generate-traceability` for AB#2202 (wishlist sharing)
 
 **Result:**
 
@@ -250,7 +250,7 @@ None. All ACs are fully traced from work item through code to tests.
 
 ### Example 2: Story with Untested Code and Missing AC
 
-**User says:** `/generate-traceability-matrix` for AB#3105 (payment integration)
+**User says:** `/generate-traceability` for AB#3105 (payment integration)
 
 **Result:**
 
@@ -352,7 +352,7 @@ Do not close this work item until both gaps are resolved.
   explicitly deferred those ACs to a documented follow-up work item
 
 ## Related Skills
-- `/review-acceptance-criteria` — review ACs before generating the matrix to
+- `/validate-acceptance-criteria` — review ACs before generating the matrix to
   ensure they are testable; untestable ACs produce incorrect matrix rows
 - `/review-pr-readiness` — the traceability matrix is a key input to the PR
   readiness verdict; Code Only and NOT COVERED gaps affect the QUALITY signal

@@ -472,14 +472,14 @@ stack:
   <table>
     <thead><tr><th>/skill-name</th><th>Signal</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td><code>/review-acceptance-criteria</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Review ACs for completeness and clarity</td></tr>
+      <tr><td><code>/validate-acceptance-criteria</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Review ACs for completeness and clarity</td></tr>
       <tr><td><code>/identify-dependencies</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Surface blockers and cross-team dependencies</td></tr>
       <tr><td><code>/design-api</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>RESTful API design from requirements</td></tr>
       <tr><td><code>/design-data-model</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>Entity/database design from stories</td></tr>
       <tr><td><code>/generate-adr</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>Architecture Decision Record generation</td></tr>
       <tr><td><code>/review-architecture</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-risk">RISK</span></td><td>Architecture review through DI lens</td></tr>
       <tr><td><code>/scaffold-feature</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Generate boilerplate from AC + story</td></tr>
-      <tr><td><code>/code-review</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Four-layer code review with DI reasoning</td></tr>
+      <tr><td><code>/review-code</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Four-layer code review with DI reasoning</td></tr>
       <tr><td><code>/debug-issue</code></td><td><span class="skill-tag tag-risk">RISK</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Structured bug diagnosis + fix suggestion</td></tr>
       <tr><td><code>/refactor-code</code></td><td><span class="skill-tag tag-design">DESIGN</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Refactoring suggestions with rationale</td></tr>
       <tr><td><code>/review-security</code></td><td><span class="skill-tag tag-quality">QUALITY</span> <span class="skill-tag tag-risk">RISK</span></td><td>Security review (OWASP Top 10 + LLM Top 10)</td></tr>
@@ -487,11 +487,11 @@ stack:
       <tr><td><code>/review-pr-readiness</code></td><td><span class="skill-tag tag-risk">RISK</span> <span class="skill-tag tag-quality">QUALITY</span></td><td>Go / Hold / Discuss verdict before merge</td></tr>
       <tr><td><code>/blast-radius-estimator</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Map downstream impact of a change</td></tr>
       <tr><td><code>/review-dependencies</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Dependency change risk analysis</td></tr>
-      <tr><td><code>/new-pull-request</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-risk">RISK</span></td><td>PR body with DI risk band + traceability</td></tr>
+      <tr><td><code>/create-pull-request</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-risk">RISK</span></td><td>PR body with DI risk band + traceability</td></tr>
       <tr><td><code>/generate-release-notes</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Release notes from commits / PRs</td></tr>
       <tr><td><code>/review-deployment-readiness</code></td><td><span class="skill-tag tag-quality">QUALITY</span> <span class="skill-tag tag-risk">RISK</span></td><td>Go / No-Go deployment checklist</td></tr>
       <tr><td><code>/generate-rollback-plan</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Rollback steps from deployment context</td></tr>
-      <tr><td><code>/generate-traceability-matrix</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
+      <tr><td><code>/generate-traceability</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
       <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper</td></tr>
       <tr><td><code>/estimate-effort</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Story-point / t-shirt estimate with rationale</td></tr>
       <tr><td><code>/review-observability</code></td><td><span class="skill-tag tag-quality">QUALITY</span></td><td>Logging, metrics, tracing, and alerting coverage review</td></tr>
@@ -515,7 +515,7 @@ stack:
     <tbody>
       <tr><td>Looking at an unfamiliar file</td><td><code>/explain-code</code></td></tr>
       <tr><td>Before opening a PR</td><td><code>/review-pr-readiness</code></td></tr>
-      <tr><td>Reviewing someone else's code</td><td><code>/code-review</code></td></tr>
+      <tr><td>Reviewing someone else's code</td><td><code>/review-code</code></td></tr>
       <tr><td>Something breaks</td><td><code>/debug-issue</code></td></tr>
       <tr><td>Joining a new codebase</td><td><code>/onboard-codebase</code></td></tr>
     </tbody>

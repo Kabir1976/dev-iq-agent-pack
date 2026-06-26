@@ -192,7 +192,7 @@ DESIGN: [STRONG | WEAK | UNGRADED]
 
 ## Related Skills
 
-- `/review-acceptance-criteria` — run first if ACs are missing or ambiguous;
+- `/validate-acceptance-criteria` — run first if ACs are missing or ambiguous;
   this skill requires testable ACs to estimate accurately
 - `/identify-dependencies` — run after estimation to surface blockers that
   could invalidate the estimate

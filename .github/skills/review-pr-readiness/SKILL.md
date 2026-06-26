@@ -14,7 +14,7 @@ produces a signal scorecard, severity-rated findings, a clear
 Go / Go with comments / Hold verdict, and a ready-to-paste PR description
 with a DI risk band.
 
-This is the capstone skill of the developer workflow. Where `/code-review`
+This is the capstone skill of the developer workflow. Where `/review-code`
 examines code quality in detail, `/review-pr-readiness` asks the higher-order
 question: *is this PR safe to merge right now?*
 
@@ -442,8 +442,8 @@ and loudly" principle — see di-code-standards.instructions.md.
 
 ## Related Skills
 - `/scaffold-feature` — start of the workflow; generate the code structure
-- `/code-review` — detailed line-level review during development
+- `/review-code` — detailed line-level review during development
 - `/blast-radius-estimator` — deeper blast radius analysis for high-risk PRs
 - `/review-security` — deeper security review for auth, payments, data handling
-- `/new-pull-request` — raise the PR with the DI risk band already filled in
+- `/create-pull-request` — raise the PR with the DI risk band already filled in
 - Assert.IQ `/check-merge` — QE signal assessment to complement this DI assessment

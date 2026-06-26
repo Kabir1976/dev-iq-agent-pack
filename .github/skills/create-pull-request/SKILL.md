@@ -1,5 +1,5 @@
 ---
-name: new-pull-request
+name: create-pull-request
 description: Generate a complete pull request description from the current diff, with DI signal assessment and traceability. Use when asked to "create a PR", "write the PR description", "generate PR notes", or "open a pull request".
 di_signal: DESIGN + QUALITY + RISK
 maturity_required: early
@@ -232,7 +232,7 @@ No implementation detail that belongs in a code comment.]
 
 ### Example 1: Feature PR with Linked ADO Work Item
 
-**User says:** `/new-pull-request` — branch `feature/wishlist-share`, work item AB#2202
+**User says:** `/create-pull-request` — branch `feature/wishlist-share`, work item AB#2202
 
 **Result:**
 
@@ -336,7 +336,7 @@ view is read-only and the URL expires after 30 days of inactivity.
 
 ### Example 2: Hotfix PR with No Work Item — INTENT UNGRADED
 
-**User says:** `/new-pull-request` — branch `hotfix/null-payment-crash`, no work item
+**User says:** `/create-pull-request` — branch `hotfix/null-payment-crash`, no work item
 
 **Result (DI Signal Summary excerpt):**
 
@@ -411,8 +411,8 @@ or confirm that a follow-up Assert.IQ test generation task is tracked.
 
 ## Related Skills
 - `/review-pr-readiness` — for a full four-layer PR readiness assessment before
-  opening the PR; use before `/new-pull-request` when confidence is low
-- `/generate-traceability-matrix` — to verify AC coverage before writing the
+  opening the PR; use before `/create-pull-request` when confidence is low
+- `/generate-traceability` — to verify AC coverage before writing the
   PR description
 - `/review-dependencies` — if the PR adds or updates dependencies, run a
   dependency review before generating the PR description

@@ -397,7 +397,7 @@ documentation — undocumented configuration changes accumulate as invisible deb
 ## Related Skills
 - `/review-deployment-readiness` — run before cutting a release; if there are
   unresolved findings, they should appear in the release notes as known issues
-- `/generate-traceability-matrix` — verify that all shipped work items have
+- `/generate-traceability` — verify that all shipped work items have
   code and test coverage before generating release notes
 - `/blast-radius-estimator` — for releases with breaking changes, the blast
   radius assessment should inform the upgrade notes

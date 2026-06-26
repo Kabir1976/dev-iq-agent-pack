@@ -23,10 +23,10 @@ Versions follow [Semantic Versioning](https://semver.org/).
 - **`hooks/config/skill-improve.config.json`** — expanded from 6 fields to full schema: weighted correction signatures (20 patterns, strong/weak), proactive insights detection, tool behavioral signals, thresholds, retention policy, full customization roots (`.github/instructions`, `.github/skills`, `.github/agents`, `.claude/skills`, `.claude/agents`, `.dev-iq`).
 - **`.dev-iq/governance.md`** — rewritten as a fillable client template: compliance posture table (HIPAA/PCI-DSS/SOX/GDPR/CCPA/FedRAMP/ISO 27001), human review gates, escalation paths, AI tool boundary, approval signatures. Existing Data Boundary and AI Output Controls content preserved.
 - **`.dev-iq/maturity-profile.md`** — expanded with 15-indicator checklist (Foundation/Signals/Quality/Governance), 7 re-evaluation triggers, approval table.
-- **`code-review` skill** — added PR Context Gathering Protocol (diff + thread fetch + iteration timeline + reconciliation), Recurring Anti-Patterns Pre-flight (6 checks), review depth calibration (<20/20-200/>200 lines), Post-Review Follow-Up section, PR Comment Reconciliation table in output.
-- **`new-pull-request` skill** — added credential pre-flight scan (7 patterns: AWS, Azure, GCP, GitHub, Slack, GitLab, PEM), PR template merge logic, per-host CLI routing table (GitHub/ADO/GitLab/Bitbucket).
-- **`review-acceptance-criteria` skill** — config-backed `ac_review.preferred_format`, `ac_review.gating_policy`, `ac_review.nfr_checklist`.
-- **`generate-traceability-matrix` skill** — 6 marker styles from `traceability.marker_style` in config; reads `code_globs`/`test_globs` from config instead of always prompting the user.
+- **`review-code` skill** — added PR Context Gathering Protocol (diff + thread fetch + iteration timeline + reconciliation), Recurring Anti-Patterns Pre-flight (6 checks), review depth calibration (<20/20-200/>200 lines), Post-Review Follow-Up section, PR Comment Reconciliation table in output.
+- **`create-pull-request` skill** — added credential pre-flight scan (7 patterns: AWS, Azure, GCP, GitHub, Slack, GitLab, PEM), PR template merge logic, per-host CLI routing table (GitHub/ADO/GitLab/Bitbucket).
+- **`validate-acceptance-criteria` skill** — config-backed `ac_review.preferred_format`, `ac_review.gating_policy`, `ac_review.nfr_checklist`.
+- **`generate-traceability` skill** — 6 marker styles from `traceability.marker_style` in config; reads `code_globs`/`test_globs` from config instead of always prompting the user.
 - **`scripts/bootstrap.sh` + `bootstrap.ps1`** — `--dry-run` flag (shows what would change without applying), `--yes` / `-y` flag (skips interactive confirmation), uninstall snapshot/restore (saves `.di.pre-install` before overwriting, restores on `--uninstall`).
 
 ---
@@ -93,25 +93,25 @@ Initial pre-release of the Dev.IQ Agent Pack.
 **Skills (22 total)**
 - `explain-code` — INTENT signal, plain-language code explanation with intent gap detection
 - `generate-user-stories` — INTENT signal, user stories with ACs from requirements
-- `review-acceptance-criteria` — INTENT signal, AC quality review (testable, specific, complete)
+- `validate-acceptance-criteria` — INTENT signal, AC quality review (testable, specific, complete)
 - `identify-dependencies` — INTENT + RISK, blocker and dependency mapping before work begins
 - `design-api` — DESIGN signal, REST/GraphQL API design from requirements
 - `design-data-model` — DESIGN signal, entity schema and relationship design
 - `generate-adr` — DESIGN signal, Architecture Decision Records (MADR format)
 - `review-architecture` — DESIGN signal, architecture review with Go/Hold verdict
 - `refactor-code` — DESIGN + QUALITY, propose-before-build refactoring with change rationale table
-- `code-review` — QUALITY signal, line-level code review with DI findings
+- `review-code` — QUALITY signal, line-level code review with DI findings
 - `review-security` — QUALITY + RISK, OWASP-grounded security review with Block/Clear verdict
 - `debug-issue` — QUALITY + RISK, root-cause diagnosis with fix risk assessment
 - `scaffold-feature` — DESIGN + QUALITY, new feature scaffolding from work item
 - `blast-radius-estimator` — RISK signal, change impact analysis across consumers
 - `review-dependencies` — RISK signal, CVE and license review on package changes
 - `review-pr-readiness` — four-layer PR readiness assessment with Go/Hold verdict
-- `new-pull-request` — delivery, PR description generation with DI signal summary
+- `create-pull-request` — delivery, PR description generation with DI signal summary
 - `generate-release-notes` — INTENT, release notes from git history + work items
 - `review-deployment-readiness` — QUALITY + RISK, go/no-go deployment assessment
 - `generate-rollback-plan` — RISK, step-by-step rollback plan with trigger criteria
-- `generate-traceability-matrix` — INTENT, requirements → code → tests traceability map
+- `generate-traceability` — INTENT, requirements → code → tests traceability map
 - `dev-iq-bootstrap` — setup, guided pack installation and configuration
 
 **Agents**

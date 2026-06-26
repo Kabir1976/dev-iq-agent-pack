@@ -296,7 +296,7 @@ I'll proceed with ACs 1, 2, and 4 and leave a flagged TODO for AC3.
 - If operating at Early maturity tier, append a coaching note explaining each design decision made
 
 ## Related Skills
-- `/review-acceptance-criteria` — review ACs before scaffolding to catch ambiguities early
-- `/code-review` — review the completed implementation against the scaffold
+- `/validate-acceptance-criteria` — review ACs before scaffolding to catch ambiguities early
+- `/review-code` — review the completed implementation against the scaffold
 - `/review-pr-readiness` — assess the PR once implementation is done
 - Assert.IQ `/generate-automated-unit-test` — generate full unit tests from the stubs

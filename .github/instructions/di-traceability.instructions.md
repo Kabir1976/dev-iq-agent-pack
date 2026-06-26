@@ -46,7 +46,7 @@ If no work item exists: note the absence in the DI assessment (INTENT layer) but
 
 ## Traceability Matrix Structure
 
-When generating a traceability matrix (via `/generate-traceability-matrix`), produce a table mapping requirements to code to tests:
+When generating a traceability matrix (via `/generate-traceability`), produce a table mapping requirements to code to tests:
 
 ```markdown
 | Work Item | AC | File / Function | Test File / Test Name | Status |

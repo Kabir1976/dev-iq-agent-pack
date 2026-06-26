@@ -359,7 +359,7 @@ coaching note explaining *why the pattern matters* in production systems.
 - Never introduce new dependencies or frameworks without explicit confirmation
 
 ## Related Skills
-- `/code-review` — line-level review during development; use before `/refactor-code`
+- `/review-code` — line-level review during development; use before `/refactor-code`
 - `/review-pr-readiness` — if refactoring clears all High findings, re-run
   to confirm the PR signal is clean
 - `/review-architecture` — for structural concerns beyond a single file

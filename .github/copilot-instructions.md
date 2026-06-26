@@ -23,14 +23,14 @@ Assert.IQ boundaries — Copilot loads it automatically via `applyTo: "**"`.
 
 | /skill-name | DI Signal | Purpose |
 |-------------|-----------|---------|
-| `/review-acceptance-criteria` | INTENT | Review ACs for completeness and clarity |
+| `/validate-acceptance-criteria` | INTENT | Review ACs for completeness and clarity |
 | `/identify-dependencies` | RISK | Surface blockers and cross-team dependencies |
 | `/design-api` | DESIGN | RESTful API design from requirements |
 | `/design-data-model` | DESIGN | Entity/database design from stories |
 | `/generate-adr` | DESIGN | Architecture Decision Record |
 | `/review-architecture` | DESIGN + RISK | Architecture review through DI lens |
 | `/scaffold-feature` | INTENT + DESIGN | Generate boilerplate from AC + story |
-| `/code-review` | DESIGN + QUALITY | Code review through DI four-layer lens |
+| `/review-code` | DESIGN + QUALITY | Code review through DI four-layer lens |
 | `/debug-issue` | RISK + QUALITY | Structured bug diagnosis + fix suggestion |
 | `/refactor-code` | DESIGN + QUALITY | Refactoring suggestions with rationale |
 | `/review-security` | QUALITY + RISK | Security-focused code review |
@@ -38,11 +38,11 @@ Assert.IQ boundaries — Copilot loads it automatically via `applyTo: "**"`.
 | `/review-pr-readiness` | RISK + QUALITY | Go/Hold/Discuss verdict |
 | `/blast-radius-estimator` | RISK | Map downstream impact of a change |
 | `/review-dependencies` | RISK | Dependency change risk analysis |
-| `/new-pull-request` | INTENT + RISK | PR body with DI risk band + traceability |
+| `/create-pull-request` | INTENT + RISK | PR body with DI risk band + traceability |
 | `/generate-release-notes` | INTENT | Release notes from commits/PRs |
 | `/review-deployment-readiness` | QUALITY + RISK | Go/No-Go deployment checklist |
 | `/generate-rollback-plan` | RISK | Rollback steps from deployment context |
-| `/generate-traceability-matrix` | INTENT + DESIGN | Req ↔ Code ↔ Test matrix |
+| `/generate-traceability` | INTENT + DESIGN | Req ↔ Code ↔ Test matrix |
 | `/dev-iq-tailor` | DESIGN | Tailor pack config to this codebase (run after bootstrap) |
 | `/estimate-effort` | INTENT + DESIGN | Story point / t-shirt estimate with rationale |
 | `/review-observability` | QUALITY | Logging, metrics, tracing, and alerting coverage review |

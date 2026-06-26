@@ -409,7 +409,7 @@ These are the statements that get security findings dismissed. Rebut them.
 - **UNGRADED check areas do not produce a Clear verdict** — an UNGRADED dependency scan is not a passing dependency scan. State the gap; the team decides whether to proceed without the data.
 
 ## Related Skills
-- `/code-review` — general line-level review; use for non-security concerns
+- `/review-code` — general line-level review; use for non-security concerns
 - `/review-pr-readiness` — security verdict feeds directly into the RISK
   signal of PR readiness; Critical/High here always produces Hold there
 - `/blast-radius-estimator` — assess downstream impact of a security fix

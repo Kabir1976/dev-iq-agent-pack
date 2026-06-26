@@ -318,7 +318,7 @@ behavior is wrong, fix the behavior. Don't leave both wrong.
 ## Related Skills
 - `/refactor-code` — after explaining, if INTENT gaps or QUALITY issues are
   found, use refactor-code to address them with a plan before changing anything
-- `/review-acceptance-criteria` — if the code is tied to a work item,
+- `/validate-acceptance-criteria` — if the code is tied to a work item,
   verify the ACs are met after understanding what the code actually does
 - `/generate-adr` — if the explanation reveals a design decision that is not
   documented anywhere, generate an ADR to capture it

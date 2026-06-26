@@ -225,7 +225,7 @@ a Go / Hold / Discuss recommendation. This is the core of what Dev.IQ does.
 |------|-------------|
 | Looking at an unfamiliar file | `/explain-code` |
 | Before opening a PR | `/review-pr-readiness` |
-| Reviewing someone else's code | `/code-review` |
+| Reviewing someone else's code | `/review-code` |
 | Something breaks | `/debug-issue` |
 | Joining a new codebase | `/onboard-codebase` |
 
@@ -277,7 +277,7 @@ Send a short report back using these prompts — the more specific, the more use
 - Did you need to change your PowerShell execution policy? Was that step clear?
 
 **Skill quality**
-- Which skills did you try? (`/explain-code`, `/review-pr-readiness`, `/code-review`, etc.)
+- Which skills did you try? (`/explain-code`, `/review-pr-readiness`, `/review-code`, etc.)
 - Did the output feel useful and specific to your code, or generic?
 - Did any skill produce output that was wrong, confusing, or unhelpful — and if so, what did you ask and what did it say?
 

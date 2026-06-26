@@ -146,7 +146,7 @@ that do not apply.
 - All generated code artifacts must reference the source ADO work item (`AB#XXXX`)
   when one is available.
 - PRs without a linked work item are flagged as a Risk finding at Medium severity.
-- A traceability matrix can be generated on demand with `/generate-traceability-matrix`.
+- A traceability matrix can be generated on demand with `/generate-traceability`.
 
 ---
 

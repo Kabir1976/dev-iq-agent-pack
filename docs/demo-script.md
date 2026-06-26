@@ -56,14 +56,14 @@ Open with one question to the room:
 
 ---
 
-## Demo 2 — `/code-review` (10 min)
+## Demo 2 — `/review-code` (10 min)
 
 **Purpose:** Show structured four-layer review vs. reviewer instinct.
 
 **Setup:**
 1. Open the PR in GitHub (browser)
 2. Copy the diff or open the changed files in VS Code
-3. In Copilot Chat: select changed files as context, type `/code-review`
+3. In Copilot Chat: select changed files as context, type `/review-code`
 
 **Talking points while it runs:**
 - "It's running through all four layers — Intent, Design, Quality, Risk. Each finding will tell you which layer it belongs to and how severe it is."

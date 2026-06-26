@@ -112,7 +112,7 @@ Be honest — this is the basis for a realistic promotion path. -->
 <!-- List the 2–4 changes that, once true, would justify re-evaluating to
 the next tier. These become your DI improvement backlog items. -->
 
-- `<e.g. 5+ PRs reviewed with the code-review skill over 2 sprints>`
+- `<e.g. 5+ PRs reviewed with the review-code skill over 2 sprints>`
 - `<e.g. Governance.md signed off and compliance posture filled in>`
 - `<Add more as needed>`
 

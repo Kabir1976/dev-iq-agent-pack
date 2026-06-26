@@ -80,7 +80,7 @@ difference is how you invoke the Dev-IQ agent.
    The agent reads your open files, the diff, and any connected ADO work items
    automatically.
 
-3. **Select code before running a skill** to scope it. For `/code-review` or
+3. **Select code before running a skill** to scope it. For `/review-code` or
    `/explain-code`, highlight the function or class first.
 
 4. **Paste when prompted.** If ADO credentials aren't wired, skills ask you to
@@ -101,7 +101,7 @@ points highlighted.
 | Skill | When to use | What you get |
 |-------|------------|--------------|
 | `/explain-code` | Any unfamiliar file or function | Purpose, patterns, dependencies, INTENT signal |
-| `/code-review` | Before or during a PR | Line-level findings across Design + Quality + Security, severity-rated |
+| `/review-code` | Before or during a PR | Line-level findings across Design + Quality + Security, severity-rated |
 | `/review-pr-readiness` | Before merging a PR | Four-layer Go / Hold / No-Go verdict with explicit rationale |
 
 ### High value (Day 1–2)
@@ -109,7 +109,7 @@ points highlighted.
 | Skill | When to use | What you get |
 |-------|------------|--------------|
 | `/review-security` | Any file with auth, data, or external calls | OWASP-grounded security scorecard |
-| `/review-acceptance-criteria` | Before sprint commit | AC-by-AC rating: Testable / Specific / Complete / Consistent |
+| `/validate-acceptance-criteria` | Before sprint commit | AC-by-AC rating: Testable / Specific / Complete / Consistent |
 | `/estimate-effort` | Sizing a story or ticket | Calibrated story-point estimate with rationale and uncertainty band |
 | `/debug-issue` | Something broke | Root cause hypothesis, reproduction steps, fix options |
 | `/refactor-code` | Code that needs cleanup | Prioritized findings + refactored code with rationale |
@@ -127,9 +127,9 @@ points highlighted.
 | `/generate-adr` | Architecture decision to record | Architecture Decision Record (ADR) document |
 | `/identify-dependencies` | Before a major change | Upstream/downstream dependency map |
 | `/blast-radius-estimator` | Before a breaking change | Blast radius estimate — who and what is affected |
-| `/generate-traceability-matrix` | Audit or compliance | Requirements → code → tests traceability table |
+| `/generate-traceability` | Audit or compliance | Requirements → code → tests traceability table |
 | `/generate-release-notes` | After a sprint | Release notes from the diff |
-| `/new-pull-request` | Creating a PR | PR description with DI context |
+| `/create-pull-request` | Creating a PR | PR description with DI context |
 | `/review-dependencies` | After adding packages | Dependency risk review (CVEs, licensing) |
 
 ---
@@ -148,9 +148,9 @@ the following days.
 - **Pass:** Response includes Purpose, INTENT signal, and `@di-review-required`
 - **Fail:** Generic response with no signal labels, or skill doesn't respond
 
-**[ ] `/code-review`**
+**[ ] `/review-code`**
 - Select a file or function you recently changed
-- Type `/code-review` in Dev-IQ chat
+- Type `/review-code` in Dev-IQ chat
 - **Pass:** Returns numbered findings with severity (🔴/🟠/🟡/⚪), DI layer label (DESIGN/QUALITY), and `@di-review-required`
 - **Fail:** Generic code comments with no DI structure
 
@@ -171,9 +171,9 @@ the following days.
 - **Pass:** OWASP-grounded checklist with severity ratings (🔴 Critical / 🟠 High / 🟡 Medium / ⚪ Low) and `@di-review-required`
 - **Fail:** Generic "looks secure" response with no checklist
 
-**[ ] `/review-acceptance-criteria`**
-- Paste a work item or user story into chat, then type `/review-acceptance-criteria`
-- Or if ADO MCP is wired: `/review-acceptance-criteria AB#[work-item-number]`
+**[ ] `/validate-acceptance-criteria`**
+- Paste a work item or user story into chat, then type `/validate-acceptance-criteria`
+- Or if ADO MCP is wired: `/validate-acceptance-criteria AB#[work-item-number]`
 - **Pass:** Table rating each AC as Pass / Weak / Fail across Testable / Specific / Complete / Consistent, plus a Sprint-Readiness verdict
 - **Fail:** Narrative feedback with no structured rating
 

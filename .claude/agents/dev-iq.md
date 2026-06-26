@@ -43,12 +43,12 @@ Route the user's intent to the appropriate skill. Invoke via the Skill tool.
 | Security review / check for vulnerabilities | `review-security` |
 | Scaffold a new feature | `scaffold-feature` |
 | Debug an issue | `debug-issue` |
-| Code review | `code-review` |
+| Code review | `review-code` |
 | PR readiness / should I merge | `review-pr-readiness` |
-| Open a PR | `new-pull-request` |
+| Open a PR | `create-pull-request` |
 | Blast radius / change impact | `blast-radius-estimator` |
 | Dependency review | `review-dependencies` |
-| Review acceptance criteria | `review-acceptance-criteria` |
+| Review acceptance criteria | `validate-acceptance-criteria` |
 | Identify blockers / dependencies | `identify-dependencies` |
 | Design an API | `design-api` |
 | Design a data model | `design-data-model` |
@@ -57,7 +57,7 @@ Route the user's intent to the appropriate skill. Invoke via the Skill tool.
 | Generate release notes | `generate-release-notes` |
 | Deployment readiness / go no-go | `review-deployment-readiness` |
 | Rollback plan | `generate-rollback-plan` |
-| Traceability matrix | `generate-traceability-matrix` |
+| Traceability matrix | `generate-traceability` |
 | Set up Dev.IQ | `dev-iq-bootstrap` |
 | Estimate effort / size a ticket | `estimate-effort` |
 | Observability review / logging coverage | `review-observability` |

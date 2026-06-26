@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: review-code
 description: Reviews code through the DI four-layer lens covering intent, design, quality, and risk. Use when asked to "review this code", "check my PR", "review this file", "look at these changes", or "is this ready to merge".
 di_signal: DESIGN + QUALITY
 maturity_required: early
@@ -269,7 +269,7 @@ Reviewed: [date]
 
 ### Example 1: Critical Security Finding
 
-**User says:** `/code-review` *(pastes user-service.ts)*
+**User says:** `/review-code` *(pastes user-service.ts)*
 
 **Result:**
 ```
@@ -386,7 +386,7 @@ These are the statements that get review findings dismissed. Rebut them.
 - At Higher maturity: verdict can be posted to PR via MCP if configured
 
 ## Related Skills
-- `/review-acceptance-criteria` — review ACs before coding starts
+- `/validate-acceptance-criteria` — review ACs before coding starts
 - `/review-security` — deeper security-only review for high-risk changes
 - `/review-pr-readiness` — full PR assessment including DI risk band
 - `/blast-radius-estimator` — assess downstream impact of this change
@@ -396,7 +396,7 @@ These are the statements that get review findings dismissed. Rebut them.
 
 After delivering the review output, offer these options:
 
-- "Want me to run /new-pull-request and attach this review to the PR description?"
+- "Want me to run /create-pull-request and attach this review to the PR description?"
 - "Want me to run /review-security for a dedicated security pass?"
 - "Want me to fix the Critical and High findings now?"
 - "Want me to generate test stubs for the functions flagged in this review?"

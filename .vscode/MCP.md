@@ -58,7 +58,7 @@ you want `/debug-issue` to pull live error events automatically.
 | `ado_org` | `https://dev.azure.com/YOUR-ORG` |
 | `ado_pat` | ADO Personal Access Token — Work Items (Read/Write), Code (Read), PR Threads (Read/Write) |
 
-**Unlocks:** `/review-acceptance-criteria`, `/estimate-effort`, `/review-pr-readiness`, `/generate-traceability-matrix` reading live ADO data.
+**Unlocks:** `/validate-acceptance-criteria`, `/estimate-effort`, `/review-pr-readiness`, `/generate-traceability` reading live ADO data.
 
 **Troubleshooting:**
 - *"401 Unauthorized"*: PAT expired or wrong scope — regenerate with the permissions above.
@@ -98,7 +98,7 @@ tracker:
 |-------|-------------|
 | `github_pat` | GitHub PAT (classic) with `repo` + `pull_requests: write` scopes |
 
-**Unlocks:** `/review-pr-readiness` (PR diff), `/new-pull-request` (creates PR with DI risk band), `/blast-radius-estimator` (repo graph).
+**Unlocks:** `/review-pr-readiness` (PR diff), `/create-pull-request` (creates PR with DI risk band), `/blast-radius-estimator` (repo graph).
 
 ---
 
@@ -163,7 +163,7 @@ No credentials. Scoped to the path you enter at first prompt.
 |-------|-------------|
 | `pg_connection_string` | `postgresql://user:pass@host:5432/dbname` |
 
-Useful for `/design-data-model` (schema awareness) and `/code-review` (ORM vs raw query patterns).
+Useful for `/design-data-model` (schema awareness) and `/review-code` (ORM vs raw query patterns).
 
 ---
 

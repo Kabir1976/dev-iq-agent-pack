@@ -36,7 +36,7 @@ Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and
 | Dependency | What it unlocks | Without it |
 |------------|-----------------|------------|
 | Node.js 18+ | All MCP servers (ADO, GitHub, filesystem) | Skills ask you to paste work item text and PR details manually |
-| ADO Personal Access Token | Live work item + PR fetch for `/review-pr-readiness`, `/review-acceptance-criteria`, `/estimate-effort`, `/generate-traceability-matrix` | You paste the work item when prompted |
+| ADO Personal Access Token | Live work item + PR fetch for `/review-pr-readiness`, `/validate-acceptance-criteria`, `/estimate-effort`, `/generate-traceability` | You paste the work item when prompted |
 | GitHub PAT | Live PR diff and repo context when `vcs.type: github` | Skills use the diff visible in your editor |
 
 **Creating an ADO PAT:** ADO → top-right avatar → Personal access tokens → New Token.
@@ -172,8 +172,8 @@ on all skill output.
 
 | Gartner tier | What the agent does | Dev.IQ skills at this tier |
 |---|---|---|
-| **Observe** | Reads and surfaces information. No recommendations. | `explain-code`, `identify-dependencies`, `generate-traceability-matrix` |
-| **Advise** | Makes recommendations. Human decides and acts. | `code-review`, `review-security`, `review-pr-readiness`, `review-architecture`, `review-acceptance-criteria`, `refactor-code` *(plan phase)*, `blast-radius-estimator`, `estimate-effort`, `review-observability`, `review-ai-integration` |
+| **Observe** | Reads and surfaces information. No recommendations. | `explain-code`, `identify-dependencies`, `generate-traceability` |
+| **Advise** | Makes recommendations. Human decides and acts. | `review-code`, `review-security`, `review-pr-readiness`, `review-architecture`, `validate-acceptance-criteria`, `refactor-code` *(plan phase)*, `blast-radius-estimator`, `estimate-effort`, `review-observability`, `review-ai-integration` |
 | **Act with Approval** | Produces a complete artifact (code, plan, ADR). Developer reviews and applies manually. | `scaffold-feature`, `generate-adr`, `design-data-model`, `generate-rollback-plan`, `generate-release-notes`, `debug-issue`, `review-deployment-readiness`, `refactor-code` *(apply phase)*, `generate-openapi`, `onboard-codebase`, `dev-iq-tailor` |
 | **Act Autonomously** | Takes action without human review. | **None** — prohibited by `governance.md` |
 
@@ -485,14 +485,14 @@ dev-iq/
 │   │   └── di-traceability.instructions.md
 │   ├── skills/                            # Canonical skill location
 │   │   ├── dev-iq-bootstrap/
-│   │   ├── review-acceptance-criteria/
+│   │   ├── validate-acceptance-criteria/
 │   │   ├── identify-dependencies/
 │   │   ├── design-api/
 │   │   ├── design-data-model/
 │   │   ├── generate-adr/
 │   │   ├── review-architecture/
 │   │   ├── scaffold-feature/
-│   │   ├── code-review/
+│   │   ├── review-code/
 │   │   ├── debug-issue/
 │   │   ├── refactor-code/
 │   │   ├── review-security/
@@ -500,11 +500,11 @@ dev-iq/
 │   │   ├── review-pr-readiness/
 │   │   ├── blast-radius-estimator/
 │   │   ├── review-dependencies/
-│   │   ├── new-pull-request/
+│   │   ├── create-pull-request/
 │   │   ├── generate-release-notes/
 │   │   ├── review-deployment-readiness/
 │   │   ├── generate-rollback-plan/
-│   │   └── generate-traceability-matrix/
+│   │   └── generate-traceability/
 │   └── agents/
 │       ├── Dev-IQ.agent.md                # Action agent
 │       └── Dev-IQ-PLAN.agent.md           # Plan-first agent
@@ -612,9 +612,9 @@ Skills compose. A typical PR-time workflow:
 /estimate-effort                → size the work before you start
 /design-api                     → design the interface
 /scaffold-feature               → generate boilerplate
-/code-review                    → four-layer review
+/review-code                    → four-layer review
 /review-pr-readiness            → Go/Hold verdict before opening PR
-/new-pull-request               → PR body with DI risk band + traceability
+/create-pull-request               → PR body with DI risk band + traceability
 ```
 
 A typical incident-driven workflow:
@@ -661,7 +661,7 @@ Or attach the file to Copilot Chat and say: "Customize this telemetry overlay fo
 In Copilot Chat, select the Dev-IQ agent and run:
 
 ```
-/code-review
+/review-code
 ```
 
 The agent should respond with a four-layer DI assessment of the current branch
@@ -672,8 +672,8 @@ will ask for it.
 
 Recommended first invocations:
 
-- **Requirements phase**: `/review-acceptance-criteria` on a recent work item
-- **Development phase**: `/code-review` on the current branch
+- **Requirements phase**: `/validate-acceptance-criteria` on a recent work item
+- **Development phase**: `/review-code` on the current branch
 - **PR phase**: `/review-pr-readiness` before opening the PR
 
 ---
@@ -688,7 +688,7 @@ skill that requires it.
 
 | Skill | DI Signal | Purpose |
 |-------|-----------|---------|
-| `/review-acceptance-criteria` | INTENT | Review ACs for completeness and clarity |
+| `/validate-acceptance-criteria` | INTENT | Review ACs for completeness and clarity |
 | `/identify-dependencies` | RISK | Surface blockers and cross-team dependencies |
 | `/estimate-effort` | INTENT + DESIGN | Story-point / t-shirt estimate with rationale |
 
@@ -707,7 +707,7 @@ skill that requires it.
 | Skill | DI Signal | Purpose |
 |-------|-----------|---------|
 | `/scaffold-feature` | INTENT + DESIGN | Generate boilerplate from AC + story |
-| `/code-review` | DESIGN + QUALITY | Review code through DI four-layer lens |
+| `/review-code` | DESIGN + QUALITY | Review code through DI four-layer lens |
 | `/debug-issue` | RISK + QUALITY | Structured bug diagnosis + fix suggestion |
 | `/refactor-code` | DESIGN + QUALITY | Refactoring suggestions with rationale |
 | `/review-security` | QUALITY + RISK | Security-focused code review |
@@ -722,7 +722,7 @@ skill that requires it.
 | `/review-pr-readiness` | RISK + QUALITY | Go/Hold/Discuss verdict |
 | `/blast-radius-estimator` | RISK | Map downstream impact of a change |
 | `/review-dependencies` | RISK | Dependency change risk analysis |
-| `/new-pull-request` | INTENT + RISK | PR body with DI risk band + traceability |
+| `/create-pull-request` | INTENT + RISK | PR body with DI risk band + traceability |
 
 ### Deployment
 
@@ -736,7 +736,7 @@ skill that requires it.
 
 | Skill | DI Signal | Purpose |
 |-------|-----------|---------|
-| `/generate-traceability-matrix` | INTENT + DESIGN | Req ↔ Code ↔ Test matrix |
+| `/generate-traceability` | INTENT + DESIGN | Req ↔ Code ↔ Test matrix |
 | `/dev-iq-bootstrap` | — | Workspace bootstrapper |
 | `/onboard-codebase` | INTENT | New developer guide from repo structure |
 | `/dev-iq-tailor` | DESIGN | Tailor pack config to this codebase |

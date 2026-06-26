@@ -118,7 +118,7 @@ Bootstrap copies instruction files, `.dev-iq/` config, `.vscode/settings.json`, 
 
 5. **Run a skill.** In Copilot Chat, select the `Dev-IQ` agent and try:
    ```
-   /code-review
+   /review-code
    ```
    The agent pulls context from your connected tools and reasons through all four DI signal layers.
 

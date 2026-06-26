@@ -582,7 +582,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
         <tbody>
           <tr><td>Looking at an unfamiliar file</td><td><code>/explain-code</code></td></tr>
           <tr><td>Before opening a PR</td><td><code>/review-pr-readiness</code></td></tr>
-          <tr><td>Reviewing someone else's code</td><td><code>/code-review</code></td></tr>
+          <tr><td>Reviewing someone else's code</td><td><code>/review-code</code></td></tr>
           <tr><td>Something breaks in production</td><td><code>/debug-issue</code></td></tr>
           <tr><td>Joining a new codebase</td><td><code>/onboard-codebase</code></td></tr>
         </tbody>
@@ -600,7 +600,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
   <table>
     <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td><code>/review-acceptance-criteria</code></td><td>INTENT</td><td>Review ACs for completeness and clarity</td></tr>
+      <tr><td><code>/validate-acceptance-criteria</code></td><td>INTENT</td><td>Review ACs for completeness and clarity</td></tr>
       <tr><td><code>/identify-dependencies</code></td><td>RISK</td><td>Surface blockers and cross-team dependencies</td></tr>
       <tr><td><code>/estimate-effort</code></td><td>INTENT + DESIGN</td><td>Story-point / t-shirt estimate with rationale and uncertainty band</td></tr>
     </tbody>
@@ -623,7 +623,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
     <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
     <tbody>
       <tr><td><code>/scaffold-feature</code></td><td>INTENT + DESIGN</td><td>Generate boilerplate from AC + story</td></tr>
-      <tr><td><code>/code-review</code></td><td>DESIGN + QUALITY</td><td>Code review through DI four-layer lens</td></tr>
+      <tr><td><code>/review-code</code></td><td>DESIGN + QUALITY</td><td>Code review through DI four-layer lens</td></tr>
       <tr><td><code>/debug-issue</code></td><td>RISK + QUALITY</td><td>Structured bug diagnosis + fix suggestion</td></tr>
       <tr><td><code>/refactor-code</code></td><td>DESIGN + QUALITY</td><td>Refactoring suggestions with rationale</td></tr>
       <tr><td><code>/review-security</code></td><td>QUALITY + RISK</td><td>Security-focused code review (OWASP)</td></tr>
@@ -640,7 +640,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
       <tr><td><code>/review-pr-readiness</code></td><td>RISK + QUALITY</td><td>Go / Hold / Discuss verdict before merge</td></tr>
       <tr><td><code>/blast-radius-estimator</code></td><td>RISK</td><td>Map downstream impact of a change</td></tr>
       <tr><td><code>/review-dependencies</code></td><td>RISK</td><td>Dependency change risk analysis</td></tr>
-      <tr><td><code>/new-pull-request</code></td><td>INTENT + RISK</td><td>PR body with DI risk band + traceability</td></tr>
+      <tr><td><code>/create-pull-request</code></td><td>INTENT + RISK</td><td>PR body with DI risk band + traceability</td></tr>
     </tbody>
   </table>
 
@@ -658,7 +658,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
   <table>
     <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td><code>/generate-traceability-matrix</code></td><td>INTENT + DESIGN</td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
+      <tr><td><code>/generate-traceability</code></td><td>INTENT + DESIGN</td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
       <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper (run once per repo)</td></tr>
       <tr><td><code>/onboard-codebase</code></td><td>INTENT</td><td>New developer guide — architecture, flows, local setup</td></tr>
       <tr><td><code>/dev-iq-tailor</code></td><td>DESIGN</td><td>Tailor pack config to this codebase (run after bootstrap)</td></tr>

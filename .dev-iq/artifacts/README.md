@@ -11,7 +11,7 @@ gitignored — nothing in this directory is ever committed.
 | `rollback-plans/` | `/generate-rollback-plan` |
 | `onboarding-guides/` | `/onboard-codebase` |
 | `openapi-specs/` | `/generate-openapi` |
-| `pr-reviews/` | `/review-pr-readiness`, `/code-review` |
+| `pr-reviews/` | `/review-pr-readiness`, `/review-code` |
 | `signals/` | DI signal records (Phase 2) |
 
 ## Usage

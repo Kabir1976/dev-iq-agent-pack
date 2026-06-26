@@ -39,7 +39,7 @@ You open Copilot Chat (or Claude Code), select the Dev-IQ agent, and type `/`. Y
 
 `/explain-code` — point at any file. Get a structured breakdown of what it does, what assumptions it makes, and where the intent gaps are. Not just "what does this do" — "what should I know before touching this."
 
-`/code-review` — paste a diff. Get a four-layer review: intent match, design findings, quality issues (with severity), and risk flags. Every finding cites the file and line. No noise, no re-stating what the code does.
+`/review-code` — paste a diff. Get a four-layer review: intent match, design findings, quality issues (with severity), and risk flags. Every finding cites the file and line. No noise, no re-stating what the code does.
 
 `/review-pr-readiness` — before you open the PR. Get a Go / Hold verdict with evidence. If it's a Hold, you know exactly which layer and why. You fix it before the reviewer sees it — not after.
 
@@ -87,7 +87,7 @@ When the team is ready to adopt: `--graduate` moves the files into git tracking.
 
 We'll run three live skills on your actual code in the session. Bring a PR you recently opened or a service file you find complex — or we'll pick one together.
 
-`/explain-code` · `/code-review` · `/review-pr-readiness`
+`/explain-code` · `/review-code` · `/review-pr-readiness`
 
 Questions: speak to the consultant who shared this with you.
 

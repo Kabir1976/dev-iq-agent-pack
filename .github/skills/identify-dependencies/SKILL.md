@@ -360,7 +360,7 @@ of confused debugging later — and avoids a broken QA environment mid-sprint.
   starting before resolution wastes effort in the specific case
 
 ## Related Skills
-- `/review-acceptance-criteria` — run before this skill; ACs must be clear before
+- `/validate-acceptance-criteria` — run before this skill; ACs must be clear before
   dependencies can be reliably mapped against them
 - `/blast-radius-estimator` — if a technical dependency involves changing a shared
   interface, estimate the blast radius before committing to the change

@@ -44,12 +44,12 @@ with a `description` field that triggers auto-routing in compatible agents.
 
 | Phase | Skills |
 |-------|--------|
-| Requirements | `review-acceptance-criteria`, `identify-dependencies`, `estimate-effort` |
+| Requirements | `validate-acceptance-criteria`, `identify-dependencies`, `estimate-effort` |
 | Design | `design-api`, `design-data-model`, `generate-adr`, `review-architecture`, `generate-openapi` |
-| Development | `scaffold-feature`, `code-review`, `debug-issue`, `refactor-code`, `review-security`, `explain-code`, `review-observability`, `review-ai-integration` |
-| Code Review / PR | `review-pr-readiness`, `blast-radius-estimator`, `review-dependencies`, `new-pull-request` |
+| Development | `scaffold-feature`, `review-code`, `debug-issue`, `refactor-code`, `review-security`, `explain-code`, `review-observability`, `review-ai-integration` |
+| Code Review / PR | `review-pr-readiness`, `blast-radius-estimator`, `review-dependencies`, `create-pull-request` |
 | Deployment | `generate-release-notes`, `review-deployment-readiness`, `generate-rollback-plan` |
-| Cross-cutting | `generate-traceability-matrix`, `dev-iq-bootstrap`, `onboard-codebase`, `dev-iq-tailor` |
+| Cross-cutting | `generate-traceability`, `dev-iq-bootstrap`, `onboard-codebase`, `dev-iq-tailor` |
 
 ## Governance you must enforce
 

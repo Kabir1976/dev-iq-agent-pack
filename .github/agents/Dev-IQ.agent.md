@@ -49,12 +49,12 @@ directly. Map the intent first; do not reinvent what a skill already does.
 | Security review / is this secure / check for vulnerabilities | `/review-security` |
 | Scaffold a new feature / generate structure | `/scaffold-feature` |
 | Debug this issue / why is this failing | `/debug-issue` |
-| Code review / review my changes | `/code-review` |
+| Code review / review my changes | `/review-code` |
 | PR readiness / is this ready to merge / should I merge | `/review-pr-readiness` |
-| Open a PR / create a pull request | `/new-pull-request` |
+| Open a PR / create a pull request | `/create-pull-request` |
 | Blast radius / impact analysis / what does this change affect | `/blast-radius-estimator` |
 | Dependency review / check my dependencies | `/review-dependencies` |
-| Review acceptance criteria / are these ACs good | `/review-acceptance-criteria` |
+| Review acceptance criteria / are these ACs good | `/validate-acceptance-criteria` |
 | Identify dependencies / what are the blockers | `/identify-dependencies` |
 | Design an API / API design from requirements | `/design-api` |
 | Design a data model / entity design / database schema | `/design-data-model` |
@@ -63,7 +63,7 @@ directly. Map the intent first; do not reinvent what a skill already does.
 | Generate release notes / what changed in this release | `/generate-release-notes` |
 | Deployment readiness / go no-go / is this safe to deploy | `/review-deployment-readiness` |
 | Rollback plan / how do we roll this back | `/generate-rollback-plan` |
-| Traceability matrix / map requirements to code | `/generate-traceability-matrix` |
+| Traceability matrix / map requirements to code | `/generate-traceability` |
 | Set up Dev.IQ / bootstrap this workspace | `/dev-iq-bootstrap` |
 | Estimate effort / story points / size this ticket | `/estimate-effort` |
 | Observability review / check logging / is this instrumented | `/review-observability` |

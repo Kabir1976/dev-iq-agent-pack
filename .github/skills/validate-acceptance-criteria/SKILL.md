@@ -1,5 +1,5 @@
 ---
-name: review-acceptance-criteria
+name: validate-acceptance-criteria
 description: Review acceptance criteria for completeness, testability, and alignment with the work item. Use when asked to "review ACs", "check acceptance criteria", "are these ACs good", or "is this story sprint-ready".
 di_signal: INTENT
 maturity_required: early
@@ -390,7 +390,7 @@ story, add one AC for "what if it fails."
 ## Related Skills
 - `/estimate-effort` — run after validating ACs; a clean AC set is the input
   to a reliable effort estimate
-- `/generate-traceability-matrix` — after implementation, verify that all ACs
+- `/generate-traceability` — after implementation, verify that all ACs
   reviewed here are covered by code and tests
 - `/review-pr-readiness` — references reviewed ACs when verifying that a PR
   addresses the stated acceptance criteria before merge
