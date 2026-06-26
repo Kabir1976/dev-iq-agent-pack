@@ -9,7 +9,8 @@ gitignored — nothing in this directory is ever committed.
 |-----------|----------------------|
 | `adrs/` | `/generate-adr` |
 | `rollback-plans/` | `/generate-rollback-plan` |
-| `user-stories/` | `/generate-user-stories` |
+| `onboarding-guides/` | `/onboard-codebase` |
+| `openapi-specs/` | `/generate-openapi` |
 | `pr-reviews/` | `/review-pr-readiness`, `/code-review` |
 | `signals/` | DI signal records (Phase 2) |
 

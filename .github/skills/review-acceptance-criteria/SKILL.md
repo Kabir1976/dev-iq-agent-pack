@@ -21,7 +21,7 @@ during code review — both outcomes are more expensive than fixing the AC now.
 ## When to Use
 - Before sprint planning or story point estimation
 - During backlog refinement when reviewing work items for readiness
-- After generating stories with `/generate-user-stories` to validate quality
+- After stories or requirements are written, to validate quality before sprint commitment
 - When a PR reviewer raises "this doesn't match the ACs" and the ACs need
   to be reviewed rather than the code
 - When a QA engineer reports that a story is untestable as written
@@ -388,8 +388,8 @@ story, add one AC for "what if it fails."
 - INTENT UNGRADED is distinct from INTENT WEAK — UNGRADED means there is insufficient data to assess; WEAK means the data exists but reveals a gap; UNGRADED produces a Not Ready verdict and blocks sprint commitment
 
 ## Related Skills
-- `/generate-user-stories` — use to generate the initial stories, then run this
-  skill to validate them before sprint commitment
+- `/estimate-effort` — run after validating ACs; a clean AC set is the input
+  to a reliable effort estimate
 - `/generate-traceability-matrix` — after implementation, verify that all ACs
   reviewed here are covered by code and tests
 - `/review-pr-readiness` — references reviewed ACs when verifying that a PR

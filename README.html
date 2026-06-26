@@ -584,7 +584,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
           <tr><td>Before opening a PR</td><td><code>/review-pr-readiness</code></td></tr>
           <tr><td>Reviewing someone else's code</td><td><code>/code-review</code></td></tr>
           <tr><td>Something breaks in production</td><td><code>/debug-issue</code></td></tr>
-          <tr><td>Starting a new feature</td><td><code>/generate-user-stories</code></td></tr>
+          <tr><td>Joining a new codebase</td><td><code>/onboard-codebase</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -594,15 +594,15 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
 
 <section>
   <h2>Skills <span class="accent">quick reference</span></h2>
-  <p class="lead">22 skills covering the full developer lifecycle. Invoke any skill with <code>/skill-name</code> in Copilot Chat or Claude Code.</p>
+  <p class="lead">27 skills covering the full developer lifecycle. Invoke any skill with <code>/skill-name</code> in Copilot Chat or Claude Code.</p>
 
   <h3>Requirements</h3>
   <table>
     <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td><code>/generate-user-stories</code></td><td>INTENT</td><td>Convert requirements to stories with acceptance criteria</td></tr>
       <tr><td><code>/review-acceptance-criteria</code></td><td>INTENT</td><td>Review ACs for completeness and clarity</td></tr>
       <tr><td><code>/identify-dependencies</code></td><td>RISK</td><td>Surface blockers and cross-team dependencies</td></tr>
+      <tr><td><code>/estimate-effort</code></td><td>INTENT + DESIGN</td><td>Story-point / t-shirt estimate with rationale and uncertainty band</td></tr>
     </tbody>
   </table>
 
@@ -614,6 +614,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
       <tr><td><code>/design-data-model</code></td><td>DESIGN</td><td>Entity/database design from stories</td></tr>
       <tr><td><code>/generate-adr</code></td><td>DESIGN</td><td>Architecture Decision Record generation</td></tr>
       <tr><td><code>/review-architecture</code></td><td>DESIGN + RISK</td><td>Architecture review through DI lens</td></tr>
+      <tr><td><code>/generate-openapi</code></td><td>DESIGN</td><td>OpenAPI 3.x spec from controller / router code</td></tr>
     </tbody>
   </table>
 
@@ -627,6 +628,8 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
       <tr><td><code>/refactor-code</code></td><td>DESIGN + QUALITY</td><td>Refactoring suggestions with rationale</td></tr>
       <tr><td><code>/review-security</code></td><td>QUALITY + RISK</td><td>Security-focused code review (OWASP)</td></tr>
       <tr><td><code>/explain-code</code></td><td>INTENT</td><td>Plain-language code explanation</td></tr>
+      <tr><td><code>/review-observability</code></td><td>QUALITY</td><td>Logging, metrics, tracing, and alerting coverage review</td></tr>
+      <tr><td><code>/review-ai-integration</code></td><td>QUALITY + RISK</td><td>OWASP LLM Top 10 review for LLM / agentic code</td></tr>
     </tbody>
   </table>
 
@@ -657,6 +660,8 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
     <tbody>
       <tr><td><code>/generate-traceability-matrix</code></td><td>INTENT + DESIGN</td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
       <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper (run once per repo)</td></tr>
+      <tr><td><code>/onboard-codebase</code></td><td>INTENT</td><td>New developer guide — architecture, flows, local setup</td></tr>
+      <tr><td><code>/dev-iq-tailor</code></td><td>DESIGN</td><td>Tailor pack config to this codebase (run after bootstrap)</td></tr>
     </tbody>
   </table>
 </section>
@@ -666,7 +671,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
   <pre class="tree"><span class="dir">.github/</span>
   <span class="file">copilot-instructions.md</span>     <span class="comment">← always-on DI reasoning rules for Copilot</span>
   <span class="dir">instructions/</span>               <span class="comment">← scoped rule sheets (code standards, security, etc.)</span>
-  <span class="dir">skills/</span>                     <span class="comment">← 22 DI skills, one subfolder each</span>
+  <span class="dir">skills/</span>                     <span class="comment">← 27 DI skills, one subfolder each</span>
   <span class="dir">agents/</span>                     <span class="comment">← Dev-IQ &amp; Dev-IQ-PLAN agent definitions</span>
 <span class="dir">.claude/</span>
   <span class="dir">agents/</span>                     <span class="comment">← Claude Code subagent counterparts</span>

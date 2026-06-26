@@ -110,7 +110,7 @@ points highlighted.
 |-------|------------|--------------|
 | `/review-security` | Any file with auth, data, or external calls | OWASP-grounded security scorecard |
 | `/review-acceptance-criteria` | Before sprint commit | AC-by-AC rating: Testable / Specific / Complete / Consistent |
-| `/generate-user-stories` | New feature or backlog item | Structured stories with personas, ACs, and traceability |
+| `/estimate-effort` | Sizing a story or ticket | Calibrated story-point estimate with rationale and uncertainty band |
 | `/debug-issue` | Something broke | Root cause hypothesis, reproduction steps, fix options |
 | `/refactor-code` | Code that needs cleanup | Prioritized findings + refactored code with rationale |
 
@@ -186,10 +186,10 @@ the following days.
 
 ### Tier 3 — Generative skills (Day 2–3, optional)
 
-**[ ] `/generate-user-stories`**
-- Describe a feature or paste a requirement, then type `/generate-user-stories`
-- **Pass:** Structured stories with persona, goal, ACs in Given/When/Then format, and INTENT signal
-- **Fail:** Generic bullet points with no AC structure
+**[ ] `/estimate-effort`**
+- Paste a user story or describe a feature, then type `/estimate-effort`
+- **Pass:** Fibonacci or t-shirt estimate with per-factor breakdown, uncertainty band, and scope-risk flags
+- **Fail:** Bare number with no rationale or uncertainty band
 
 **[ ] `/review-deployment-readiness`**
 - On a branch ready for production

@@ -54,11 +54,16 @@
 | `generate-release-notes` | INTENT | Generates structured release notes from git history, merged PRs, and linked work items, flagging untracked scope as INTENT UNGRADED. |
 | `generate-rollback-plan` | RISK | Generates a rollback plan for a deployment — trigger criteria, step-by-step reversal procedure, and explicit documentation of what cannot be rolled back. |
 | `generate-traceability-matrix` | INTENT | Generates a traceability matrix mapping work items to acceptance criteria to code to tests, surfacing gaps at each link in the chain. |
-| `generate-user-stories` | INTENT | Converts requirements or stakeholder descriptions into well-formed user stories with acceptance criteria and a shared Definition of Done. |
+| `dev-iq-tailor` | DESIGN | Tailors the pack configuration to the specific stack, deployment targets, and observability tools of the workspace — sets defaults for signal thresholds, stack languages, and framework patterns. |
+| `estimate-effort` | INTENT + DESIGN | Produces a calibrated story-point or t-shirt size estimate for a user story, feature request, or diff, with rationale, uncertainty band, and scope-risk flags. |
+| `generate-openapi` | DESIGN | Generates an OpenAPI 3.x YAML specification by reading controller, router, or handler code — extracts endpoints, parameters, request/response shapes, auth schemes, and produces a gap report. |
 | `identify-dependencies` | INTENT + RISK | Surfaces blockers, external dependencies, and delivery risks for a work item before work begins, rated by severity with a resolution order. |
+| `onboard-codebase` | INTENT | Generates a structured new-developer guide from repo structure — entry points, architecture overview, one end-to-end data flow trace, local setup, established conventions, and the top 10 things to know before touching code. |
 | `new-pull-request` | DESIGN + QUALITY + RISK | Generates a complete, ready-to-paste PR description from the current diff and linked work item, including a DI signal summary. |
 | `refactor-code` | DESIGN + QUALITY | Analyzes code through DESIGN and QUALITY lenses, proposes a plan for developer approval, then delivers refactored code with per-change rationale. |
 | `review-acceptance-criteria` | INTENT | Evaluates acceptance criteria on a work item for testability, specificity, completeness, and consistency — returns an AC-by-AC assessment with gaps. |
+| `review-ai-integration` | QUALITY + RISK | Reviews LLM API calls, prompt construction, agentic workflows, and RAG pipelines against the OWASP LLM Top 10 plus DI security and quality standards. |
+| `review-observability` | QUALITY | Reviews code for adequate logging, metrics instrumentation, distributed tracing, alerting hooks, and health endpoints — flags PII in logs, silent catches, and missing business-operation coverage. |
 | `review-architecture` | DESIGN + RISK | Reviews an architecture or design proposal for layer separation, coupling, scalability, and single points of failure — issues a Go / Go with recommendations / Hold verdict. |
 | `review-dependencies` | RISK | Reviews package dependencies for security vulnerabilities, license risk, maintenance status, and pinning hygiene — produces severity-rated findings per dependency. |
 | `review-deployment-readiness` | QUALITY + RISK | Runs all four DI signal layers against a release and issues a Go / Go with conditions / No-Go deployment readiness verdict. |

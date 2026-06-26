@@ -58,7 +58,7 @@ you want `/debug-issue` to pull live error events automatically.
 | `ado_org` | `https://dev.azure.com/YOUR-ORG` |
 | `ado_pat` | ADO Personal Access Token — Work Items (Read/Write), Code (Read), PR Threads (Read/Write) |
 
-**Unlocks:** `/generate-user-stories`, `/review-acceptance-criteria`, `/review-pr-readiness`, `/generate-traceability-matrix` reading live ADO data.
+**Unlocks:** `/review-acceptance-criteria`, `/estimate-effort`, `/review-pr-readiness`, `/generate-traceability-matrix` reading live ADO data.
 
 **Troubleshooting:**
 - *"401 Unauthorized"*: PAT expired or wrong scope — regenerate with the permissions above.

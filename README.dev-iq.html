@@ -332,7 +332,7 @@
   <p class="lead">The complete reference for the Dev.IQ Agent Pack — install options, DI signal model, full skill registry, maturity tiers, MCP wiring, governance, and troubleshooting.</p>
 
   <h2 id="at-a-glance">At a Glance</h2>
-  <p>Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and give GitHub Copilot Chat and Claude Code a Developer Intelligence reasoning layer — 22 skills, two agents, and MCP wiring for ADO and GitHub — without deploying any runtime or service.</p>
+  <p>Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and give GitHub Copilot Chat and Claude Code a Developer Intelligence reasoning layer — 27 skills, two agents, and MCP wiring for ADO and GitHub — without deploying any runtime or service.</p>
 
   <p><strong>Fastest path to first value:</strong> extract the zip → run <code>bootstrap.sh --preset=solo</code> against your repo → open Copilot Chat → select Dev-IQ → run <code>/review-pr-readiness</code> on a branch with changes. Under 20 minutes, requires nothing beyond VS Code and Git.</p>
 
@@ -358,7 +358,7 @@
     <thead><tr><th>Dependency</th><th>What it unlocks</th><th>Without it</th></tr></thead>
     <tbody>
       <tr><td>Node.js 18+</td><td>All MCP servers (ADO, GitHub, filesystem)</td><td>Skills ask you to paste work item text and PR details manually</td></tr>
-      <tr><td>ADO Personal Access Token</td><td>Live work item + PR fetch for <code>/review-pr-readiness</code>, <code>/generate-user-stories</code>, <code>/review-acceptance-criteria</code>, <code>/generate-traceability-matrix</code></td><td>You paste the work item when prompted</td></tr>
+      <tr><td>ADO Personal Access Token</td><td>Live work item + PR fetch for <code>/review-pr-readiness</code>, <code>/review-acceptance-criteria</code>, <code>/estimate-effort</code>, <code>/generate-traceability-matrix</code></td><td>You paste the work item when prompted</td></tr>
       <tr><td>GitHub PAT</td><td>Live PR diff and repo context when <code>vcs.type: github</code></td><td>Skills use the diff visible in your editor</td></tr>
     </tbody>
   </table>
@@ -409,8 +409,8 @@
     <thead><tr><th>Gartner Tier</th><th>What the agent does</th><th>Dev.IQ skills at this tier</th></tr></thead>
     <tbody>
       <tr><td><strong>Observe</strong></td><td>Reads and surfaces information. No recommendations.</td><td><code>/explain-code</code>, <code>/identify-dependencies</code>, <code>/generate-traceability-matrix</code></td></tr>
-      <tr><td><strong>Advise</strong></td><td>Makes recommendations. Human decides and acts.</td><td><code>/code-review</code>, <code>/review-security</code>, <code>/review-pr-readiness</code>, <code>/review-architecture</code>, <code>/review-acceptance-criteria</code>, <code>/refactor-code</code> (plan phase), <code>/blast-radius-estimator</code></td></tr>
-      <tr><td><strong>Act with Approval</strong></td><td>Produces a complete artifact. Developer reviews and applies manually.</td><td><code>/scaffold-feature</code>, <code>/generate-user-stories</code>, <code>/generate-adr</code>, <code>/design-data-model</code>, <code>/generate-rollback-plan</code>, <code>/generate-release-notes</code>, <code>/debug-issue</code>, <code>/review-deployment-readiness</code>, <code>/refactor-code</code> (apply phase)</td></tr>
+      <tr><td><strong>Advise</strong></td><td>Makes recommendations. Human decides and acts.</td><td><code>/code-review</code>, <code>/review-security</code>, <code>/review-pr-readiness</code>, <code>/review-architecture</code>, <code>/review-acceptance-criteria</code>, <code>/refactor-code</code> (plan phase), <code>/blast-radius-estimator</code>, <code>/estimate-effort</code>, <code>/review-observability</code>, <code>/review-ai-integration</code></td></tr>
+      <tr><td><strong>Act with Approval</strong></td><td>Produces a complete artifact. Developer reviews and applies manually.</td><td><code>/scaffold-feature</code>, <code>/generate-adr</code>, <code>/design-data-model</code>, <code>/generate-rollback-plan</code>, <code>/generate-release-notes</code>, <code>/debug-issue</code>, <code>/review-deployment-readiness</code>, <code>/refactor-code</code> (apply phase), <code>/generate-openapi</code>, <code>/onboard-codebase</code>, <code>/dev-iq-tailor</code></td></tr>
       <tr><td><strong>Act Autonomously</strong></td><td>Takes action without human review.</td><td><em>None — prohibited by <code>governance.md</code></em></td></tr>
     </tbody>
   </table>
@@ -530,9 +530,9 @@ git push internal main</code></pre>
   <table>
     <thead><tr><th>Skill</th><th>DI Signal</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td><code>/generate-user-stories</code></td><td>INTENT</td><td>Convert requirements to stories with acceptance criteria</td></tr>
       <tr><td><code>/review-acceptance-criteria</code></td><td>INTENT</td><td>Review ACs for completeness and clarity</td></tr>
       <tr><td><code>/identify-dependencies</code></td><td>RISK</td><td>Surface blockers and cross-team dependencies</td></tr>
+      <tr><td><code>/estimate-effort</code></td><td>INTENT + DESIGN</td><td>Story-point / t-shirt estimate with rationale and uncertainty band</td></tr>
     </tbody>
   </table>
 
@@ -544,6 +544,7 @@ git push internal main</code></pre>
       <tr><td><code>/design-data-model</code></td><td>DESIGN</td><td>Entity/database design from stories</td></tr>
       <tr><td><code>/generate-adr</code></td><td>DESIGN</td><td>Architecture Decision Record generation</td></tr>
       <tr><td><code>/review-architecture</code></td><td>DESIGN + RISK</td><td>Architecture review through DI lens</td></tr>
+      <tr><td><code>/generate-openapi</code></td><td>DESIGN</td><td>OpenAPI 3.x spec from controller / router code</td></tr>
     </tbody>
   </table>
 
@@ -557,6 +558,8 @@ git push internal main</code></pre>
       <tr><td><code>/refactor-code</code></td><td>DESIGN + QUALITY</td><td>Refactoring suggestions with rationale</td></tr>
       <tr><td><code>/review-security</code></td><td>QUALITY + RISK</td><td>Security-focused code review (OWASP Top 10 + LLM Top 10)</td></tr>
       <tr><td><code>/explain-code</code></td><td>INTENT</td><td>Plain-language code explanation</td></tr>
+      <tr><td><code>/review-observability</code></td><td>QUALITY</td><td>Logging, metrics, tracing, and alerting coverage review</td></tr>
+      <tr><td><code>/review-ai-integration</code></td><td>QUALITY + RISK</td><td>OWASP LLM Top 10 review for LLM / agentic code</td></tr>
     </tbody>
   </table>
 
@@ -587,6 +590,8 @@ git push internal main</code></pre>
     <tbody>
       <tr><td><code>/generate-traceability-matrix</code></td><td>INTENT + DESIGN</td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
       <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper</td></tr>
+      <tr><td><code>/onboard-codebase</code></td><td>INTENT</td><td>New developer guide — architecture, flows, local setup</td></tr>
+      <tr><td><code>/dev-iq-tailor</code></td><td>DESIGN</td><td>Tailor pack config to this codebase (run after bootstrap)</td></tr>
     </tbody>
   </table>
 

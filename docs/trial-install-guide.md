@@ -227,7 +227,7 @@ a Go / Hold / Discuss recommendation. This is the core of what Dev.IQ does.
 | Before opening a PR | `/review-pr-readiness` |
 | Reviewing someone else's code | `/code-review` |
 | Something breaks | `/debug-issue` |
-| Starting a new feature | `/generate-user-stories` |
+| Joining a new codebase | `/onboard-codebase` |
 
 ---
 

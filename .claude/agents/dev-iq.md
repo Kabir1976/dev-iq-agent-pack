@@ -48,7 +48,6 @@ Route the user's intent to the appropriate skill. Invoke via the Skill tool.
 | Open a PR | `new-pull-request` |
 | Blast radius / change impact | `blast-radius-estimator` |
 | Dependency review | `review-dependencies` |
-| Generate user stories | `generate-user-stories` |
 | Review acceptance criteria | `review-acceptance-criteria` |
 | Identify blockers / dependencies | `identify-dependencies` |
 | Design an API | `design-api` |
@@ -60,6 +59,12 @@ Route the user's intent to the appropriate skill. Invoke via the Skill tool.
 | Rollback plan | `generate-rollback-plan` |
 | Traceability matrix | `generate-traceability-matrix` |
 | Set up Dev.IQ | `dev-iq-bootstrap` |
+| Estimate effort / size a ticket | `estimate-effort` |
+| Observability review / logging coverage | `review-observability` |
+| Generate OpenAPI spec | `generate-openapi` |
+| Onboard to this codebase | `onboard-codebase` |
+| Review AI / LLM / agentic code | `review-ai-integration` |
+| Tailor pack config to this repo | `dev-iq-tailor` |
 
 ## DI Instruction Files
 

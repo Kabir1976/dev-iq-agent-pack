@@ -472,7 +472,6 @@ stack:
   <table>
     <thead><tr><th>/skill-name</th><th>Signal</th><th>Purpose</th></tr></thead>
     <tbody>
-      <tr><td><code>/generate-user-stories</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Convert requirements to stories with ACs</td></tr>
       <tr><td><code>/review-acceptance-criteria</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>Review ACs for completeness and clarity</td></tr>
       <tr><td><code>/identify-dependencies</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Surface blockers and cross-team dependencies</td></tr>
       <tr><td><code>/design-api</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>RESTful API design from requirements</td></tr>
@@ -494,6 +493,12 @@ stack:
       <tr><td><code>/generate-rollback-plan</code></td><td><span class="skill-tag tag-risk">RISK</span></td><td>Rollback steps from deployment context</td></tr>
       <tr><td><code>/generate-traceability-matrix</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
       <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper</td></tr>
+      <tr><td><code>/estimate-effort</code></td><td><span class="skill-tag tag-intent">INTENT</span> <span class="skill-tag tag-design">DESIGN</span></td><td>Story-point / t-shirt estimate with rationale</td></tr>
+      <tr><td><code>/review-observability</code></td><td><span class="skill-tag tag-quality">QUALITY</span></td><td>Logging, metrics, tracing, and alerting coverage review</td></tr>
+      <tr><td><code>/generate-openapi</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>OpenAPI 3.x spec from controller / router code</td></tr>
+      <tr><td><code>/onboard-codebase</code></td><td><span class="skill-tag tag-intent">INTENT</span></td><td>New developer guide — architecture, flows, local setup</td></tr>
+      <tr><td><code>/review-ai-integration</code></td><td><span class="skill-tag tag-quality">QUALITY</span> <span class="skill-tag tag-risk">RISK</span></td><td>OWASP LLM Top 10 review for LLM / agentic code</td></tr>
+      <tr><td><code>/dev-iq-tailor</code></td><td><span class="skill-tag tag-design">DESIGN</span></td><td>Tailor pack config to this codebase (run after bootstrap)</td></tr>
     </tbody>
   </table>
 </section>
@@ -512,7 +517,7 @@ stack:
       <tr><td>Before opening a PR</td><td><code>/review-pr-readiness</code></td></tr>
       <tr><td>Reviewing someone else's code</td><td><code>/code-review</code></td></tr>
       <tr><td>Something breaks</td><td><code>/debug-issue</code></td></tr>
-      <tr><td>Starting a new feature</td><td><code>/generate-user-stories</code></td></tr>
+      <tr><td>Joining a new codebase</td><td><code>/onboard-codebase</code></td></tr>
     </tbody>
   </table>
 </section>

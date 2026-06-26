@@ -36,7 +36,7 @@ Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and
 | Dependency | What it unlocks | Without it |
 |------------|-----------------|------------|
 | Node.js 18+ | All MCP servers (ADO, GitHub, filesystem) | Skills ask you to paste work item text and PR details manually |
-| ADO Personal Access Token | Live work item + PR fetch for `/review-pr-readiness`, `/generate-user-stories`, `/review-acceptance-criteria`, `/generate-traceability-matrix` | You paste the work item when prompted |
+| ADO Personal Access Token | Live work item + PR fetch for `/review-pr-readiness`, `/review-acceptance-criteria`, `/estimate-effort`, `/generate-traceability-matrix` | You paste the work item when prompted |
 | GitHub PAT | Live PR diff and repo context when `vcs.type: github` | Skills use the diff visible in your editor |
 
 **Creating an ADO PAT:** ADO → top-right avatar → Personal access tokens → New Token.
@@ -173,8 +173,8 @@ on all skill output.
 | Gartner tier | What the agent does | Dev.IQ skills at this tier |
 |---|---|---|
 | **Observe** | Reads and surfaces information. No recommendations. | `explain-code`, `identify-dependencies`, `generate-traceability-matrix` |
-| **Advise** | Makes recommendations. Human decides and acts. | `code-review`, `review-security`, `review-pr-readiness`, `review-architecture`, `review-acceptance-criteria`, `refactor-code` *(plan phase)*, `blast-radius-estimator` |
-| **Act with Approval** | Produces a complete artifact (code, plan, ADR). Developer reviews and applies manually. | `scaffold-feature`, `generate-user-stories`, `generate-adr`, `design-data-model`, `generate-rollback-plan`, `generate-release-notes`, `debug-issue`, `review-deployment-readiness`, `refactor-code` *(apply phase)* |
+| **Advise** | Makes recommendations. Human decides and acts. | `code-review`, `review-security`, `review-pr-readiness`, `review-architecture`, `review-acceptance-criteria`, `refactor-code` *(plan phase)*, `blast-radius-estimator`, `estimate-effort`, `review-observability`, `review-ai-integration` |
+| **Act with Approval** | Produces a complete artifact (code, plan, ADR). Developer reviews and applies manually. | `scaffold-feature`, `generate-adr`, `design-data-model`, `generate-rollback-plan`, `generate-release-notes`, `debug-issue`, `review-deployment-readiness`, `refactor-code` *(apply phase)*, `generate-openapi`, `onboard-codebase`, `dev-iq-tailor` |
 | **Act Autonomously** | Takes action without human review. | **None** — prohibited by `governance.md` |
 
 ### What this means in practice
@@ -485,7 +485,6 @@ dev-iq/
 │   │   └── di-traceability.instructions.md
 │   ├── skills/                            # Canonical skill location
 │   │   ├── dev-iq-bootstrap/
-│   │   ├── generate-user-stories/
 │   │   ├── review-acceptance-criteria/
 │   │   ├── identify-dependencies/
 │   │   ├── design-api/
@@ -610,7 +609,7 @@ changed surfaces, and governance concerns when AI is applied to high-risk areas.
 Skills compose. A typical PR-time workflow:
 
 ```
-/generate-user-stories          → define what we're building
+/estimate-effort                → size the work before you start
 /design-api                     → design the interface
 /scaffold-feature               → generate boilerplate
 /code-review                    → four-layer review
@@ -689,9 +688,9 @@ skill that requires it.
 
 | Skill | DI Signal | Purpose |
 |-------|-----------|---------|
-| `/generate-user-stories` | INTENT | Convert requirements to stories with AC |
 | `/review-acceptance-criteria` | INTENT | Review ACs for completeness and clarity |
 | `/identify-dependencies` | RISK | Surface blockers and cross-team dependencies |
+| `/estimate-effort` | INTENT + DESIGN | Story-point / t-shirt estimate with rationale |
 
 ### Design
 
@@ -701,6 +700,7 @@ skill that requires it.
 | `/design-data-model` | DESIGN | Entity/database design from stories |
 | `/generate-adr` | DESIGN | Architecture Decision Record generation |
 | `/review-architecture` | DESIGN + RISK | Architecture review through DI lens |
+| `/generate-openapi` | DESIGN | OpenAPI 3.x spec from controller/router code |
 
 ### Development
 
@@ -712,6 +712,8 @@ skill that requires it.
 | `/refactor-code` | DESIGN + QUALITY | Refactoring suggestions with rationale |
 | `/review-security` | QUALITY + RISK | Security-focused code review |
 | `/explain-code` | INTENT | Plain-language code explanation |
+| `/review-observability` | QUALITY | Logging, metrics, tracing, and alerting coverage |
+| `/review-ai-integration` | QUALITY + RISK | OWASP LLM Top 10 review for LLM/agentic code |
 
 ### Code Review / PR
 
@@ -736,6 +738,8 @@ skill that requires it.
 |-------|-----------|---------|
 | `/generate-traceability-matrix` | INTENT + DESIGN | Req ↔ Code ↔ Test matrix |
 | `/dev-iq-bootstrap` | — | Workspace bootstrapper |
+| `/onboard-codebase` | INTENT | New developer guide from repo structure |
+| `/dev-iq-tailor` | DESIGN | Tailor pack config to this codebase |
 
 > **Testing skills are covered by Assert.IQ.**
 > Install both packs together for full SDLC + QE coverage.

@@ -54,7 +54,6 @@ directly. Map the intent first; do not reinvent what a skill already does.
 | Open a PR / create a pull request | `/new-pull-request` |
 | Blast radius / impact analysis / what does this change affect | `/blast-radius-estimator` |
 | Dependency review / check my dependencies | `/review-dependencies` |
-| Write user stories / generate stories from requirements | `/generate-user-stories` |
 | Review acceptance criteria / are these ACs good | `/review-acceptance-criteria` |
 | Identify dependencies / what are the blockers | `/identify-dependencies` |
 | Design an API / API design from requirements | `/design-api` |
@@ -66,6 +65,12 @@ directly. Map the intent first; do not reinvent what a skill already does.
 | Rollback plan / how do we roll this back | `/generate-rollback-plan` |
 | Traceability matrix / map requirements to code | `/generate-traceability-matrix` |
 | Set up Dev.IQ / bootstrap this workspace | `/dev-iq-bootstrap` |
+| Estimate effort / story points / size this ticket | `/estimate-effort` |
+| Observability review / check logging / is this instrumented | `/review-observability` |
+| Generate OpenAPI spec / document this API | `/generate-openapi` |
+| Onboard to this codebase / new developer guide | `/onboard-codebase` |
+| Review AI / LLM code / check prompt injection / audit agent | `/review-ai-integration` |
+| Tailor Dev.IQ config to this codebase | `/dev-iq-tailor` |
 
 When the request is fuzzy, suggest the 1–2 most likely skills and ask which fits,
 rather than guessing and running the wrong one.

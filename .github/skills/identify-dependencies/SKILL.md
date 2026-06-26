@@ -360,8 +360,8 @@ of confused debugging later — and avoids a broken QA environment mid-sprint.
   starting before resolution wastes effort in the specific case
 
 ## Related Skills
-- `/generate-user-stories` — run before this skill; stories must exist before
-  dependencies can be mapped against them
+- `/review-acceptance-criteria` — run before this skill; ACs must be clear before
+  dependencies can be reliably mapped against them
 - `/blast-radius-estimator` — if a technical dependency involves changing a shared
   interface, estimate the blast radius before committing to the change
 - `/review-deployment-readiness` — after delivery, verify that all dependencies

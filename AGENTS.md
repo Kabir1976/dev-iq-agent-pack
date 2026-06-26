@@ -39,17 +39,17 @@ matching file(s) for the user's current task.
 
 ## Skills
 
-The pack ships 22 DI skills under `.github/skills/`. Each has a `SKILL.md`
+The pack ships 27 DI skills under `.github/skills/`. Each has a `SKILL.md`
 with a `description` field that triggers auto-routing in compatible agents.
 
 | Phase | Skills |
 |-------|--------|
-| Requirements | `generate-user-stories`, `review-acceptance-criteria`, `identify-dependencies` |
-| Design | `design-api`, `design-data-model`, `generate-adr`, `review-architecture` |
-| Development | `scaffold-feature`, `code-review`, `debug-issue`, `refactor-code`, `review-security`, `explain-code` |
+| Requirements | `review-acceptance-criteria`, `identify-dependencies`, `estimate-effort` |
+| Design | `design-api`, `design-data-model`, `generate-adr`, `review-architecture`, `generate-openapi` |
+| Development | `scaffold-feature`, `code-review`, `debug-issue`, `refactor-code`, `review-security`, `explain-code`, `review-observability`, `review-ai-integration` |
 | Code Review / PR | `review-pr-readiness`, `blast-radius-estimator`, `review-dependencies`, `new-pull-request` |
 | Deployment | `generate-release-notes`, `review-deployment-readiness`, `generate-rollback-plan` |
-| Cross-cutting | `generate-traceability-matrix`, `dev-iq-bootstrap` |
+| Cross-cutting | `generate-traceability-matrix`, `dev-iq-bootstrap`, `onboard-codebase`, `dev-iq-tailor` |
 
 ## Governance you must enforce
 

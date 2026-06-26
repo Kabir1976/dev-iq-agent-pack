@@ -208,7 +208,6 @@ mcp:
       purpose: "Work item lookup, AC retrieval, PR creation, and release note delivery via ADO"
       allowed_skills:
         - "review-acceptance-criteria"
-        - "generate-user-stories"
         - "new-pull-request"
         - "review-pr-readiness"
         - "generate-traceability-matrix"
@@ -226,6 +225,5 @@ mcp:
       allowed_skills:
         - "generate-adr"
         - "generate-rollback-plan"
-        - "generate-user-stories"
         - "generate-release-notes"
         - "review-pr-readiness"
