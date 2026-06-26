@@ -237,6 +237,7 @@ if ($Uninstall) {
 
     Remove-DiMarkerBlock "$Target\CLAUDE.md"  "CLAUDE.md"
     Remove-DiMarkerBlock "$Target\AGENTS.md"  "AGENTS.md"
+    Remove-DiMarkerBlock "$Target\.github\copilot-instructions.md"  "copilot-instructions.md"
 
     # Remove trial entries from .git\info\exclude
     $ExcludePath = "$Target\.git\info\exclude"
@@ -251,7 +252,8 @@ if ($Uninstall) {
             Where-Object { $_ -notmatch "^\.dev-iq" } |
             Where-Object { $_ -notmatch "^hooks/" } |
             Where-Object { $_ -notmatch "^CLAUDE\.md" } |
-            Where-Object { $_ -notmatch "^AGENTS\.md" }
+            Where-Object { $_ -notmatch "^AGENTS\.md" } |
+            Where-Object { $_ -notmatch "^\.github/copilot-instructions" }
         $Lines | Set-Content $ExcludePath -Encoding UTF8
         Write-Ok "Removed trial entries from .git\info\exclude."
     }
@@ -286,7 +288,8 @@ if ($Graduate) {
             Where-Object { $_ -notmatch "^\.dev-iq" } |
             Where-Object { $_ -notmatch "^hooks/" } |
             Where-Object { $_ -notmatch "^CLAUDE\.md" } |
-            Where-Object { $_ -notmatch "^AGENTS\.md" }
+            Where-Object { $_ -notmatch "^AGENTS\.md" } |
+            Where-Object { $_ -notmatch "^\.github/copilot-instructions" }
         $Lines | Set-Content $ExcludePath -Encoding UTF8
         Write-Ok "Removed trial entries from .git\info\exclude."
     }
@@ -449,9 +452,11 @@ function Invoke-InjectMd {
 if ($DryRun) {
     Write-Host "  [dry-run] would inject: CLAUDE.md"
     Write-Host "  [dry-run] would inject: AGENTS.md"
+    Write-Host "  [dry-run] would inject: .github\copilot-instructions.md"
 } else {
     Invoke-InjectMd "$PackRoot\CLAUDE.md"  "$Target\CLAUDE.md"  "CLAUDE.md"
     Invoke-InjectMd "$PackRoot\AGENTS.md"  "$Target\AGENTS.md"  "AGENTS.md"
+    Invoke-InjectMd "$PackRoot\.github\copilot-instructions.md"  "$Target\.github\copilot-instructions.md"  "copilot-instructions.md"
 }
 
 # ── Trial mode: add paths to .git\info\exclude ───────────────────
@@ -468,7 +473,7 @@ if ($Mode -eq "trial") {
         if ($ExcludeContent -match "# dev-iq") {
             Write-Warn "Trial mode entries already present in .git\info\exclude."
         } else {
-            $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.claude/agents/`n.claude/skills.md`n.dev-iq/`nCLAUDE.md`nAGENTS.md"
+            $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.github/copilot-instructions.md`n.claude/agents/`n.claude/skills.md`n.dev-iq/`nCLAUDE.md`nAGENTS.md"
             if ($Hooks) { $Block += "`nhooks/" }
             Add-Content $ExcludePath $Block -Encoding UTF8
             Write-Ok "Dev.IQ paths added to .git\info\exclude (invisible to git)."

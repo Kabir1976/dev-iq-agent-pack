@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DI Decision Signal Payload",
+  "description": "Signal emitted by Dev.IQ skills after a DI four-layer assessment. Consumed by the telemetry sink configured in .dev-iq/telemetry-overlay.md.",
+  "type": "object",
+  "required": ["run_id", "commit_sha", "maturity_tier"],
+  "properties": {
+    "run_id": { "type": "string", "description": "Unique identifier for this assessment run (e.g. UUID or CI job ID)." },
+    "commit_sha": { "type": "string", "description": "Git commit SHA at the time of assessment." },
+    "branch": { "type": "string" },
+    "pr_id": { "type": ["string", "null"], "description": "PR / work item identifier if this assessment is PR-scoped, otherwise null." },
+    "maturity_tier": {
+      "enum": ["early", "mid", "higher"],
+      "description": "Maturity tier from .dev-iq/maturity-profile.md at the time of assessment. Drives verdict autonomy."
+    },
+    "signal_type": {
+      "description": "Discriminator for which Dev.IQ skill produced this signal.",
+      "enum": [
+        "pr.assessed",
+        "deployment.assessed",
+        "security.reviewed",
+        "code.reviewed",
+        "architecture.reviewed",
+        "blast_radius.estimated"
+      ]
+    },
+    "layers": {
+      "type": "object",
+      "description": "Per-layer state and evidence collected during the DI assessment.",
+      "required": ["intent", "design", "quality", "risk", "decision_confidence"],
+      "properties": {
+        "intent": {
+          "type": "object",
+          "description": "INTENT — are we building the right thing? Work item coverage and AC alignment.",
+          "properties": {
+            "work_item_id": { "type": ["string", "null"], "description": "Linked work item ID (ADO, Jira, GitHub Issue)." },
+            "ac_count": { "type": "integer", "description": "Number of acceptance criteria defined on the work item." },
+            "ac_covered": { "type": "integer", "description": "Number of ACs addressed by this change." },
+            "state": { "enum": ["STRONG", "WEAK", "UNGRADED"], "description": "Assessed state for this layer." },
+            "notes": { "type": "string" }
+          }
+        },
+        "design": {
+          "type": "object",
+          "description": "DESIGN — are we building it the right way? Architecture, patterns, naming, abstractions.",
+          "properties": {
+            "lint_score": { "type": ["number", "null"], "description": "Lint score from configured lint tool (0–100 scale if available)." },
+            "pattern_violations": { "type": "integer", "description": "Count of design findings (naming, layer separation, abstraction)." },
+            "breaking_api_changes": { "type": "boolean", "description": "True if public API or interface contract was modified." },
+            "state": { "enum": ["STRONG", "WEAK", "UNGRADED"] },
+            "notes": { "type": "string" }
+          }
+        },
+        "quality": {
+          "type": "object",
+          "description": "QUALITY — is it production-ready? Coverage, SAST, error handling.",
+          "properties": {
+            "coverage_pct": { "type": ["number", "null"], "description": "Line/branch coverage percentage from the CI coverage report." },
+            "sast_critical": { "type": "integer", "description": "Count of Critical SAST findings." },
+            "sast_high": { "type": "integer", "description": "Count of High SAST findings." },
+            "sast_medium": { "type": "integer", "description": "Count of Medium SAST findings." },
+            "state": { "enum": ["STRONG", "WEAK", "UNGRADED"] },
+            "notes": { "type": "string" }
+          }
+        },
+        "risk": {
+          "type": "object",
+          "description": "RISK — what could break? Blast radius, breaking changes, dependency health.",
+          "properties": {
+            "files_changed": { "type": "integer" },
+            "services_touched": { "type": "array", "items": { "type": "string" }, "description": "Logical services or modules touched by this change." },
+            "schema_changes": { "type": "boolean", "description": "True if a database migration or schema change is included." },
+            "vuln_critical": { "type": "integer", "description": "Count of Critical dependency CVEs." },
+            "vuln_high": { "type": "integer", "description": "Count of High dependency CVEs." },
+            "state": { "enum": ["STRONG", "WEAK", "UNGRADED"] },
+            "notes": { "type": "string" }
+          }
+        },
+        "decision_confidence": {
+          "type": "object",
+          "description": "Synthesized verdict — the combined answer to 'is this safe to proceed?' No single metric substitutes for all four layers.",
+          "properties": {
+            "verdict": {
+              "enum": ["Go", "Hold", "Discuss"],
+              "description": "Go = all layers STRONG or WEAK with no blockers. Hold = Critical/High security finding or UNGRADED layer. Discuss = findings present that require human review before proceeding."
+            },
+            "ungraded_layers": {
+              "type": "array",
+              "items": { "enum": ["intent", "design", "quality", "risk"] },
+              "description": "Layers that could not be assessed due to missing tooling or data."
+            },
+            "blocking_findings": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Human-readable descriptions of findings that block the verdict (Critical/High security, UNGRADED layer)."
+            }
+          }
+        }
+      }
+    }
+  }
+}

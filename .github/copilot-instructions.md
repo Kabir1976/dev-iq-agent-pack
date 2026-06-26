@@ -16,7 +16,7 @@ Assert.IQ boundaries — Copilot loads it automatically via `applyTo: "**"`.
 ## Copilot capabilities
 
 - **Agents** — `Dev-IQ` (default, full tools) and `Dev-IQ-PLAN` (read-only planning → Start Implementation handoff to Dev-IQ)
-- **Skills** — 22 DI skills invoked with `/skill-name` in Copilot Chat. Type `/` to see all available skills.
+- **Skills** — 23 DI skills invoked with `/skill-name` in Copilot Chat. Type `/` to see all available skills.
 - **Per-client config** — `.dev-iq/config.yaml`, `.dev-iq/governance.md`, `.dev-iq/maturity-profile.md`
 
 ## Skills quick reference
@@ -44,6 +44,7 @@ Assert.IQ boundaries — Copilot loads it automatically via `applyTo: "**"`.
 | `/review-deployment-readiness` | QUALITY + RISK | Go/No-Go deployment checklist |
 | `/generate-rollback-plan` | RISK | Rollback steps from deployment context |
 | `/generate-traceability-matrix` | INTENT + DESIGN | Req ↔ Code ↔ Test matrix |
+| `/dev-iq-tailor` | DESIGN | Tailor pack config to this codebase (run after bootstrap) |
 
 ## Companion files
 

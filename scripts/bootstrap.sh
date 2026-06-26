@@ -215,6 +215,7 @@ if [[ "$GRADUATE" == true ]]; then
       | grep -v "^hooks/" \
       | grep -v "^CLAUDE\.md" \
       | grep -v "^AGENTS\.md" \
+      | grep -v "^\.github/copilot-instructions" \
       > "$EXCLUDE.tmp" && mv "$EXCLUDE.tmp" "$EXCLUDE"
     ok "Removed trial entries from .git/info/exclude."
   fi
@@ -296,6 +297,16 @@ if [[ "$UNINSTALL" == true ]]; then
     [[ -s "$AGENTS_DST" ]] || { rm -f "$AGENTS_DST"; ok "Removed empty AGENTS.md."; }
   fi
 
+  # Remove dev-iq marker block from copilot-instructions.md.
+  COPILOT_DST="$TARGET/.github/copilot-instructions.md"
+  if [[ -f "$COPILOT_DST" ]] && grep -qE '<!-- dev-iq:(begin|start)' "$COPILOT_DST" 2>/dev/null; then
+    sed -i.bak '/<!-- dev-iq:/,/<!-- dev-iq:end -->/d' "$COPILOT_DST" 2>/dev/null \
+      && rm -f "${COPILOT_DST}.bak" \
+      || warn "Could not remove Dev.IQ block from copilot-instructions.md — delete the block manually."
+    ok "Removed Dev.IQ block from copilot-instructions.md."
+    [[ -s "$COPILOT_DST" ]] || { rm -f "$COPILOT_DST"; ok "Removed empty copilot-instructions.md."; }
+  fi
+
   EXCLUDE="$TARGET/.git/info/exclude"
   if [[ -f "$EXCLUDE" ]] && grep -qF "# dev-iq" "$EXCLUDE" 2>/dev/null; then
     grep -v "^# dev-iq" "$EXCLUDE" \
@@ -308,6 +319,7 @@ if [[ "$UNINSTALL" == true ]]; then
       | grep -v "^hooks/" \
       | grep -v "^CLAUDE\.md" \
       | grep -v "^AGENTS\.md" \
+      | grep -v "^\.github/copilot-instructions" \
       > "$EXCLUDE.tmp" && mv "$EXCLUDE.tmp" "$EXCLUDE"
     ok "Removed trial entries from .git/info/exclude."
   fi
@@ -519,9 +531,11 @@ _inject_md() {
 if [[ "$DRY_RUN" == true ]]; then
   echo "  [dry-run] would inject: CLAUDE.md"
   echo "  [dry-run] would inject: AGENTS.md"
+  echo "  [dry-run] would inject: .github/copilot-instructions.md"
 else
   _inject_md "$PACK_ROOT/CLAUDE.md"  "$TARGET/CLAUDE.md"  "CLAUDE.md"
   _inject_md "$PACK_ROOT/AGENTS.md"  "$TARGET/AGENTS.md"  "AGENTS.md"
+  _inject_md "$PACK_ROOT/.github/copilot-instructions.md"  "$TARGET/.github/copilot-instructions.md"  "copilot-instructions.md"
 fi
 
 # ── Trial mode: add paths to .git/info/exclude ───────────────────
@@ -542,6 +556,7 @@ if [[ "$MODE" == "trial" ]]; then
 .github/skills/
 .github/instructions/
 .github/agents/
+.github/copilot-instructions.md
 .claude/agents/
 .claude/skills.md
 .dev-iq/
