@@ -7,6 +7,22 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.12.0] — 2026-07-05
+
+### Added
+
+- **`review-naming-conventions`** (DESIGN) — Reviews naming consistency in a PR diff, file, or module against the team's established patterns. Reads the codebase convention baseline before judging; produces severity-rated findings with specific suggested names, not generic rule citations.
+- **`review-test-coverage`** (QUALITY) — Maps acceptance criteria and new public functions to test stubs, surfaces coverage gaps (Covered / Stub present / Not covered / UNGRADED), and generates missing stubs. Defers full test implementation to Assert.IQ; this skill owns the gap assessment and stub scaffold only.
+- **`generate-changelog`** (INTENT) — Generates a structured changelog from `git log` for a release or version range in Keep a Changelog format. Applies INTENT signal to each commit: links to work items where available, flags untracked commits as INTENT UNGRADED rather than omitting them.
+- **`review-error-handling`** (QUALITY) — Reviews error handling coverage across four dimensions: external call coverage, error propagation discipline, logging discipline, and null/undefined safety. Surfaces silent catches, unhandled external calls, and generic exceptions used in place of typed domain errors.
+- **Anti-rationalization tables** — All 27 existing SKILL.md files now include a `## Common Rationalizations` section with a 4-row table mapping common excuses to skip the skill to factual rebuttals grounded in the DI signal model. Borrowed pattern from agent-skills (addyosmani/agent-skills); adapted to DI four-layer framing.
+
+### Changed
+
+- **`VERSION`** — Bumped to `0.12.0`.
+
+---
+
 ## [0.11.0] — 2026-06-25
 
 ### Added

@@ -70,6 +70,10 @@
 | `review-pr-readiness` | RISK + QUALITY | Runs a structured pre-merge assessment across all four DI signal layers and produces a signal scorecard, findings, and a Go / Go with comments / Hold verdict. |
 | `review-security` | QUALITY + RISK | Runs a structured security assessment across OWASP Top 10 and DI signal layers — Critical and High findings always block regardless of delivery pressure. |
 | `scaffold-feature` | INTENT + DESIGN | Generates a production-ready code scaffold from a user story and ACs — file structure, interfaces, placeholder implementations with TODOs, and test stubs. |
+| `review-naming-conventions` | DESIGN | Reviews naming consistency in a PR diff, file, or module against the team's established patterns — not generic style guides. Produces severity-rated findings with specific suggested names. |
+| `review-test-coverage` | QUALITY | Maps acceptance criteria and new public functions to test stubs, surfaces coverage gaps, and generates missing stubs. Defers full test implementation to Assert.IQ. |
+| `generate-changelog` | INTENT | Generates a structured changelog from git log for a release or version range in Keep a Changelog format, with work item references and INTENT UNGRADED markers for untracked commits. |
+| `review-error-handling` | QUALITY | Reviews error handling coverage across external call sites, error propagation, logging discipline, and null safety — surfaces silent catches and unhandled failures. |
 
 ### .github/agents/
 

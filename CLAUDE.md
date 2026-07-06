@@ -17,7 +17,7 @@ Assert.IQ boundaries — read it before acting on any code or delivery question.
 ## Claude Code capabilities
 
 - **Subagents** — `.claude/agents/dev-iq.md` (full tools) and `.claude/agents/dev-iq-plan.md` (read-only planning)
-- **Skills** — `.github/skills/` mirrored at `.claude/skills/` — 27 DI skills auto-discovered
+- **Skills** — `.github/skills/` mirrored at `.claude/skills/` — 31 DI skills auto-discovered
 - **Hooks** — `.claude/settings.json`, sourced from `hooks/hooks.json`. Run `bash scripts/bootstrap.sh` to sync.
 - **Per-client config** — `.dev-iq/config.yaml`, `.dev-iq/governance.md`, `.dev-iq/maturity-profile.md`, `.dev-iq/telemetry-overlay.md`
 - **Bootstrap** — `scripts/bootstrap.sh` / `scripts/bootstrap.ps1`, invoked by `/dev-iq-bootstrap`:
