@@ -238,6 +238,17 @@ Generated: [date]
 @di-review-required
 ```
 
+## Common Rationalizations
+
+These are the statements that get AI integration review skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "The LLM is just generating text, it's not risky" | LLM output used in a SQL query, shell command, or template render is arbitrary untrusted input — the same as input from an external attacker. The source doesn't change the risk. |
+| "We control the prompt, so the output is safe" | Prompt injection allows an attacker to override your prompt with user-controlled content. Control of the system prompt does not mean control of all model inputs. |
+| "We're not storing user data in the LLM" | LLM APIs may log prompts, use them for training, or expose context windows in error messages. Data in the prompt context is data in a third-party system without a firewall. |
+| "Our LLM integration is too simple to review" | Simple integrations become complex ones as features grow. A review when it's simple is cheap; a security remediation after a prompt injection incident is not. |
+
 ## Governance
 
 - LLM output used in a SQL query or shell command is always Critical — flag

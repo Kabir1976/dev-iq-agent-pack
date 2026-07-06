@@ -243,6 +243,17 @@ Snapshot `.vscode/mcp.json`, then:
   no tailor litter behind. If you snapshot elsewhere, remove it manually
   when done.
 
+## Common Rationalizations
+
+These are the statements that get Dev.IQ tailoring skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "The defaults are good enough for our team" | Defaults are good enough for teams that haven't evaluated their specific stack, estimation unit, maturity tier, or security posture. Tailoring takes 10 minutes and makes every subsequent skill output more accurate. |
+| "We'll configure it properly once the team adopts it" | Adoption is harder when outputs don't match the team's conventions. Configuration before adoption makes the first experience better — which drives adoption. |
+| "Governance settings are overkill for our project" | Governance settings encode what the team has agreed to about security, merges, and dependency changes. Without them, every DI skill operates on generic assumptions that may not match your team's actual constraints. |
+| "We're not sure what settings we need yet" | Start with stack language, framework, and maturity tier — three fields that improve every output. Everything else can be added as the team uses the pack and identifies gaps. |
+
 ## Anti-patterns (do not do these)
 
 - Do **not** tailor `config.yaml` last — keystone goes first.

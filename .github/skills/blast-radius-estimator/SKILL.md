@@ -381,6 +381,17 @@ results.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get blast radius assessment skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "It's a small change, it can't affect much" | Blast radius is determined by what you touch, not how much you change. A one-line signature change on a shared interface has a larger radius than a 500-line internal refactor. |
+| "We'll deal with breakage if it happens" | Unplanned breakage is an incident. A blast radius estimate is the difference between a managed migration and a production fire at 2am. |
+| "Only the team using this API matters" | Every consumer you don't know about is a consumer you can't notify. Unknown consumers become support escalations after the deploy. |
+| "We've done similar changes before without issues" | Prior success doesn't map blast radius. Codebase growth and new consumers change the impact profile of every subsequent change. |
+
 ## Governance
 - At Early maturity, blast radius estimation is advisory only — the tool will
   not produce an authoritative blast radius map; it will guide the developer

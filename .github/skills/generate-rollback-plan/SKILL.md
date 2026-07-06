@@ -394,6 +394,17 @@ financial remediation may take days. Plan accordingly.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get rollback planning skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We can always just redeploy the old version" | "Just redeploy" assumes no schema changes, no data state changes, no shared dependencies that have already moved. An untested rollback is a second incident waiting to happen alongside the first. |
+| "Our deployments are simple, rollback is obvious" | Rollback feels obvious until you're doing it under pressure at 2am with an incident bridge open and a database migration half-applied. Obvious plans written in advance beat improvised plans written under duress. |
+| "We've never needed to rollback before" | Prior success doesn't guarantee future simplicity. Every release that adds schema changes or external dependencies increases the rollback complexity. |
+| "The rollback plan is in someone's head" | Knowledge in someone's head is unavailable when that person is on vacation, off-call, or asleep when the incident fires. Plans must be written and accessible to whoever is on duty. |
+
 ## Governance
 - Rollback trigger criteria must be specific and observable before a deployment
   is approved for production — "monitor for problems" is not a trigger criterion

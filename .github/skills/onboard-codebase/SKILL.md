@@ -223,6 +223,17 @@ Note: AI-generated from codebase analysis — team should review and supplement.
 @di-review-required
 ```
 
+## Common Rationalizations
+
+These are the statements that get codebase onboarding skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "New developers should just read the code" | Reading code without context produces a distorted mental model. Knowing what the code does is different from knowing why it's structured that way, where the seams are, and what is safe to change. |
+| "We'll pair them with a senior dev instead" | Pairing is valuable — and time-limited. An onboarding guide is always available at 11pm when the senior dev is not. Both are needed. |
+| "The README covers enough" | READMEs describe how to run the code, not how the system is designed. Architecture, layer boundaries, key invariants, and known traps are what orient a developer, not installation steps. |
+| "Our codebase is too large to document" | A large codebase is exactly the one that needs an orientation guide. The cognitive cost of navigating an undocumented large codebase is measured in days, not hours. |
+
 ## Governance
 
 - Describe what IS in the code, not what should be — this guide is for

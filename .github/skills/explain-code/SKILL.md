@@ -302,6 +302,17 @@ behavior is wrong, fix the behavior. Don't leave both wrong.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get code explanation skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "Just read the code" | Code tells you what it does — not why it was written that way, what constraints shaped it, or what assumptions it relies on. Those are what understanding requires. |
+| "It's obvious from the variable names" | Naming captures intent at the point of writing, not the tradeoffs rejected, the edge cases handled, or the system context it lives in. Obvious to the author ≠ obvious to the next developer. |
+| "We don't need this for a quick fix" | Fixes applied without understanding produce secondary bugs. The fastest path to a correct fix is understanding the code first, not assuming. |
+| "AI-generated code is self-explanatory" | AI-generated code is fluent, not transparent. It can be plausible-looking while encoding subtle assumptions or missing edge cases that only become visible with a DI-layer explanation. |
+
 ## Governance
 - INTENT signal must be assessed and stated explicitly — not implied or omitted
 - STRONG may only be assigned when name, behavior, and (if available) work item

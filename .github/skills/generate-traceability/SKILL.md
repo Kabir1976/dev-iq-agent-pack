@@ -337,6 +337,17 @@ Do not close this work item until both gaps are resolved.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get traceability skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "Everyone knows what the code is supposed to do" | What everyone knows informally is not the same as what is formally verified. Traceability is the audit trail that proves each AC was built, not assumed. |
+| "Work item links are bureaucratic overhead" | The overhead is one ID per function. The alternative is hours of archaeology when a compliance audit, post-incident review, or disputed scope question requires proof of what was built and why. |
+| "We don't have time for traceability at this stage" | Untracked work accumulates as invisible debt. The teams that defer traceability "until they have time" are the ones doing full history reconstruction under audit pressure. |
+| "Our tests prove the code works — that's enough" | Tests prove the code runs correctly. Traceability proves the code implements the agreed requirements. Green CI and full traceability are different claims — you need both. |
+
 ## Governance
 - Never declare a status of Covered based on code alone — the test must exist
   and must be identifiable as covering the specific AC

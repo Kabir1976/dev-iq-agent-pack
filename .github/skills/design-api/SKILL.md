@@ -370,6 +370,17 @@ API design will begin once these questions are answered.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get API design skipped or rushed. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We'll document the API after we build it" | Post-hoc documentation describes what was built, not what was intended. Contract-first design catches disagreements before they're baked into code that consumers depend on. |
+| "Just make it work for now, we'll redesign it later" | APIs are contracts. Once consumers depend on a shape, changing it is a breaking change. The "temporary" design becomes permanent the moment the first caller ships. |
+| "The client knows what they need, I'll build what they asked for" | What clients ask for and what they need diverge most visibly at the API layer. Design review surfaces that gap before implementation, not at integration time. |
+| "REST is obvious, we don't need a design skill for it" | Naming consistency, error semantics, versioning strategy, and pagination shape are where most API tech debt originates — not in the HTTP verb choice. |
+
 ## Governance
 - DESIGN signal may only be STRONG when all six dimensions are assessed as Pass —
   an unchecked dimension is UNGRADED, not implicitly Pass

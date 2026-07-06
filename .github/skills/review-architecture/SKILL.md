@@ -367,6 +367,17 @@ when the codebase is twice the size.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get architecture review skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We're moving fast, we can fix the architecture later" | Architecture that ships becomes architecture that is depended on. The cost of restructuring increases exponentially with the number of consumers and the volume of data already shaped by it. |
+| "The developers know the system, we don't need a formal review" | Developer familiarity with a system is not the same as architectural soundness. Familiarity can mask accumulated complexity that becomes apparent only during a cross-cutting change. |
+| "We'll do an architecture review when we scale" | The time to review architecture is before the scale, not after. Architectural changes at scale require coordinated migrations — architectural changes early are refactors. |
+| "It works, so the architecture must be fine" | A system can work while having architectural problems that will become visible under load, during feature extension, or when the original team leaves and tribal knowledge goes with them. |
+
 ## Governance
 - Go verdict may only be issued when all six dimensions are rated STRONG or have
   only Low findings — any Medium or High finding produces "Go with recommendations"

@@ -351,6 +351,17 @@ v9 breaking change for empty secrets must be verified before merge.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get dependency review skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "It's a popular package, it must be safe" | Popularity is not a security audit. Popular packages have been the vector for major supply chain attacks — the larger the install base, the higher the return on compromising it. |
+| "We'll check for CVEs when we do our security review" | CVEs in packages added today create exposure now. Dependency review at PR time prevents knowingly introducing vulnerable packages and then forgetting about them for months. |
+| "It's just a dev dependency" | Dev dependencies run in CI, build tooling, and sometimes developer machines. A compromised dev dependency can exfiltrate secrets, inject code, or compromise the build pipeline. |
+| "The package is well-maintained, so we're fine" | Maintenance history doesn't prevent future abandonment, ownership transfer, or a malicious release. Dependency review pins specific versions and confirms the license and current CVE status — not historical trustworthiness. |
+
 ## Governance
 - Critical and High findings always block the PR verdict — no delivery pressure
   or maturity tier overrides this rule

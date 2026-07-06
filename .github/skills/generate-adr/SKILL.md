@@ -384,6 +384,17 @@ horizontal scaling" is worth more than a two-page decision statement.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get ADR generation skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We don't need documentation for every decision" | ADRs are not for every decision — they're for significant ones that a future team member would question or want to reverse. If you'd struggle to explain the choice in six months, write the ADR now. |
+| "Everyone on the team knows why we chose this" | The person who joins next quarter doesn't. The team six months into a product shift doesn't. An ADR costs 20 minutes and eliminates hours of archaeology. |
+| "We'll document it after we ship" | After the ship, the context is gone — the rejected alternatives, the constraints that ruled them out, the tradeoffs that seemed obvious at the time. ADRs must be written while the decision is fresh. |
+| "An ADR is too formal for a team our size" | The format can be as lightweight as the team needs. The value — recording the decision, the context, and the rejected alternatives — is independent of team size. |
+
 ## Governance
 - ADRs must document at least one rejected alternative — an ADR with only the
   chosen option is a DESIGN finding and will not be generated without prompting

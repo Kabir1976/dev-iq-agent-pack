@@ -430,6 +430,17 @@ surfaced explicitly rather than silently swallowed. This is the "fail fast
 and loudly" principle — see di-code-standards.instructions.md.
 ```
 
+## Common Rationalizations
+
+These are the statements that get PR readiness review skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "The PR is small, it doesn't need a full readiness check" | Small PRs introduce the majority of production bugs. A readiness check that takes 2 minutes is not proportional to PR size — it's proportional to what's at stake if a gap is missed. |
+| "My reviewer will catch anything I missed" | Reviewers focus on design and correctness — they are not a substitute for the developer verifying that the PR is complete. Missing test stubs, unset environment variables, and deferred ACs are the developer's responsibility. |
+| "We're in a hurry — we'll review it after we merge" | Post-merge reviews address what is already in the main branch. Readiness review is what prevents RISK WEAK signals from shipping — it cannot be done retrospectively. |
+| "The build passed — that's the readiness check" | Build success confirms compilation and test runs. Readiness covers ACs, DESIGN signal, security surface, deployment requirements, and risk assessment — none of which a green build verifies. |
+
 ## Governance
 - Critical findings always produce Hold — no exceptions, regardless of maturity
 - Never post a Go verdict on a PR with hardcoded secrets or credentials

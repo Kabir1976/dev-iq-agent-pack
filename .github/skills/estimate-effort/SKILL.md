@@ -180,6 +180,17 @@ DESIGN: [STRONG | WEAK | UNGRADED]
 @di-review-required
 ```
 
+## Common Rationalizations
+
+These are the statements that get effort estimation skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We don't have time to estimate, we just need to start" | Starting without an estimate is itself an estimate — of zero. A 20-minute estimation session costs less than the first day of unplanned overtime when scope surprises hit mid-sprint. |
+| "Estimates are always wrong anyway" | Estimates are refined forecasts, not guarantees. Their value is in surfacing scope risk and DESIGN complexity before the sprint starts — not in being accurate to the hour. |
+| "The developer who will build it should estimate alone" | Solo estimates miss assumptions the team would challenge. Estimation is most accurate as a conversation, not a solo exercise. |
+| "Story points are made up" | The unit matters less than the conversation it forces: what are we actually building, how complex is it, and what unknowns remain? That conversation is the real output of estimation. |
+
 ## Governance
 
 - Never produce an estimate without rationale — a bare number is not useful

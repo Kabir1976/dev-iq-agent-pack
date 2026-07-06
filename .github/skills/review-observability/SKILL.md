@@ -206,6 +206,17 @@ Generated: [date]
 @di-review-required
 ```
 
+## Common Rationalizations
+
+These are the statements that get observability review skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We'll add logging when we need to debug something" | You need logging at the moment something breaks in production — not after. Logging added reactively is logging that doesn't exist for the incident that's happening right now. |
+| "The framework logs enough automatically" | Framework logs tell you what happened at the infrastructure level. Business operation logs — order placed, payment processed, user authenticated — are what incident responders need to diagnose failures. |
+| "Metrics are expensive to set up" | Unobserved services are expensive in a different way: every incident in an unobserved system is a blind investigation. Setup cost is paid once; observability pays for itself on the first production issue. |
+| "Our system is simple enough that we don't need dashboards" | Simple systems become complex ones. Adding observability before complexity arrives is easier than retrofitting it after an incident reveals you're flying blind. |
+
 ## Governance
 
 - PII or credentials in any log statement is always Critical — flag immediately

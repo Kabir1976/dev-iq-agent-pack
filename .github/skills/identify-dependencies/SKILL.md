@@ -345,6 +345,17 @@ of confused debugging later — and avoids a broken QA environment mid-sprint.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get dependency identification skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We'll discover dependencies as we build" | Dependencies discovered mid-sprint become unplanned blockers that stall delivery without warning. Identifying them before planning is what separates a sprint commitment from a guess. |
+| "The ticket description covers what we need" | Tickets describe what to build — not what that build depends on. The dependency list is what makes the estimate and the sequence reliable. |
+| "We know our system well enough" | Familiarity with the system doesn't prevent blind spots in external service availability, shared team timelines, or licensing constraints. A structured check catches what familiarity misses. |
+| "If there are blockers, they'll surface during the sprint" | Sprint-time blocker discovery is a planning failure. Blockers surfaced in advance can be resolved, worked around, or descoped — blockers surfaced mid-sprint stall the team and miss the sprint goal. |
+
 ## Governance
 - Blockers must be communicated to the team before a story is committed to a sprint —
   a Blocker discovered mid-sprint is a process gap, not a sprint failure

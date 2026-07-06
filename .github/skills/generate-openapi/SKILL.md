@@ -203,6 +203,17 @@ DESIGN Signal: [STRONG | WEAK | UNGRADED]
 @di-review-required
 ````
 
+## Common Rationalizations
+
+These are the statements that get OpenAPI spec generation skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "Our API is self-documenting from the code" | Code documents implementation. An OpenAPI spec documents the contract — what callers can depend on, what error shapes to expect, what auth model to use. Those are different things. |
+| "We'll add the spec when we need it" | The moment you need it is the moment an external team or third-party integration is blocked waiting for it. A spec generated upfront unblocks parallel development. |
+| "Postman collections are good enough" | Postman collections are test artifacts. An OpenAPI spec is a machine-readable contract that drives mock servers, client generation, and integration tests across teams. |
+| "The API is simple enough that no one needs docs" | Simplicity is relative to context. An endpoint that's obvious to the team that built it is a guessing game for every consumer who wasn't in the room. |
+
 ## Governance
 
 - Never invent endpoints — every path in the output must map to actual code

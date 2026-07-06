@@ -308,6 +308,17 @@ This does not block deployment but creates an observability gap.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get deployment readiness review skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "It passed CI, so it's ready to deploy" | CI validates that code runs — not that environment variables are configured, migrations are ready to execute, or feature flags are set correctly for the target environment. |
+| "We've deployed this service many times, we know the checklist" | Informal checklists drift. Steps added for past incidents get dropped. A structured readiness review catches gaps that familiarity masks — especially for environment-specific configuration. |
+| "We can hotfix anything that goes wrong" | A hotfix takes 20-40 minutes minimum — longer if a migration is involved. A deployment readiness review takes 5 minutes. The math favors the review. |
+| "It's a small change, the deployment is trivial" | Small changes can have non-trivial deployment requirements: a single added environment variable that isn't set in production will take the service down at startup. |
+
 ## Governance
 - Critical and High security findings always produce No-Go — no delivery timeline,
   sprint pressure, or maturity tier override this rule; report it and let the

@@ -147,6 +147,17 @@ command needed to resolve it.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get Dev.IQ bootstrap skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We'll set up the agent pack when things slow down" | Setup takes 2 minutes. The DI signal model, however, needs to run on the work that's happening now — not on a future quiet period that never arrives. |
+| "Our team doesn't need governance tooling yet" | Governance tooling is most valuable before the first big incident, the first compliance audit, or the first disputed scope question — not after. |
+| "Trial mode sounds complex — we'll just skip it" | Trial mode is the simplest path: install locally, try it for 2–3 days, graduate to team mode if the team finds value. Nothing touches shared configuration until you choose to promote it. |
+| "We already have code review in place" | Dev.IQ's four-layer DI signal model adds INTENT and RISK assessment that traditional code review doesn't cover. It complements your existing review process rather than replacing it. |
+
 ## Governance
 - Never silently overwrite user files — bootstrap script preserves existing
   files via SHA256 compare and conflict resolver

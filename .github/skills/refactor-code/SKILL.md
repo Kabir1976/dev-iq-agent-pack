@@ -346,6 +346,17 @@ coaching note explaining *why the pattern matters* in production systems.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get structured refactoring skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "I'll just clean it up as I go" | Incidental cleanup mixed with feature work makes both changes harder to review, harder to revert, and harder to attribute when something breaks. Refactoring and feature work belong in separate commits. |
+| "It's technical debt — it can wait" | Technical debt accrues interest. Every developer who navigates confusing code spends time that could have been spent building. The cost of not refactoring is invisible but real. |
+| "Refactoring is risky — better not to touch it" | Unrefactored code is also risky — it resists change and hides bugs. The risk of a planned refactoring with a test suite is lower than the risk of an unplanned fix in code no one understands. |
+| "The tests pass, so it's fine" | Tests verify behavior, not maintainability. Code that is correct and unmaintainable will eventually become code that is incorrect and unmaintainable. |
+
 ## Governance
 - Agent always outputs the refactoring plan before writing code — developer
   approves before any code is produced

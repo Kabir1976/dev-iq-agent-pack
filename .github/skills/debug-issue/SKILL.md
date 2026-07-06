@@ -400,6 +400,17 @@ instance. The module-level singleton is the root cause — not the test itself.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get root cause analysis skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "I'll just keep changing things until it works" | Random changes without a hypothesis waste time and commonly introduce new bugs while hiding the original one. Hypothesis-first is faster, not slower. |
+| "It worked in my environment" | "Works here, broken there" is a symptom, not a diagnosis. Environment differences are evidence — follow them to the root cause rather than dismissing them as noise. |
+| "Restarting it fixes it, good enough" | Restart-to-recover masks the root cause and guarantees the same incident recurs. A fix that requires restarting is not a fix. |
+| "The logs don't say anything useful" | Unhelpful logs are a QUALITY finding in their own right — they mean the next incident will be equally undiagnosable. Surface the logging gap alongside the fix. |
+
 ## Governance
 - Every fix recommendation must address the root cause — not just silence the
   error, suppress the exception, or hide the symptom behind a broader catch block

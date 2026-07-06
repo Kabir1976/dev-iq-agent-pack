@@ -349,6 +349,17 @@ developer will eventually "fix" it, breaking historical order accuracy.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get data model design skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "We can always add columns later" | Schema changes on live tables with production data are expensive, risky, and require migration files. Design the model correctly before data is in it, not after. |
+| "We'll figure out the relationships when we need them" | Foreign key constraints and relationship cardinality affect query performance, referential integrity, and migration complexity — not just how you write the joins. |
+| "It's just a simple table" | Every "simple" table eventually accumulates complex requirements. The cost of a poorly designed model grows with the data volume and the number of consumers reading it. |
+| "The ORM handles all that for us" | ORMs generate SQL — they don't validate data model design. N+1 queries, missing indices, and incorrect nullability constraints are ORM-generated, not ORM-prevented. |
+
 ## Governance
 - Schema changes to existing live tables are always Medium or High risk — never Low
   — because they require migration coordination across all environments

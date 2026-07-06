@@ -370,6 +370,17 @@ documentation — undocumented configuration changes accumulate as invisible deb
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get release notes skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "The git log is good enough for our team" | Git log is for engineers who can read diffs. Release notes are for everyone making decisions based on what changed — support, QA, product, and customers. They have different information needs. |
+| "We'll write them later when someone asks" | Reconstructing what changed after the fact from commit messages is slower than generating notes at release time and often produces notes that miss the actual user impact. |
+| "It's just an internal release" | Internal releases become external releases. Internal teams also need to know what changed to update runbooks, adjust support expectations, and plan testing. |
+| "No one reads them anyway" | That observation usually follows a release where something broke and no one knew what had changed. Release notes are most valuable when things go wrong. |
+
 ## Governance
 - INTENT UNGRADED commits must never be omitted from release notes — they are
   reported even if unpleasant; the team decides how to handle them

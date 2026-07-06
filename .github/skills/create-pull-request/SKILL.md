@@ -394,6 +394,17 @@ or confirm that a follow-up Assert.IQ test generation task is tracked.
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get PR descriptions skipped or shortcut. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "Everyone knows what this change does" | The reviewer in six months does not. PR descriptions are the audit trail that makes post-incident debugging possible without reading every line of diff. |
+| "It's a small fix, no description needed" | The size of the change does not determine the importance of knowing why it was made. Small fixes can have large reasons. |
+| "I'll add the description after review" | A PR without a description signals to reviewers that they need to reconstruct intent from code — slowing review and increasing the chance of a missed INTENT gap. |
+| "The commit messages explain it" | Commit messages are for git history. PR descriptions are for reviewers deciding whether to approve, and for the team understanding what shipped and why. |
+
 ## Governance
 - INTENT must always reference the work item or explicitly state that no work
   item exists — a PR with no work item reference carries an INTENT UNGRADED

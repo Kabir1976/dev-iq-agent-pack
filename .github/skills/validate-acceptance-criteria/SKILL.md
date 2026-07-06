@@ -369,6 +369,17 @@ story, add one AC for "what if it fails."
 
 ---
 
+## Common Rationalizations
+
+These are the statements that get AC validation skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "The team knows what we're building — the ACs are just formality" | Informal shared understanding diverges silently. The moment something goes wrong or scope is disputed, "what everyone knows" becomes "what different people remember differently." ACs are the written record. |
+| "The ACs are clear enough to build from" | "Clear enough to build from" and "testable" are different bars. An AC that a developer can interpret is not necessarily one that a tester can verify or that an auditor can trace. |
+| "We'll refine the ACs during the sprint" | ACs refined during the sprint mean the sprint goal shifts after commitment. Validation before sprint planning is what makes the commitment meaningful. |
+| "If the ACs are wrong, we'll catch it in QA" | QA catches failures against the AC. QA cannot catch the case where the AC itself was wrong — only an upfront review can do that. Defects sourced to incorrect ACs are the most expensive kind to fix. |
+
 ## Governance
 - STRONG may only be assigned when all ACs are rated Pass and the set covers at
   least happy path plus one error case — a story with only happy-path ACs is

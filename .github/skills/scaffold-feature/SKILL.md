@@ -286,6 +286,17 @@ This AC cannot be mapped to a specific method without clarification. Please spec
 I'll proceed with ACs 1, 2, and 4 and leave a flagged TODO for AC3.
 ```
 
+## Common Rationalizations
+
+These are the statements that get feature scaffolding skipped. Rebut them.
+
+| Rationalization | Reality |
+|----------------|---------|
+| "Scaffolding is overhead — I'll just start writing code" | Scaffolding is what aligns the structure before code fills it. Starting without it produces structure that matches how it was written rather than how the system is designed — which is harder to review and maintain. |
+| "I know the codebase, I don't need a template" | Familiarity reduces the chance of missing a structural step — it doesn't eliminate it. A scaffold verifies the structure before feature code fills it, not instead of knowing the codebase. |
+| "AI code generation is faster, it doesn't need scaffolding" | AI generation produces code faster, but without scaffolding it produces structure that matches the prompt, not the team's architecture. Scaffold first, generate into structure second. |
+| "We'll reorganize the files later if needed" | File organization established at the start of a feature becomes the pattern every subsequent developer matches. Getting it right before the code fills it costs nothing — changing it after is a refactor. |
+
 ## Governance
 - Every output carries `@di-review-required` — do not apply scaffold to codebase without human review
 - Never write files directly — output only; developer applies manually or via paste
