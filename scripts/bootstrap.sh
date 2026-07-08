@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Dev.IQ Agent Pack — Bootstrap Installer
-# Version : 0.11.0
+# Version : 0.12.0
 # Usage   : bash scripts/bootstrap.sh [--target=<path>] [--mode=trial|committed]
 #           [--preset=pod|solo|portable] [--graduate] [--uninstall] [--hooks]
 set -euo pipefail
 
-PACK_VERSION="0.11.0"
+PACK_VERSION="0.12.0"
 PACK_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MARKER_START="<!-- dev-iq:begin v=${PACK_VERSION} -->"
 MARKER_END="<!-- dev-iq:end -->"
@@ -277,6 +277,13 @@ if [[ "$UNINSTALL" == true ]]; then
     fi
   done
 
+  # Remove .claude/skills symlink.
+  if [[ -L "$TARGET/.claude/skills" ]]; then
+    rm -f "$TARGET/.claude/skills"
+    (( _deleted++ )) || true
+    ok "Removed symlink : .claude/skills"
+  fi
+
   # Remove dev-iq marker block from CLAUDE.md (handles both begin/start marker formats).
   CLAUDE_DST="$TARGET/CLAUDE.md"
   if [[ -f "$CLAUDE_DST" ]] && grep -qE '<!-- dev-iq:(begin|start)' "$CLAUDE_DST" 2>/dev/null; then
@@ -409,12 +416,32 @@ _make_dir() {
   mkdir -p "$dir"
 }
 
+# ── Detect self-install (Path A: running from inside the pack itself) ───────────
+# When PACK_ROOT == TARGET the files are already present; skip file copies.
+SELF_INSTALL=false
+if [[ "$(cd "$PACK_ROOT" && pwd)" == "$(cd "$TARGET" && pwd)" ]]; then
+  SELF_INSTALL=true
+fi
+
 # ── Install pack-owned files ──────────────────────────────────────
-_copy_dir "$PACK_ROOT/.github/skills"       "$TARGET/.github/skills"
-_copy_dir "$PACK_ROOT/.github/instructions" "$TARGET/.github/instructions"
-_copy_dir "$PACK_ROOT/.github/agents"       "$TARGET/.github/agents"
-_copy_dir "$PACK_ROOT/.claude/agents"       "$TARGET/.claude/agents"
-_copy_file "$PACK_ROOT/.claude/skills.md"   "$TARGET/.claude/skills.md"
+if [[ "$SELF_INSTALL" == false ]]; then
+  _copy_dir "$PACK_ROOT/.github/skills"       "$TARGET/.github/skills"
+  _copy_dir "$PACK_ROOT/.github/instructions" "$TARGET/.github/instructions"
+  _copy_dir "$PACK_ROOT/.github/agents"       "$TARGET/.github/agents"
+  _copy_dir "$PACK_ROOT/.claude/agents"       "$TARGET/.claude/agents"
+  _copy_file "$PACK_ROOT/.claude/skills.md"   "$TARGET/.claude/skills.md"
+fi
+
+# ── Create .claude/skills symlink ────────────────────────────────────────────
+# Claude Code discovers skills from .claude/skills/; this symlink exposes
+# .github/skills/ there without duplicating files.
+if [[ "$DRY_RUN" == true ]]; then
+  echo "  [dry-run] would create: .claude/skills → ../.github/skills"
+elif [[ ! -e "$TARGET/.claude/skills" ]]; then
+  mkdir -p "$TARGET/.claude"
+  ln -s "../.github/skills" "$TARGET/.claude/skills"
+  ok "Symlink created : .claude/skills → ../.github/skills"
+fi
 
 # ── Install user-configured stubs (preserve if already filled in) ─
 _copy_file "$PACK_ROOT/.dev-iq/config.yaml"          "$TARGET/.dev-iq/config.yaml"          true
@@ -559,6 +586,7 @@ if [[ "$MODE" == "trial" ]]; then
 .github/copilot-instructions.md
 .claude/agents/
 .claude/skills.md
+.claude/skills
 .dev-iq/
 CLAUDE.md
 AGENTS.md
@@ -628,7 +656,7 @@ else
   fi
   if [[ "$MODE" == "trial" ]]; then
     echo -e "  Share with the team later:"
-    echo -e "    ${C_BLD}bash /path/to/dev-iq/scripts/bootstrap.sh --target=$(pwd) --graduate${C_RST}"
+    echo -e "    ${C_BLD}bash /path/to/dev-iq-agent-pack/scripts/bootstrap.sh --target=$TARGET --graduate${C_RST}"
     echo ""
   fi
 fi

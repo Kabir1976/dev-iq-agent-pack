@@ -50,7 +50,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$PackVersion  = "0.11.0"
+$PackVersion  = "0.12.0"
 $PackRoot     = (Resolve-Path "$PSScriptRoot\..").Path
 $MarkerStart  = "<!-- dev-iq:begin v=$PackVersion -->"
 $MarkerEnd    = "<!-- dev-iq:end -->"
@@ -218,6 +218,14 @@ if ($Uninstall) {
             $Deleted++
         }
         Write-Ok "Processed : .claude\skills.md"
+    }
+
+    # Remove .claude\skills symlink or copied directory.
+    $SkillsLink = "$Target\.claude\skills"
+    if (Test-Path $SkillsLink) {
+        Remove-Item -Recurse -Force $SkillsLink
+        $Deleted++
+        Write-Ok "Removed : .claude\skills"
     }
 
     # Helper: remove dev-iq marker block from a Markdown file (handles begin/start formats).
@@ -401,12 +409,37 @@ function Invoke-PrefillConfig {
     $Content | Set-Content $ConfigPath -Encoding UTF8 -NoNewline
 }
 
+# ── Detect self-install (Path A: running from inside the pack itself) ───────────
+# When PackRoot == Target the files are already present; skip file copies.
+$SelfInstall = ((Resolve-Path $PackRoot).Path -eq (Resolve-Path $Target).Path)
+
 # ── Install pack-owned files ──────────────────────────────────────
-Copy-PackDir "$PackRoot\.github\skills"       "$Target\.github\skills"
-Copy-PackDir "$PackRoot\.github\instructions" "$Target\.github\instructions"
-Copy-PackDir "$PackRoot\.github\agents"       "$Target\.github\agents"
-Copy-PackDir "$PackRoot\.claude\agents"       "$Target\.claude\agents"
-Copy-PackFile "$PackRoot\.claude\skills.md"   "$Target\.claude\skills.md"
+if (-not $SelfInstall) {
+    Copy-PackDir "$PackRoot\.github\skills"       "$Target\.github\skills"
+    Copy-PackDir "$PackRoot\.github\instructions" "$Target\.github\instructions"
+    Copy-PackDir "$PackRoot\.github\agents"       "$Target\.github\agents"
+    Copy-PackDir "$PackRoot\.claude\agents"       "$Target\.claude\agents"
+    Copy-PackFile "$PackRoot\.claude\skills.md"   "$Target\.claude\skills.md"
+}
+
+# ── Create .claude\skills symlink (or directory copy when symlinks unavailable) ─
+# Claude Code discovers skills from .claude/skills/; this link exposes
+# .github/skills/ there without duplicating files.
+$SkillsLink = "$Target\.claude\skills"
+if ($DryRun) {
+    Write-Host "  [dry-run] would create: .claude\skills -> ..\.github\skills"
+} elseif (-not (Test-Path $SkillsLink)) {
+    $ClaudeDir = "$Target\.claude"
+    if (-not (Test-Path $ClaudeDir)) { New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null }
+    try {
+        New-Item -ItemType SymbolicLink -Path $SkillsLink -Target "..\.github\skills" -Force | Out-Null
+        Write-Ok "Symlink created : .claude\skills -> ..\.github\skills"
+    } catch {
+        # Windows without Developer Mode: fall back to copying the directory.
+        Copy-Item -Path "$PackRoot\.github\skills" -Destination $SkillsLink -Recurse -Force
+        Write-Ok "Skills copied   : .claude\skills (symlinks unavailable — enable Developer Mode for a symlink)"
+    }
+}
 
 # ── Install user-configured stubs ─────────────────────────────────
 Copy-PackFile "$PackRoot\.dev-iq\config.yaml"          "$Target\.dev-iq\config.yaml"          $true
@@ -473,7 +506,7 @@ if ($Mode -eq "trial") {
         if ($ExcludeContent -match "# dev-iq") {
             Write-Warn "Trial mode entries already present in .git\info\exclude."
         } else {
-            $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.github/copilot-instructions.md`n.claude/agents/`n.claude/skills.md`n.dev-iq/`nCLAUDE.md`nAGENTS.md"
+            $Block = "`n# dev-iq — trial install v$PackVersion`n.github/skills/`n.github/instructions/`n.github/agents/`n.github/copilot-instructions.md`n.claude/agents/`n.claude/skills.md`n.claude/skills`n.dev-iq/`nCLAUDE.md`nAGENTS.md"
             if ($Hooks) { $Block += "`nhooks/" }
             Add-Content $ExcludePath $Block -Encoding UTF8
             Write-Ok "Dev.IQ paths added to .git\info\exclude (invisible to git)."

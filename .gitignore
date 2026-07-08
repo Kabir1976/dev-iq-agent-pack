@@ -14,6 +14,9 @@ hooks/logs/*.log
 # Local Claude settings (machine-specific)
 .claude/settings.local.json
 
+# Symlink created by bootstrap in Path A — not committed
+.claude/skills
+
 # OS
 .DS_Store
 Thumbs.db

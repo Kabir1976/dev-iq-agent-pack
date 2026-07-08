@@ -4,7 +4,7 @@
 > instructions, agents, and tools that turn GitHub Copilot Chat **and**
 > Claude Code into a delivery-aware engineering partner inside the IDE.
 
-**Version**: v0.11.0
+**Version**: v0.12.0
 
 ---
 
@@ -12,7 +12,7 @@
 
 Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and give GitHub Copilot Chat and Claude Code a Developer Intelligence reasoning layer — 31 skills, two agents, and MCP wiring for ADO and GitHub — without deploying any runtime or service.
 
-**Fastest path to first value:** extract the zip → run `bootstrap.sh --preset=solo` against your repo → open Copilot Chat → select Dev-IQ → run `/review-pr-readiness` on a branch with changes. Under 20 minutes, requires nothing beyond VS Code and Git.
+**Fastest path to first value:** clone the repo → run `bootstrap.sh --preset=solo` against your repo → open Copilot Chat → select Dev-IQ → run `/review-pr-readiness` on a branch with changes. Under 20 minutes, requires nothing beyond VS Code and Git.
 
 **Skills work without MCP.** If Node.js isn't installed or credentials aren't configured, every skill that needs external data falls back to asking you to paste the content inline. Nothing is blocking.
 
@@ -27,7 +27,7 @@ Dev.IQ is a set of markdown, YAML, and JSON files that bootstrap into a repo and
 | VS Code | 1.99 | Host for Copilot Chat and MCP servers |
 | GitHub Copilot Chat extension | v0.22 | Agent mode, skill invocation, custom agents. Check: `Help → About` |
 | Git | Any recent | Branch detection, diff context for skills |
-| dev-iq pack | v0.11.0 | Provided as a zip by your engagement lead |
+| dev-iq pack | v0.12.0 | Clone from `github.com/Kabir1976/dev-iq-agent-pack` |
 
 > **Claude Code alternative:** Claude Code CLI works instead of or alongside Copilot Chat. Skills and agents behave identically. See `.claude/claude-readme.md` for Claude-specific setup.
 
@@ -67,7 +67,7 @@ Enables directory symlinks without an admin shell. Without it, bootstrap falls b
 
 ---
 
-## What's Disabled in v0.11.0
+## What's Disabled in v0.12.0
 
 These features are built and wired but explicitly turned off. The flag is in `.dev-iq/config.yaml` unless noted otherwise.
 
@@ -77,7 +77,7 @@ These features are built and wired but explicitly turned off. The flag is in `.d
 | **Decision Confidence signal** | `signals.confidence.enabled: false` | Phase 2 — not built | Do not enable. Referenced in skill output format but not computed. Ships in a future release. |
 | **Blast Radius full mode** | `blast_radius.enabled: false` | Disabled at Early maturity | The `/blast-radius-estimator` skill still runs in advisory mode. Full dependency-graph traversal requires `blast_radius.dependency_map_path` and Mid+ maturity. |
 | **Auto-assign reviewer on Yellow** | `pr.auto_assign_on_yellow: false` | Off | Requires ADO/GitHub PAT with write access and Mid+ maturity. |
-| **Signal emission to `.dev-iq/signals/`** | — | Planned for 0.11.0 | Skills don't yet write structured JSONL signal records. The directory doesn't exist yet. |
+| **Signal emission to `.dev-iq/signals/`** | — | Planned for a future release | Skills don't yet write structured JSONL signal records. The directory doesn't exist yet. |
 | **Webhook telemetry sink** | `hooks.telemetry_sink: local` | Local only | Signals written to local logs only. Set `telemetry_sink: webhook` and add a URL in `hooks.telemetry_webhook_url` to push externally. |
 
 ### MCP servers: what's active vs. disabled
@@ -306,49 +306,21 @@ bash ~/dev-iq/scripts/bootstrap.sh --preset=portable
 
 ### Pinning to a version
 
-v0.11.0 is a pre-release — no git tags have been cut yet. Use the zip provided
-by your engagement lead, which is pinned to a specific commit. Once the repo
-moves to tagged releases (v1.0.0+), bootstrap CLI flags, manifest schema, skill
-names, and workspace surface layout will not change incompatibly without a
-major-version bump.
+v0.12.0 is distributed via GitHub. To pin to a specific commit, clone and check out the commit hash you want before running bootstrap. Once the repo moves to tagged releases, pin with `git checkout v0.12.0`. Bootstrap CLI flags, manifest schema, skill names, and workspace surface layout will not change incompatibly without a major-version bump.
 
 ---
 
 ## Distributing to Colleagues
 
-Three options depending on your environment. For most corporate/restricted environments, Option 1 is the fastest path.
-
-### Option 1 — Zip file (no internet required)
-
-Create a clean zip from the pack and share via Teams, email, or SharePoint:
+Share the repo URL. Anyone can clone and run bootstrap — no collaborator invite needed:
 
 ```bash
-cd /path/to/dev-iq
-git archive --format=zip --output=~/Desktop/dev-iq-v0.11.0.zip HEAD
+git clone https://github.com/Kabir1976/dev-iq-agent-pack
+cd dev-iq-agent-pack
+bash scripts/bootstrap.sh --preset=solo
 ```
 
-`git archive` includes only committed files — no `.git` folder, no machine-specific files (`.claude/settings.local.json`, `hooks/hooks.json`, `.DS_Store`) are included. The result is exactly what a colleague needs to run bootstrap.
-
-Colleagues receive the zip and follow [docs/trial-install-guide.md](trial-install-guide.md).
-
-### Option 2 — GitHub collaborator (if colleagues have GitHub access)
-
-Invite them to `github.com/Kabir1976/dev-iq-agent-pack`:
-
-> GitHub → Settings → Collaborators → Add people
-
-They clone once, then run bootstrap against their own repos. No zip needed; they get updates via `git pull`.
-
-### Option 3 — Internal Git server (enterprise long-term)
-
-If your organisation has an internal ADO or GitLab instance:
-
-```bash
-git remote add internal https://your-internal-git/dev-iq.git
-git push internal main
-```
-
-Colleagues clone from the internal URL and run bootstrap as normal. Updates are pushed to the internal remote.
+They follow the [README](../../README.html) install steps. Updates are pulled with `git pull`.
 
 ---
 

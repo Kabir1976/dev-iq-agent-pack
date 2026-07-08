@@ -1,6 +1,6 @@
 # Dev.IQ
 
-**v0.11.0** · [Full documentation →](docs/reference.md)
+**v0.12.0** · [Full documentation →](docs/reference.md)
 
 ---
 
@@ -75,7 +75,7 @@ Dev.IQ addresses all three: the trust gap with explicit signal grounding (UNGRAD
 **Claude Code**
 
 ```bash
-/plugin install [your-org]/dev-iq@v0.11.0
+/plugin install [your-org]/dev-iq@v0.12.0
 ```
 
 This installs the 31 skills and both agents globally. Nothing is written to your codebase yet — that's the next step.

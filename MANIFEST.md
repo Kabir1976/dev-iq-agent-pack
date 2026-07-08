@@ -11,7 +11,7 @@
 
 | File | Purpose |
 |------|---------|
-| `README.md` | Project overview and quick-start entry point for the Dev.IQ Agent Pack v0.11.0. |
+| `README.md` | Project overview and quick-start entry point for the Dev.IQ Agent Pack v0.12.0. |
 | `CHANGELOG.md` | Release history for the pack following the Keep a Changelog format. |
 | `MANIFEST.md` | This file — a complete inventory of every tracked file with purpose descriptions. |
 | `AGENTS.md` | Agent-spec pointer for AGENTS.md-aware tooling (Codex CLI, Cursor, Aider) — sets DI governance rules for all AI agents operating in the codebase. |
@@ -26,7 +26,6 @@
 | File | Purpose |
 |------|---------|
 | `.github/copilot-instructions.md` | GitHub Copilot Chat entrypoint — mirrors `CLAUDE.md` for the Copilot side, pointing to the same DI instruction files. |
-| `.github/vscode-readme.md` | Placeholder for VS Code–specific guidance to be added in a future session. |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR template enforcing DI traceability: work item link, AC coverage, and DI signal summary. |
 
 ### .github/instructions/
@@ -94,7 +93,6 @@
 
 | File | Purpose |
 |------|---------|
-| `.claude/claude-readme.md` | Placeholder for Claude Code–specific guidance to be added in a future session. |
 | `.claude/settings.json` | Claude Code hook configuration — wires PostToolUse and Stop hooks to the Hindsight Hook scripts. |
 | `.claude/skills.md` | Documents that the `.claude/skills/` directory is a symlink to `.github/skills/` created by the bootstrap script. |
 
@@ -155,7 +153,6 @@
 | File | Purpose |
 |------|---------|
 | `hooks/hooks.template.json` | Source template for `hooks/hooks.json` — bootstrap replaces `{{PACK_ROOT}}` with the absolute pack root path when rendering. |
-| `hooks/config/README.md` | Placeholder for hooks config documentation to be added in a future session. |
 | `hooks/config/skill-improve.config.json` | Hindsight Hooks configuration — enables/disables the retrospective refinement system and lists the customization roots to scan. |
 | `hooks/state/dismissed-lessons.json` | Runtime state file tracking correction lessons that have been dismissed so they are not re-surfaced each session. |
 | `hooks/state/edit-frequency.json` | Runtime state file tracking how often each file is edited, used by the Hindsight system to weight correction patterns. |

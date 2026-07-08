@@ -167,7 +167,7 @@ bootstrap:
   preset: "pod"                   # solo | pod
                                   # solo → individual contributor defaults
                                   # pod  → cross-functional team defaults
-  version: "0.11.0"
+  version: "0.12.0"
 
 # ── Code Review ────────────────────────────────────────────────────
 # Tunes the review-code skill output, severity filtering, and thread
