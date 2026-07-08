@@ -227,15 +227,17 @@ Dev.IQ or deploying it into a team's repo.
 ### Path A — Try it on the pack folder itself
 
 Best when you want to explore Dev.IQ without touching your team's repository.
-Extract the pack zip, then run the bootstrap from inside the pack folder.
+Clone the pack, then run the bootstrap from inside the pack folder.
 
 ```bash
-# macOS / Linux
-cd path/to/dev-iq
+# macOS / Linux / WSL
+git clone https://github.com/Kabir1976/dev-iq-agent-pack
+cd dev-iq-agent-pack
 bash scripts/bootstrap.sh --preset=solo
 
 # Windows PowerShell
-cd C:\Tools\dev-iq
+git clone https://github.com/Kabir1976/dev-iq-agent-pack
+cd dev-iq-agent-pack
 powershell -File scripts\bootstrap.ps1 -Preset solo
 ```
 
