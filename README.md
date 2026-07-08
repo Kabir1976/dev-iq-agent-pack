@@ -41,7 +41,7 @@ Dev.IQ is the accelerator. It drops a DI reasoning layer directly into **GitHub 
 DI is the operating model. Dev.IQ is how developers act on it — from day one, in the tools they already use.
 
 > Dev.IQ covers the developer lifecycle. Assert.IQ covers the QE lifecycle.
-> Install both for full SDLC coverage.
+> Install both for Dev and QA coverage.
 
 ---
 

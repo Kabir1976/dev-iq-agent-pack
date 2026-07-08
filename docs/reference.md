@@ -130,7 +130,7 @@ without ever becoming a tooling pitch.
 > Dev.IQ and Assert.IQ are complementary packs. Assert.IQ owns the QE lifecycle
 > (testing, defects, quality signals). Dev.IQ owns the developer lifecycle
 > (requirements, design, code, deployment). They share the same pack architecture
-> and can be installed independently or together for full SDLC coverage.
+> and can be installed independently or together for Dev and QA coverage.
 
 ---
 
@@ -716,7 +716,7 @@ skill that requires it.
 | `/dev-iq-tailor` | DESIGN | Tailor pack config to this codebase |
 
 > **Testing skills are covered by Assert.IQ.**
-> Install both packs together for full SDLC + QE coverage.
+> Install both packs together for Dev and QA coverage.
 
 ---
 
@@ -806,7 +806,7 @@ matches your actual tools and file paths.
 - It is not a runtime. There is no service to deploy.
 - It is not a SaaS. The client owns the files — if the consulting team rotates off, the pack stays.
 - It is not a replacement for engineering judgment. Every output is a draft; human review is required.
-- It is not a replacement for Assert.IQ. Use both packs together for full SDLC + QE coverage.
+- It is not a replacement for Assert.IQ. Use both packs together for Dev and QA coverage.
 - It is not a tooling pitch. Use it where the maturity supports it. Lead with DI thinking, not with this pack.
 
 ---
