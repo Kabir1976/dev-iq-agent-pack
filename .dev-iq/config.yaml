@@ -10,7 +10,7 @@
 
 # ── Client ────────────────────────────────────────────────────────
 client:
-  name: ""                        # e.g. "UPS", "Acme Corp"
+  name: ""                        # e.g. "Acme Corp"
   engagement: ""                  # e.g. "STLC Modernization"
   engagement_lead: ""             # lead consultant name
 

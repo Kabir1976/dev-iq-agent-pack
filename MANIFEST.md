@@ -195,8 +195,6 @@
 | File | Purpose |
 |------|---------|
 | `docs/reference.md` | Full technical reference documentation for the Dev.IQ Agent Pack — skills, configuration, maturity tiers, and architecture. |
-| `docs/trial-install-guide.md` | Step-by-step personal trial install guide covering both VS Code and Visual Studio 2022 in under 20 minutes, invisible to the team until graduated. |
-| `docs/colleague-welcome.md` | Getting-started guide written for a new team member joining a workspace where Dev.IQ is already installed (UPS trial audience). |
 | `docs/demo-script.md` | Facilitated 30–40 minute live demo script for presenting Dev.IQ to a tech lead and developer team inside the IDE. |
 | `docs/pitch-developers.md` | Four-minute developer-facing pitch document explaining Dev.IQ's value without requiring an install. |
 
