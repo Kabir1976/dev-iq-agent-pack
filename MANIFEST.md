@@ -112,7 +112,7 @@
 | File | Purpose |
 |------|---------|
 | `.claude-plugin/plugin.json` | Claude plugin manifest declaring the pack name, version, and description for the Dev.IQ plugin. |
-| `.claude-plugin/marketplace.json` | Marketplace metadata identifying the plugin publisher (sparq) for distribution. |
+| `.claude-plugin/marketplace.json` | Marketplace metadata identifying the plugin publisher (dev-intelligence-studio) for distribution. |
 
 ---
 
