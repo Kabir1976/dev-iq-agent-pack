@@ -533,7 +533,7 @@ powershell -File ~\dev-iq-agent-pack\scripts\bootstrap.ps1 -Mode trial</code></p
           <tr><td><strong>When to use</strong></td><td>Exploring Dev.IQ before touching your team's repo</td><td>The real deployment — installs into a project your team works in</td></tr>
           <tr><td><strong>Where you run it</strong></td><td>Inside the cloned pack folder</td><td>Inside your target repo</td></tr>
           <tr><td><strong>VS Code / editor required?</strong></td><td>No — CLI only</td><td>No — CLI only</td></tr>
-          <tr><td><strong>Reversible?</strong></td><td>Yes — <code>bash scripts/bootstrap.sh --uninstall</code></td><td>Yes — <code>bash scripts/bootstrap.sh --uninstall</code> in each target repo</td></tr>
+          <tr><td><strong>Reversible?</strong></td><td>Yes — <code>bash scripts/bootstrap.sh --uninstall</code></td><td>Yes — <code>bash ~/dev-iq-agent-pack/scripts/bootstrap.sh --uninstall</code> in each target repo</td></tr>
         </tbody>
       </table>
 
