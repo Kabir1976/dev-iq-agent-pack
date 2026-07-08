@@ -331,7 +331,7 @@ Colleagues receive the zip and follow [docs/trial-install-guide.md](trial-instal
 
 ### Option 2 — GitHub collaborator (if colleagues have GitHub access)
 
-Invite them to `github.com/Kabir1976/dev-iq`:
+Invite them to `github.com/Kabir1976/dev-iq-agent-pack`:
 
 > GitHub → Settings → Collaborators → Add people
 

@@ -490,13 +490,15 @@
       <div class="paths">
         <div class="path-card">
           <h3>Path A &middot; Try it on the pack</h3>
-          <p style="font-size:0.92em;">Best if you want to explore Dev.IQ before touching your team's repository. Extract the zip, run bootstrap from inside the pack folder.</p>
-<pre><code><span class="comment"># macOS / Linux</span>
-cd path/to/dev-iq
+          <p style="font-size:0.92em;">Best if you want to explore Dev.IQ before touching your team's repository. Clone the pack, run bootstrap from inside the pack folder.</p>
+<pre><code><span class="comment"># macOS / Linux / WSL</span>
+git clone https://github.com/Kabir1976/dev-iq-agent-pack
+cd dev-iq-agent-pack
 bash scripts/bootstrap.sh --preset=solo
 
 <span class="comment"># Windows PowerShell</span>
-cd C:\Tools\dev-iq
+git clone https://github.com/Kabir1976/dev-iq-agent-pack
+cd dev-iq-agent-pack
 powershell -File scripts\bootstrap.ps1 -Preset solo</code></pre>
           <p style="font-size:0.88em;">Reverse with <code>--uninstall</code>.</p>
         </div>
