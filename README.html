@@ -392,7 +392,7 @@
 
 <section class="hero">
   <div class="hero-content">
-    <div class="badge"><span class="badge-dot"></span>v0.11.0 · Internal Sparq asset</div>
+    <div class="badge"><span class="badge-dot"></span>v0.12.0 · Internal Sparq asset</div>
     <h1>Dev.IQ Agent Pack</h1>
     <p class="tagline">Developer Intelligence, built into your IDE.</p>
     <div class="hero-cta">
@@ -447,7 +447,7 @@
   <div class="features">
     <div class="feature">
       <div class="feature-icon" aria-hidden="true">⚡</div>
-      <h4>27 Skills</h4>
+      <h4>31 Skills</h4>
       <p>API design, feature scaffolding, code review, security analysis, observability review, AI integration review, PR readiness, blast radius estimation, deployment checks, and more — covering the full developer lifecycle.</p>
     </div>
     <div class="feature">
@@ -525,6 +525,19 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
         </div>
       </div>
 
+      <h4>Compare the paths</h4>
+      <table>
+        <thead>
+          <tr><th></th><th>Path A — Try it on the pack</th><th>Path B — Install into your codebase</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>When to use</strong></td><td>Exploring Dev.IQ before touching your team's repo</td><td>The real deployment — installs into a project your team works in</td></tr>
+          <tr><td><strong>Where you run it</strong></td><td>Inside the extracted pack folder</td><td>Inside your target repo</td></tr>
+          <tr><td><strong>VS Code / editor required?</strong></td><td>No — CLI only</td><td>No — CLI only</td></tr>
+          <tr><td><strong>Reversible?</strong></td><td>Yes — <code>--uninstall</code></td><td>Yes — <code>--uninstall</code> in each target repo</td></tr>
+        </tbody>
+      </table>
+
       <h4>Compare the presets</h4>
       <table>
         <thead>
@@ -537,6 +550,11 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
         </tbody>
       </table>
 
+      <div class="callout" style="margin-top:16px;margin-bottom:16px;">
+        <strong>Presets vs. Modes — what's the difference?</strong>
+        <p style="margin:6px 0 0 0;"><strong><code>--mode</code></strong> controls <em>git visibility</em>: <code>trial</code> hides pack files from git entirely so only you see them; <code>committed</code> checks them in so the whole team gets them. <strong><code>--preset</code></strong> is a shortcut that bundles a mode with an opinionated set of options: <code>solo</code> = trial + no hooks (fastest personal eval), <code>pod</code> = committed + hooks (team adoption), <code>portable</code> = committed + minimal footprint (client handoff). You can always override individual flags after picking a preset.</p>
+      </div>
+
       <div class="callout" style="margin-top:16px;">
         <strong>Bootstrap surface overview</strong>
         <p style="margin:6px 0 0 0;">Bootstrap writes <strong>twelve surfaces</strong>: <code>.dev-iq/</code>, <code>.github/instructions/</code>, <code>.github/copilot-instructions.md</code>, <code>.github/skills/</code>, <code>.github/agents/</code>, <code>.claude/agents/</code>, <code>.claude/skills</code> (symlink), <code>.claude/settings.json</code>, <code>CLAUDE.md</code>, <code>AGENTS.md</code>, <code>.vscode/settings.json</code> + <code>.vscode/mcp.json</code>, and <code>hooks/</code>. SHA256-compares before writing — pre-existing files are preserved, never silently overwritten.</p>
@@ -544,28 +562,19 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
     </div>
 
     <div class="step">
-      <h3>Configure for your codebase</h3>
-      <p>Bootstrap places the pack; configuration tailors it to your project.</p>
+      <h3>Tailor the pack to your codebase</h3>
+      <p>Bootstrap places the pack; tailoring makes it yours. In Copilot Chat or Claude Code, run:</p>
+<pre><code>/dev-iq-tailor</code></pre>
+      <p>The skill reads your repo, asks about your stack, and writes the right defaults into the config files below — no manual editing required.</p>
 
+      <p style="font-size:0.92em;color:var(--text-dim);margin-top:20px;">What it configures:</p>
       <ul style="font-size:0.92em;color:var(--text-dim);padding-left:20px;">
-        <li style="margin-bottom:8px;"><strong><code>.dev-iq/maturity-profile.md</code></strong> — Set your maturity tier: Early, Mid, or Higher. Agents read this on every code and delivery question and scale behavior accordingly.</li>
-        <li style="margin-bottom:8px;"><strong><code>.dev-iq/governance.md</code></strong> — Set your compliance posture: constraints the agents must respect and never override.</li>
-        <li style="margin-bottom:8px;"><strong><code>.dev-iq/config.yaml</code></strong> — Set <code>client.name</code>, <code>tracker.type</code> (ado or jira), <code>vcs.type</code>, and <code>language</code>. Every skill reads this.</li>
-        <li style="margin-bottom:8px;"><strong><code>.dev-iq/telemetry-overlay.md</code></strong> — Map each DI signal to your actual data sources: ADO/Jira for intent, SonarQube/Codecov for quality, your dependency manifest for risk. Or attach it to chat and say: <em>"Customize this overlay for my stack."</em></li>
-        <li><strong><code>.vscode/mcp.json</code></strong> — Credentials are entered when VS Code prompts (stored in OS keychain, never committed). See <code>.vscode/MCP.md</code> for per-server setup.</li>
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/maturity-profile.md</code></strong> — Early, Mid, or Higher. Controls whether agent outputs are advisory drafts or autonomous verdicts.</li>
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/governance.md</code></strong> — Your compliance posture: constraints the agents must respect and can never override.</li>
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/config.yaml</code></strong> — Stack language, tracker type (ado or jira), VCS, signal thresholds, and review depth. Every skill reads this.</li>
+        <li style="margin-bottom:8px;"><strong><code>.dev-iq/telemetry-overlay.md</code></strong> — Maps each DI signal layer to your actual data sources: ADO/Jira for INTENT, SonarQube/Codecov for QUALITY, dependency manifest for RISK.</li>
+        <li><strong><code>.vscode/mcp.json</code></strong> — MCP server credentials are entered when VS Code prompts (stored in OS keychain, never committed). See <code>.vscode/MCP.md</code> for per-server setup.</li>
       </ul>
-
-      <h4>Workspace topology</h4>
-      <table>
-        <thead>
-          <tr><th>Topology</th><th><code>workspace.role</code></th><th>Setup</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Tests + prod in one repo</td><td><code>monorepo</code> (default)</td><td>Nothing else to configure</td></tr>
-          <tr><td>This repo = prod; tests elsewhere</td><td><code>prod</code></td><td>Set <code>workspace.companion_repo</code> to tests repo</td></tr>
-          <tr><td>This repo = tests; prod elsewhere</td><td><code>tests</code></td><td>Set <code>workspace.companion_repo</code> to prod repo</td></tr>
-        </tbody>
-      </table>
     </div>
 
     <div class="step">
@@ -592,86 +601,13 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
   </div>
 </section>
 
-<section>
-  <h2>Skills <span class="accent">quick reference</span></h2>
-  <p class="lead">27 skills covering the full developer lifecycle. Invoke any skill with <code>/skill-name</code> in Copilot Chat or Claude Code.</p>
-
-  <h3>Requirements</h3>
-  <table>
-    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td><code>/validate-acceptance-criteria</code></td><td>INTENT</td><td>Review ACs for completeness and clarity</td></tr>
-      <tr><td><code>/identify-dependencies</code></td><td>RISK</td><td>Surface blockers and cross-team dependencies</td></tr>
-      <tr><td><code>/estimate-effort</code></td><td>INTENT + DESIGN</td><td>Story-point / t-shirt estimate with rationale and uncertainty band</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Design</h3>
-  <table>
-    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td><code>/design-api</code></td><td>DESIGN</td><td>RESTful API design from requirements</td></tr>
-      <tr><td><code>/design-data-model</code></td><td>DESIGN</td><td>Entity/database design from stories</td></tr>
-      <tr><td><code>/generate-adr</code></td><td>DESIGN</td><td>Architecture Decision Record generation</td></tr>
-      <tr><td><code>/review-architecture</code></td><td>DESIGN + RISK</td><td>Architecture review through DI lens</td></tr>
-      <tr><td><code>/generate-openapi</code></td><td>DESIGN</td><td>OpenAPI 3.x spec from controller / router code</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Development</h3>
-  <table>
-    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td><code>/scaffold-feature</code></td><td>INTENT + DESIGN</td><td>Generate boilerplate from AC + story</td></tr>
-      <tr><td><code>/review-code</code></td><td>DESIGN + QUALITY</td><td>Code review through DI four-layer lens</td></tr>
-      <tr><td><code>/debug-issue</code></td><td>RISK + QUALITY</td><td>Structured bug diagnosis + fix suggestion</td></tr>
-      <tr><td><code>/refactor-code</code></td><td>DESIGN + QUALITY</td><td>Refactoring suggestions with rationale</td></tr>
-      <tr><td><code>/review-security</code></td><td>QUALITY + RISK</td><td>Security-focused code review (OWASP)</td></tr>
-      <tr><td><code>/explain-code</code></td><td>INTENT</td><td>Plain-language code explanation</td></tr>
-      <tr><td><code>/review-observability</code></td><td>QUALITY</td><td>Logging, metrics, tracing, and alerting coverage review</td></tr>
-      <tr><td><code>/review-ai-integration</code></td><td>QUALITY + RISK</td><td>OWASP LLM Top 10 review for LLM / agentic code</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Code Review / PR</h3>
-  <table>
-    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td><code>/review-pr-readiness</code></td><td>RISK + QUALITY</td><td>Go / Hold / Discuss verdict before merge</td></tr>
-      <tr><td><code>/blast-radius-estimator</code></td><td>RISK</td><td>Map downstream impact of a change</td></tr>
-      <tr><td><code>/review-dependencies</code></td><td>RISK</td><td>Dependency change risk analysis</td></tr>
-      <tr><td><code>/create-pull-request</code></td><td>INTENT + RISK</td><td>PR body with DI risk band + traceability</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Deployment</h3>
-  <table>
-    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td><code>/generate-release-notes</code></td><td>INTENT</td><td>Release notes from commits / PRs</td></tr>
-      <tr><td><code>/review-deployment-readiness</code></td><td>QUALITY + RISK</td><td>Go / No-Go deployment checklist</td></tr>
-      <tr><td><code>/generate-rollback-plan</code></td><td>RISK</td><td>Rollback steps from deployment context</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Cross-Cutting</h3>
-  <table>
-    <thead><tr><th>/skill-name</th><th>DI Signal</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td><code>/generate-traceability</code></td><td>INTENT + DESIGN</td><td>Req &harr; Code &harr; Test traceability matrix</td></tr>
-      <tr><td><code>/dev-iq-bootstrap</code></td><td>—</td><td>Workspace bootstrapper (run once per repo)</td></tr>
-      <tr><td><code>/onboard-codebase</code></td><td>INTENT</td><td>New developer guide — architecture, flows, local setup</td></tr>
-      <tr><td><code>/dev-iq-tailor</code></td><td>DESIGN</td><td>Tailor pack config to this codebase (run after bootstrap)</td></tr>
-    </tbody>
-  </table>
-</section>
 
 <section>
   <h2>What's <span class="accent">inside</span></h2>
   <pre class="tree"><span class="dir">.github/</span>
   <span class="file">copilot-instructions.md</span>     <span class="comment">← always-on DI reasoning rules for Copilot</span>
   <span class="dir">instructions/</span>               <span class="comment">← scoped rule sheets (code standards, security, etc.)</span>
-  <span class="dir">skills/</span>                     <span class="comment">← 27 DI skills, one subfolder each</span>
+  <span class="dir">skills/</span>                     <span class="comment">← 31 DI skills, one subfolder each</span>
   <span class="dir">agents/</span>                     <span class="comment">← Dev-IQ &amp; Dev-IQ-PLAN agent definitions</span>
 <span class="dir">.claude/</span>
   <span class="dir">agents/</span>                     <span class="comment">← Claude Code subagent counterparts</span>
@@ -715,6 +651,8 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
   <ul style="color:var(--text-dim);">
     <li>VS Code / Copilot Chat — <a href="vscode-readme.html"><code>vscode-readme.html</code></a></li>
     <li>Claude Code — <a href="claude-readme.html"><code>claude-readme.html</code></a></li>
+    <li>MCP Servers — <a href="README.dev-iq.html#mcp-servers">MCP setup and credential guide</a></li>
+    <li>Hindsight Hooks — <a href="README.dev-iq.html#hindsight-hooks">Retrospective refinement system</a></li>
   </ul>
 
   <div class="callout" style="margin-top:40px;max-width:680px;">
@@ -726,7 +664,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
 </div>
 
 <footer>
-  <div>Dev.IQ Agent Pack &middot; v0.11.0 &middot; Sparq Intelligence Studio</div>
+  <div>Dev.IQ Agent Pack &middot; v0.12.0 &middot; Sparq Intelligence Studio</div>
   <div style="margin-top:12px;">
     <a href="README.md">Markdown README</a>
     <a href="README.dev-iq.html">Full Docs</a>
