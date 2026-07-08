@@ -506,17 +506,17 @@ powershell -File scripts\bootstrap.ps1 -Preset solo</code></pre>
         <div class="path-card featured">
           <h3>Path B &middot; Install into your codebase</h3>
           <p style="font-size:0.92em;">The real deployment path. <strong>Run bootstrap from a terminal in your target repo</strong> — no editor required:</p>
-<pre><code><span class="comment"># 1. Extract the pack zip somewhere (one time, anywhere)</span>
-<span class="comment">#    e.g. ~/tools/dev-iq  or  C:\Tools\dev-iq on Windows</span>
+<pre><code><span class="comment"># 1. Clone the pack somewhere (one time, anywhere)</span>
+git clone https://github.com/Kabir1976/dev-iq-agent-pack ~/dev-iq-agent-pack
 
 <span class="comment"># 2. cd into YOUR repo</span>
 cd ~/code/my-app
 
-<span class="comment"># 3. Run bootstrap pointing at the extracted pack</span>
-bash ~/tools/dev-iq/scripts/bootstrap.sh --mode=trial
+<span class="comment"># 3. Run bootstrap pointing at the clone</span>
+bash ~/dev-iq-agent-pack/scripts/bootstrap.sh --mode=trial
 
-<span class="comment"># Windows PowerShell</span>
-powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
+<span class="comment"># Windows (PowerShell 5.1 or PowerShell Core)</span>
+powershell -File ~\dev-iq-agent-pack\scripts\bootstrap.ps1 -Mode trial</code></pre>
           <p style="font-size:0.88em;">The script is fully standalone — accepts <code>--preset=solo|pod</code>, prompts interactively, and writes everything Copilot and Claude need. <strong>No chicken-and-egg.</strong> You do not need to open VS Code or Claude Code first.</p>
 
           <div class="callout" style="margin-top:16px;margin-bottom:16px;">
@@ -534,7 +534,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
         </thead>
         <tbody>
           <tr><td><strong>When to use</strong></td><td>Exploring Dev.IQ before touching your team's repo</td><td>The real deployment — installs into a project your team works in</td></tr>
-          <tr><td><strong>Where you run it</strong></td><td>Inside the extracted pack folder</td><td>Inside your target repo</td></tr>
+          <tr><td><strong>Where you run it</strong></td><td>Inside the cloned pack folder</td><td>Inside your target repo</td></tr>
           <tr><td><strong>VS Code / editor required?</strong></td><td>No — CLI only</td><td>No — CLI only</td></tr>
           <tr><td><strong>Reversible?</strong></td><td>Yes — <code>--uninstall</code></td><td>Yes — <code>--uninstall</code> in each target repo</td></tr>
         </tbody>
@@ -640,7 +640,7 @@ powershell -File C:\Tools\dev-iq\scripts\bootstrap.ps1 -Mode trial</code></pre>
         <li><strong>Path B</strong> (codebase install): <code>bash scripts/bootstrap.sh --uninstall</code> in each target repo</li>
       </ul>
     </li>
-    <li><code>git pull</code> (or re-extract the zip) to the new version, then re-run the same path to refresh.</li>
+    <li><code>git pull</code> to the new version, then re-run the same path to refresh.</li>
     <li>Re-run <code>/dev-iq-bootstrap</code> to refresh workspace surfaces.</li>
   </ol>
 </section>
