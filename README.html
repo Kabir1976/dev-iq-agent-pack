@@ -491,15 +491,11 @@
         <div class="path-card">
           <h3>Path A &middot; Try it on the pack</h3>
           <p style="font-size:0.92em;">Best if you want to explore Dev.IQ before touching your team's repository. Clone the pack, run bootstrap from inside the pack folder.</p>
-<pre><code><span class="comment"># macOS / Linux / WSL</span>
-git clone https://github.com/Kabir1976/dev-iq-agent-pack
+<pre><code>git clone https://github.com/Kabir1976/dev-iq-agent-pack
 cd dev-iq-agent-pack
-bash scripts/bootstrap.sh --preset=solo
-
-<span class="comment"># Windows PowerShell</span>
-git clone https://github.com/Kabir1976/dev-iq-agent-pack
-cd dev-iq-agent-pack
-powershell -File scripts\bootstrap.ps1 -Preset solo</code></pre>
+bash scripts/bootstrap.sh --preset=solo       <span class="comment"># macOS / Linux / WSL</span>
+<span class="comment"># or</span>
+powershell -File scripts\bootstrap.ps1 -Preset solo  <span class="comment"># Windows PowerShell</span></code></pre>
           <p style="font-size:0.88em;">Reverse with <code>bash scripts/bootstrap.sh --uninstall</code>.</p>
         </div>
 
@@ -524,6 +520,7 @@ powershell -File ~\dev-iq-agent-pack\scripts\bootstrap.ps1 -Mode trial</code></p
             <p style="margin:6px 0 0 0;">Trial hides pack files from git via <code>.git/info/exclude</code> — only you see them; your codebase <code>.gitignore</code> is <strong>never</strong> touched. Graduate to committed any time with <code>--graduate</code>.</p>
           </div>
           <p style="font-size:0.85em;color:var(--text-dim);"><em>Already have the pack loaded in your editor?</em> Run <code>/dev-iq-bootstrap</code> from Copilot Chat or Claude Code — same outcome, chat-driven prompts.</p>
+          <p style="font-size:0.88em;">Reverse with <code>bash ~/dev-iq-agent-pack/scripts/bootstrap.sh --uninstall</code> run from inside your target repo.</p>
         </div>
       </div>
 
@@ -536,7 +533,7 @@ powershell -File ~\dev-iq-agent-pack\scripts\bootstrap.ps1 -Mode trial</code></p
           <tr><td><strong>When to use</strong></td><td>Exploring Dev.IQ before touching your team's repo</td><td>The real deployment — installs into a project your team works in</td></tr>
           <tr><td><strong>Where you run it</strong></td><td>Inside the cloned pack folder</td><td>Inside your target repo</td></tr>
           <tr><td><strong>VS Code / editor required?</strong></td><td>No — CLI only</td><td>No — CLI only</td></tr>
-          <tr><td><strong>Reversible?</strong></td><td>Yes — <code>--uninstall</code></td><td>Yes — <code>--uninstall</code> in each target repo</td></tr>
+          <tr><td><strong>Reversible?</strong></td><td>Yes — <code>bash scripts/bootstrap.sh --uninstall</code></td><td>Yes — <code>bash scripts/bootstrap.sh --uninstall</code> in each target repo</td></tr>
         </tbody>
       </table>
 
