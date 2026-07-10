@@ -336,6 +336,14 @@ if [[ "$UNINSTALL" == true ]]; then
     ok "Removed : .dev-iq/"
   fi
 
+  # Remove pre-commit hook if it was installed by Dev.IQ.
+  HOOK_FILE="$TARGET/.git/hooks/pre-commit"
+  if [[ -f "$HOOK_FILE" ]] && grep -q "dev-iq" "$HOOK_FILE" 2>/dev/null; then
+    rm -f "$HOOK_FILE"
+    (( _deleted++ )) || true
+    ok "Removed pre-commit hook : .git/hooks/pre-commit"
+  fi
+
   echo ""
   ok "Dev.IQ removed from $TARGET."
   log "Restored ${_restored} pre-install files, deleted ${_deleted}."
@@ -514,6 +522,31 @@ prefill_config "$TARGET/.dev-iq/config.yaml"
 if [[ "$INCLUDE_HOOKS" == true ]]; then
   _copy_dir "$PACK_ROOT/hooks" "$TARGET/hooks"
   ok "Hooks installed."
+fi
+
+# ── Install pre-commit hook (pack repo / self-install only) ───────
+# validate-skills.sh only exists in the pack itself, so the hook is
+# only meaningful when bootstrap runs from inside the pack (Path A).
+if [[ "$SELF_INSTALL" == true ]]; then
+  HOOK_FILE="$TARGET/.git/hooks/pre-commit"
+  if [[ "$DRY_RUN" == true ]]; then
+    echo "  [dry-run] would install: .git/hooks/pre-commit (validate-skills)"
+  elif [[ ! -f "$HOOK_FILE" ]] || grep -q "dev-iq" "$HOOK_FILE" 2>/dev/null; then
+    cat > "$HOOK_FILE" << 'HOOK'
+#!/usr/bin/env bash
+# Dev.IQ: validate skill frontmatter before every commit.
+SCRIPT="$(git rev-parse --show-toplevel)/scripts/validate-skills.sh"
+[ -f "$SCRIPT" ] || exit 0
+bash "$SCRIPT" || {
+  echo "[dev-iq] Fix the skill frontmatter errors above before committing."
+  exit 1
+}
+HOOK
+    chmod +x "$HOOK_FILE"
+    ok "Pre-commit hook installed : .git/hooks/pre-commit"
+  else
+    warn "Pre-commit hook already exists (not dev-iq) — skipping."
+  fi
 fi
 
 # ── Markdown file injection (idempotent merge-marker) ─────────────
