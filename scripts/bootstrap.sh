@@ -588,7 +588,9 @@ _inject_md() {
   fi
 }
 
-if [[ "$DRY_RUN" == true ]]; then
+if [[ "$SELF_INSTALL" == true ]]; then
+  ok "Self-install detected — skipping markdown injection (pack files are the source)."
+elif [[ "$DRY_RUN" == true ]]; then
   echo "  [dry-run] would inject: CLAUDE.md"
   echo "  [dry-run] would inject: AGENTS.md"
   echo "  [dry-run] would inject: .github/copilot-instructions.md"
