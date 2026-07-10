@@ -25,7 +25,7 @@ maturity:
 
 # ── Work Item Tracker ─────────────────────────────────────────────
 tracker:
-  type: "ado"                     # ado | jira | linear | github-issues
+  type: "github-issues"                     # ado | jira | linear | github-issues
   # ADO
   ado:
     org_url: ""                   # e.g. "https://dev.azure.com/my-org"
@@ -74,7 +74,7 @@ architecture:
 # for client-specific tooling.
 signals:
   intent:
-    source: "ado"                 # ado | jira | linear | github-issues
+    source: "github-issues"                 # ado | jira | linear | github-issues
   design:
     architecture_docs: ""         # e.g. "docs/architecture/"
     pattern_library: ""           # e.g. "docs/patterns/"
