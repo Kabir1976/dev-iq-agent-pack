@@ -2,6 +2,9 @@
 name: dev-iq-tailor
 mode: agent
 description: "Tailor a freshly-installed Dev.IQ pack to THIS codebase — discover the stack once, then customize config.yaml, governance.md, maturity-profile.md, the five instruction files, the skills, and mcp.json in dependency order, gated by human review. WHEN: customize the pack, tailor Dev.IQ, configure config.yaml for my repo, fill in the placeholders, set up governance, just installed the pack what next, onboard the pack to my codebase."
+di_signal: —
+maturity_required: early
+status: approved
 ---
 
 <!-- markdownlint-disable MD033 -->
