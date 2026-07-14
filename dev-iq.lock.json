@@ -1,0 +1,12 @@
+{
+  "lockfile_version": 1,
+  "pack": {
+    "version": "0.12.0",
+    "source": "https://github.com/Kabir1976/dev-iq-agent-pack.git"
+  },
+  "mode": "trial",
+  "agents": ["copilot", "claude-code"],
+  "hooks": false,
+  "config_hash": "sha256:4f7159f59e7e0e7e3548fb3bf647ba063174383ccfdf7eae27f4818a768f5197",
+  "installed_at": "2026-07-14T04:13:03Z"
+}

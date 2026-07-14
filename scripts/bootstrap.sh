@@ -35,6 +35,7 @@ INCLUDE_HOOKS=false
 PRESET=""
 DRY_RUN=false
 YES=false
+CHECK=false
 
 for arg in "$@"; do
   case "$arg" in
@@ -46,6 +47,7 @@ for arg in "$@"; do
     --hooks)      INCLUDE_HOOKS=true ;;
     --dry-run)    DRY_RUN=true ;;
     --yes|-y)     YES=true ;;
+    --check)      CHECK=true ;;
     --help|-h)
       cat << EOF
 Dev.IQ Agent Pack — Bootstrap Installer v${PACK_VERSION}
@@ -65,6 +67,7 @@ Options:
   --hooks            Also install the hooks/ directory
   --dry-run          Preview what would be installed without writing any files
   --yes, -y          Skip interactive confirmation prompts
+  --check            Verify the lockfile matches the installed pack and config
 
 Examples:
   bash /path/to/dev-iq/scripts/bootstrap.sh
@@ -96,6 +99,40 @@ command -v git >/dev/null 2>&1 || die "git is required but not found."
 [[ -d "$TARGET" ]]      || die "Target directory not found: $TARGET"
 [[ -d "$TARGET/.git" ]] || die "Target is not a git repository: $TARGET"
 TARGET="$(cd "$TARGET" && pwd)"
+LOCKFILE="$TARGET/dev-iq.lock.json"
+
+# ── Check mode (read-only, exits early) ───────────────────────────
+_sha256() { command -v sha256sum >/dev/null 2>&1 && sha256sum "$1" | awk '{print $1}' || shasum -a 256 "$1" | awk '{print $1}'; }
+
+if [[ "$CHECK" == true ]]; then
+  [[ -f "$LOCKFILE" ]] || die "No dev-iq.lock.json found in $TARGET. Run bootstrap first."
+  echo ""
+  log "Dev.IQ lockfile check — $TARGET"
+  LOCKED_VER=$(awk -F'"' '/"version"/ && !/lockfile/{print $4; exit}' "$LOCKFILE")
+  LOCKED_HASH=$(awk -F'"' '/"config_hash"/{print $4}' "$LOCKFILE")
+  log "  Locked version : v${LOCKED_VER}"
+  log "  Pack version   : v${PACK_VERSION}"
+  echo ""
+  if [[ "$LOCKED_VER" == "$PACK_VERSION" ]]; then
+    ok "Version matches."
+  else
+    warn "Version mismatch — re-run bootstrap to update the lockfile."
+  fi
+  if [[ -f "$TARGET/.dev-iq/config.yaml" ]]; then
+    CURRENT_HASH="sha256:$(_sha256 "$TARGET/.dev-iq/config.yaml")"
+    if [[ "$CURRENT_HASH" == "$LOCKED_HASH" ]]; then
+      ok "Config hash matches."
+    else
+      warn "Config drift — config.yaml has changed since last bootstrap."
+      warn "  Locked : $LOCKED_HASH"
+      warn "  Current: $CURRENT_HASH"
+    fi
+  else
+    warn "config.yaml not found — pack may not be installed."
+  fi
+  echo ""
+  exit 0
+fi
 
 # ── Auto-detect project context ───────────────────────────────────
 DETECTED_TRACKER="ado"
@@ -197,6 +234,16 @@ if [[ -f "$MANIFEST" ]]; then
   log "  New pack version  : v${PACK_VERSION}"
   log "  Current mode      : ${PREV_MODE}"
   echo ""
+fi
+
+# Lockfile drift check — warn if the committed lockfile pins a different version.
+if [[ -f "$LOCKFILE" ]]; then
+  LOCKED_VER=$(awk -F'"' '/"version"/ && !/lockfile/{print $4; exit}' "$LOCKFILE")
+  if [[ -n "$LOCKED_VER" && "$LOCKED_VER" != "$PACK_VERSION" ]]; then
+    warn "dev-iq.lock.json pins v${LOCKED_VER} but this pack is v${PACK_VERSION}."
+    warn "The lockfile will be updated after install."
+    echo ""
+  fi
 fi
 
 # ── Graduate mode ─────────────────────────────────────────────────
@@ -336,6 +383,11 @@ if [[ "$UNINSTALL" == true ]]; then
     ok "Removed : .dev-iq/"
   fi
 
+  if [[ -f "$LOCKFILE" ]]; then
+    rm -f "$LOCKFILE"
+    ok "Removed : dev-iq.lock.json"
+  fi
+
   # Remove pre-commit hook if it was installed by Dev.IQ.
   HOOK_FILE="$TARGET/.git/hooks/pre-commit"
   if [[ -f "$HOOK_FILE" ]] && grep -q "dev-iq" "$HOOK_FILE" 2>/dev/null; then
@@ -390,6 +442,8 @@ _copy_file() {
     echo "  [dry-run] would copy: $src -> ${dst#"$TARGET/"}"
     return
   fi
+  # Skip silently when src and dst resolve to the same file (self-install).
+  [[ -f "$src" && "$src" -ef "$dst" ]] && return
   mkdir -p "$(dirname "$dst")"
   # CONFLICT_BULK_CHOICE=K forces keep; =O forces overwrite regardless of preserve flag.
   local effective_preserve="$preserve"
@@ -422,6 +476,33 @@ _make_dir() {
     return
   fi
   mkdir -p "$dir"
+}
+
+# ── Lockfile writer ───────────────────────────────────────────────
+_write_lockfile() {
+  local config_hash=""
+  if [[ -f "$TARGET/.dev-iq/config.yaml" ]]; then
+    config_hash="sha256:$(_sha256 "$TARGET/.dev-iq/config.yaml")"
+  fi
+  local remote_url
+  remote_url=$(git -C "$TARGET" remote get-url origin 2>/dev/null || echo "")
+  local hooks_bool; hooks_bool=$( [[ "$INCLUDE_HOOKS" == true ]] && echo "true" || echo "false" )
+  local now; now=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date +%s)
+  cat > "$LOCKFILE" << EOF
+{
+  "lockfile_version": 1,
+  "pack": {
+    "version": "$PACK_VERSION",
+    "source": "$remote_url"
+  },
+  "mode": "$MODE",
+  "agents": ["copilot", "claude-code"],
+  "hooks": $hooks_bool,
+  "config_hash": "$config_hash",
+  "installed_at": "$now"
+}
+EOF
+  ok "Lockfile written  : dev-iq.lock.json"
 }
 
 # ── Detect self-install (Path A: running from inside the pack itself) ───────────
@@ -645,6 +726,7 @@ _copy_file "$PACK_ROOT/.dev-iq/artifacts/README.md"  "$TARGET/.dev-iq/artifacts/
 # ── Write install manifest ────────────────────────────────────────
 if [[ "$DRY_RUN" == true ]]; then
   echo "  [dry-run] would write: .dev-iq/.install-manifest.json"
+  echo "  [dry-run] would write: dev-iq.lock.json"
 else
   mkdir -p "$TARGET/.dev-iq"
   HOOKS_BOOL=$( [[ "$INCLUDE_HOOKS" == true ]] && echo "true" || echo "false" )
@@ -668,6 +750,7 @@ else
 }
 EOF
   ok "Manifest written : .dev-iq/.install-manifest.json"
+  _write_lockfile
 fi
 
 # ── Done ──────────────────────────────────────────────────────────
